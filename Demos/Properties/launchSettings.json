@@ -79,6 +79,18 @@
 		"InverseKinematicsPerformanceDemo": {
 			"commandName": "Project",
 			"commandLineArgs": "InverseKinematicsPerformanceDemo"
+		},
+		"PrintHdMorphDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "PrintHdMorphDemo"
+		},
+		"SaveHdMorphDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "SaveHdMorphDemo"
+		},
+		"ApplyHdMorphDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "ApplyHdMorphDemo"
 		}
 	}
 }
