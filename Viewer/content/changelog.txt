@@ -1,0 +1,26 @@
+﻿[0.4]
+	Major: Added hair
+	Minor: Companion window now shares HMD view on startup.
+		Press "Space" to re-activate the independent companion window view at cost to performance.
+	Fixed: Animations juddered between key-frames
+	Fixed: Eva arms had slightly different color than rest of body
+	Fixed: Menu-related crash on startup on some systems (Thanks for Nath for reporting this) 
+
+[0.3]
+	Major: Added new characters Mei Lin, Monique, Rune and Victoria
+	Major: Added lighting environment controls
+	Major: Added tone mapping controls
+	Minor: Process textures to prevent texture bleeding (was causing white outline around pupils)
+	Minor: Move "Reset Shape" menu item under "Shaping" menu
+
+[0.2]
+	Major: Added subsurface scattering
+	Minor: A/X buttons on Rift now work to select menu items
+	Minor: "Reset Pose" no longer resets expressions
+	Fixed: Occasional crash when dragging whole body
+
+[0.1.1]
+	Fixed: Crash on startup on Oculus Rift
+
+[0.1]
+	Initial Release

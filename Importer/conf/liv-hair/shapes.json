@@ -1,0 +1,62 @@
+[
+	{
+		"name": "Style 01",
+		"morphs": {
+			"STYLE-Dial01": 1.0
+		}
+	},
+	{
+		"name": "Style 02",
+		"morphs": {
+			"STYLE-Dial02": 1.0
+		}
+	},
+	{
+		"name": "Style 03",
+		"morphs": {
+			"STYLE-Dial03": 1.0
+		}
+	},
+	{
+		"name": "Style 04",
+		"morphs": {
+			"STYLE-Dial04": 1.0
+		}
+	},
+	{
+		"name": "Style 05",
+		"morphs": {
+			"STYLE-Dial05": 1.0
+		}
+	},
+	{
+		"name": "Style 06",
+		"morphs": {
+			"STYLE-Dial06": 1.0
+		}
+	},
+	{
+		"name": "Style 07",
+		"morphs": {
+			"STYLE-Dial07": 1.0
+		}
+	},
+	{
+		"name": "Style 08",
+		"morphs": {
+			"STYLE-Dial08": 1.0
+		}
+	},
+	{
+		"name": "Style 09",
+		"morphs": {
+			"STYLE-Dial09": 1.0
+		}
+	},
+	{
+		"name": "Style 10",
+		"morphs": {
+			"STYLE-Dial10": 1.0
+		}
+	}
+]

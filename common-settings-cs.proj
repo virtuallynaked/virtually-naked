@@ -1,0 +1,46 @@
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<StartWorkingDirectory>$(SolutionDir)</StartWorkingDirectory>
+		<StartArguments>--data=$(SolutionDir)work</StartArguments>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="Properties\AssemblyInfo.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="src\**\*.cs" />
+		
+		<VertexShader Include="src\**\*.vs.hlsl">
+			<EnableDebuggingInfo>True</EnableDebuggingInfo>
+			<AdditionalIncludeDirectories>src</AdditionalIncludeDirectories>
+		</VertexShader>
+		<PixelShader Include="src\**\*.ps.hlsl">
+			<EnableDebuggingInfo>True</EnableDebuggingInfo>
+			<AdditionalIncludeDirectories>src</AdditionalIncludeDirectories>
+		</PixelShader>
+		<ComputeShader Include="src\**\*.cs.hlsl">
+			<EnableDebuggingInfo>True</EnableDebuggingInfo>
+			<AdditionalIncludeDirectories>src</AdditionalIncludeDirectories>
+		</ComputeShader>
+		
+		<None Include="src\**\*" Exclude="**\*.cs;**\*.vs.hlsl;**\*.ps.hlsl;**\*.cs.hlsl"></None>
+	</ItemGroup>
+
+	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+	<Import Project="packages\Microsoft.HLSL.CSharpVB.1.0.1\build\Microsoft.HLSL.CSharpVB.targets" Condition="Exists('packages\Microsoft.HLSL.CSharpVB.1.0.1\build\Microsoft.HLSL.CSharpVB.targets')"/>
+	
+	<Target Name="EmbedCompiledShaders" DependsOnTargets="FxCompile" AfterTargets="AfterResGen">
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(FxCompileOutput->'%(FullPath)')" />
+		</ItemGroup>
+		<ItemGroup>
+			<IntermediateCso Include="$(IntermediateOutputPath)\src\**\*.cso" />
+			<EmbeddedResource Include="@(IntermediateCso)" Condition="'@(IntermediateCso)'!=''">
+				<LogicalName>$([System.String]::new(%(RecursiveDir)).Replace('\', '/'))%(Filename)%(Extension)</LogicalName>
+				<Type>Non-Resx</Type>
+				<WithCulture>false</WithCulture>
+			</EmbeddedResource>
+		</ItemGroup>
+	</Target>
+</Project>

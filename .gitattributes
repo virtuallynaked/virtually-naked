@@ -1,0 +1,25 @@
+*				text=auto
+
+.txt			text
+.nb				text
+.json			text
+.config			text
+.cpp			text
+.h				text
+.cs				text
+.hlsl			text
+.props			text
+.csproj			text
+.csproj.user	text
+.proj			text
+.project		text
+.projitems		text
+.shproj			text
+.vcxproj		text
+.sln			text
+.bat			text
+.duf			text
+
+.lib			binary
+.dll			binary
+.exe			binary

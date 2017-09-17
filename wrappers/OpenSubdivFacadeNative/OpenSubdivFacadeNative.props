@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>OPENSUBDIV_VERSION_STRING="3.0.5";and=&amp;&amp;;and_eq=&amp;=;bitand=&amp;;bitor=|;compl=~;not=!;not_eq=!=;or=||;or_eq=|=;xor=^/**/;xor_eq=^=;NOMINMAX;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;OPENSUBDIV_HAS_OPENGL;GLFW_VERSION_3;OSD_USES_GLEW;OPENSUBDIV_HAS_GLSL_TRANSFORM_FEEDBACK;OPENSUBDIV_HAS_GLSL_COMPUTE;GLEW_STATIC;OPENSUBDIV_HAS_DX11SDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\third-party\OpenSubdiv\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>osdCPU.lib;osdGPU.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

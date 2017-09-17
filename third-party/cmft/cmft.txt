@@ -1,0 +1,192 @@
+cmft - cubemap filtering tool
+Copyright 2014-2015 Dario Manesku. All rights reserved.
+License: http://www.opensource.org/licenses/BSD-2-Clause
+
+Usage: cmft [options]
+
+Typical uses:
+
+1. Lists available OpenCL devices that can be used with cmft for processing:
+
+    cmft --printCLDevices
+
+2. Typical parameters for irradiance filter:
+
+    cmft --input <file path>
+         --filter irradiance
+         --outputNum 1
+         --output0 <output name>
+         --output0params dds,bgra8,cubemap
+
+3. Typical parameters for generating spherical harmonics coefficients:
+
+    cmft --input <file path>
+         --filter shcoeffs
+         --outputNum 1
+         --output0 <output name>
+
+4. Typical parameters for radiance filter:
+
+    cmft --input <file path>
+         --filter radiance
+         --srcFaceSize 256
+         --excludeBase false
+         --mipCount 9
+         --glossScale 10
+         --glossBias 1
+         --lightingModel phongbrdf
+         --dstFaceSize 256
+         --numCpuProcessingThreads 4
+         --useOpenCL true
+         --clVendor anyGpuVendor
+         --deviceType gpu
+         --deviceIndex 0
+         --inputGammaNumerator 1.0
+         --inputGammaDenominator 1.0
+         --outputGammaNumerator 1.0
+         --outputGammaDenominator 1.0
+         --generateMipChain false
+         --outputNum 2
+         --output0 <output name>
+         --output0params dds,bgra8,cubemap
+         --output1 <output name>
+         --output1params ktx,rgba8,cubemap
+
+5. Cmft can be used without any filter for performing image manipulations and/or exporting different format(s) and type(s):
+
+    cmft --input <file path>
+         --filter none
+         --generateMipChain true
+         --posXrotate90
+         --posXrotate180
+         --posXrotate270
+         --posXflipH
+         --posXflipV
+         --negXrotate90
+         --negXrotate180
+         --negXrotate270
+         --negXflipH
+         --negXflipV
+         --posYrotate90
+         --posYrotate180
+         --posYrotate270
+         --posYflipH
+         --posYflipV
+         --negYrotate90
+         --negYrotate180
+         --negYrotate270
+         --negYflipH
+         --negYflipV
+         --posZrotate90
+         --posZrotate180
+         --posZrotate270
+         --posZflipH
+         --posZflipV
+         --negZrotate90
+         --negZrotate180
+         --negZrotate270
+         --negZflipH
+         --negZflipV
+         --outputGamma 1.0
+         --outputGammaDenominator 2.2
+         --outputNum 1
+         --output0 <output name>
+         --output0params dds,bgra8,cubemap
+
+All options listed:
+    --help                             Prints this message
+    --printCLDevices                   Prints OpenCL devices that can be used for processing. Although application allows CPU-type devices to be picked, GPU-type devices are meant to be used as OpenCL devices!
+    --input <file path>                Input environment map for filtering. Can be *.dds, *.ktx, *.hdr, *.exr, *.tga and in form of: cubemap, latlong image, horizontal or vertical cube cross or image strip.
+    --inputFacePosX <file path>        Input face +x in case --input is not specified.
+    --inputFaceNegX <file path>        Input face -x in case --input is not specified.
+    --inputFacePosY <file path>        Input face +y in case --input is not specified.
+    --inputFaceNegY <file path>        Input face -y in case --input is not specified.
+    --inputFacePosZ <file path>        Input face +z in case --input is not specified.
+    --inputFaceNegZ <file path>        Input face -z in case --input is not specified.
+    --filter <filter>                  Filter action to be executed.
+          radiance
+          irradiance
+          shCoeffs
+          none
+    --srcFaceSize <uint>               Resize input image to <uint>. If <uint> == 0, input face size is left as is.
+    --dstFaceSize <uint>               Filter output face size. If <uint> == 0, output face size will be same as srcFaceSize.
+    --excludeBase <bool>               Exclude base image when generating mipmaped radiance cubemap. [radiance filter param]
+    --mipCount <uint>                  Radiance cubemap mipmap number. Glossiness distribution is uniform. [radiance filter param]
+    --glossScale <uint>                Equation is glossScale * mipGlossiness + glossBias. [radiance filter param]
+    --glossBias <uint>                 Equation is glossScale * mipGlossiness + glossBias. [radiance filter param]
+    --lightingModel <model>            Lighting model that matches game lighting equation. [radiance filter param]
+          phong
+          phongbrdf
+          blinn
+          blinnbrdf
+    --edgeFixup <fixup>                DirectX9 and OpenGL without ARB_seamless_cube_map cannot sample cubemap across face edges. In those cases, use 'warp' edge fixup. Otherwise, choose 'none'. Cubemaps filtered with warp edge fixup also require some shader code to be executed at runtime. See 'cmft/include/cubemapfilter.h' for more details. [radiance filter param]
+          none
+          warp
+    --numCpuProcessingThreads <uint>   Should not be bigger than the number of physical CPU cores/threads. [radiance filter param]
+    --useOpenCL <bool>                 OpenCL processing can be used alongside processing on CPU. Therefore, OpenCL device should be GPU. [radiance filter param]
+    --clVendor <vendor>                This parameter should generally be 'anyGpuVendor'. If other vendor is to be choosen, type in part of the vendor name. Use 'cmft --printCLDevices' to list available devices and vendors. [radiance filter param]
+          intel
+          amd
+          ati
+          nvidia
+          anyGpuVendor
+          anyCpuVendor
+          [other]
+    --deviceType <type>                After selecting vendor, 'deviceType' is considered. If desired 'deviceType' is not present, value is ignored. [radiance filter param]
+          gpu
+          cpu
+          accelerator
+          default
+    --deviceIndex <uint>               If there are multiple devices of chosen vendor and type, <uint> is used for selection. There is no support for multiple OpenCL devices for now. [radiance filter param]
+    --generateMipChain <bool>          After processing, generate entire mip map chain.
+    --inputGammaNumerator <uint>       Gamma applied to cubemap before processing. Use this field to specify gamma numerator. Gamma equation is value^(numerator/denominator).
+    --inputGammaDenominator <uint>     Gamma applied to cubemap before processing. Use this field to specify gamma denominator. Gamma equation is value^(numerator/denominator).
+    --outputGammaNumerator <uint>      Gamma applied to cubemap after processing. Use this field to specify gamma numerator. Gamma equation is value^(numerator/denominator).
+    --outputGammaDenominator <uint>    Gamma applied to cubemap after processing. Use this field to specify gamma denominator. Gamma equation is value^(numerator/denominator).
+    --posXrotate90                     Rotate +x input cubemap face by 90 degrees.
+    --posXrotate180                    Rotate +x input cubemap face by 180 degrees.
+    --posXrotate270                    Rotate +x input cubemap face by 270 degrees.
+    --posXflipH                        Horizontal flip +x input cubemap face.
+    --posXflipV                        Vertical flip +x input cubemap face.
+    --negXrotate90                     Rotate -x input cubemap face by 90 degrees.
+    --negXrotate180                    Rotate -x input cubemap face by 180 degrees.
+    --negXrotate270                    Rotate -x input cubemap face by 270 degrees.
+    --negXflipH                        Horizontal flip -x input cubemap face.
+    --negXflipV                        Vertical flip -x input cubemap face.
+    --posYrotate90                     Rotate +y input cubemap face by 90 degrees.
+    --posYrotate180                    Rotate +y input cubemap face by 180 degrees.
+    --posYrotate270                    Rotate +y input cubemap face by 270 degrees.
+    --posYflipH                        Horizontal flip +y input cubemap face.
+    --posYflipV                        Vertical flip +y input cubemap face.
+    --negYrotate90                     Rotate -y input cubemap face by 90 degrees.
+    --negYrotate180                    Rotate -y input cubemap face by 180 degrees.
+    --negYrotate270                    Rotate -y input cubemap face by 270 degrees.
+    --negYflipH                        Horizontal flip -y input cubemap face.
+    --negYflipV                        Vertical flip -y input cubemap face.
+    --posZrotate90                     Rotate +z input cubemap face by 90 degrees.
+    --posZrotate180                    Rotate +z input cubemap face by 180 degrees.
+    --posZrotate270                    Rotate +z input cubemap face by 270 degrees.
+    --posZflipH                        Horizontal flip +z input cubemap face.
+    --posZflipV                        Vertical flip +z input cubemap face.
+    --negZrotate90                     Rotate -z input cubemap face by 90 degrees.
+    --negZrotate180                    Rotate -z input cubemap face by 180 degrees.
+    --negZrotate270                    Rotate -z input cubemap face by 270 degrees.
+    --negZflipH                        Horizontal flip -z input cubemap face.
+    --negZflipV                        Vertical flip -z input cubemap face.
+    --outputNum <N>                    Number of outputs to be considered. Should be equal or bigger than the number of outputs specified. Could be ommited. Default value is 16, maximum 16.
+    --output[0..N-1] <file name>       File name without extension.
+    --output[0..N-1]params <params>    Output parameters as following:
+          <params> = <fileFormat>,<textureFormat>,<outputType>
+          <fileFromat> = [dds,ktx,tga,hdr]
+          <dds_textureFormat> = [bgr8,bgra8,rgba16,rgba16f,rgba32f]
+          <ktx_textureFormat> = [rgb8,rgb16,rgb16f,rgb32f,rgba8,rgba16,rgba16f,rgba32f]
+          <tga_textureFormat> = [bgr8,bgra8]
+          <hdr_textureFormat> = [rgbe]
+          <dds_outputType> = [cubemap,latlong,hcross,vcross,hstrip,vstrip,facelist]
+          <ktx_outputType> = [cubemap,latlong,hcross,vcross,hstrip,vstrip,facelist]
+          <tga_outputType> = [latlong,hcross,vcross,hstrip,vstrip,facelist]
+          <hdr_outputType> = [latlong,hcross,vcross,hstrip,vstrip,facelist]
+    --silent                           Do not print any output.
+
+Command line parameters are case insenitive (except for file names and paths).
+For additional information, see https://github.com/dariomanesku/cmft

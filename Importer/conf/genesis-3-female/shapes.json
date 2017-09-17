@@ -1,0 +1,257 @@
+[
+	{
+		"name": "Base",
+		"morphs": {
+			"PBMNavel": 1.0,
+			"PBMNipples": 1.0
+		}
+	},
+	{
+		"name": "Victoria",
+		"morphs": {
+			"CTRLVictoria7": 1.0
+		}
+	},
+	{
+		"name": "Summer",
+		"morphs": {
+			"CTRLSummer": 1.0,
+			"CTRLVictoria7": 0.5,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Adaline",
+		"morphs": {
+			"CTRL-FWSAAdaline": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Chiyo",
+		"morphs": {
+			"CTRLChiyo": 1.0,
+			"CTRLVictoria7": 1.0
+		}
+	},
+	{
+		"name": "Kalea",
+		"morphs": {
+			"CTRLKalea7": 1.0
+		}
+	},
+	{
+		"name": "Halina",
+		"morphs": {
+			"CTRL-FWSAHalina": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Lilinoe",
+		"morphs": {
+			"Lilione": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Lainee",
+		"morphs": {
+			"CTRL-SSLainee": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Samira",
+		"morphs": {
+			"CTRL-FWSASamira": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Taia",
+		"morphs": {
+			"CTRL-FWSATaia": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Mei Lin",
+		"morphs": {
+			"CTRLMeiLin7": 1.0
+		}
+	},
+	{
+		"name": "Cai",
+		"morphs": {
+			"CTRL-FWSACai": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Hye",
+		"morphs": {
+			"Hye": 1.0
+		}
+	},
+	{
+		"name": "Phoenix",
+		"morphs": {
+			"CTRL-FWPhoenix": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Dayanara",
+		"morphs": {
+			"CTRL-FWSADayanara": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Sapphire",
+		"morphs": {
+			"CTRLSapphire": 1.0,
+			"CTRLVictoria7": 1.0
+		}
+	},
+	{
+		"name": "Gillian",
+		"morphs": {
+			"CTRL-FWSAGillian": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Lien",
+		"morphs": {
+			"CTRL-FWLien": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Olympia",
+		"morphs": {
+			"CTRLOlympia7": 1.0
+		}
+	},
+	{
+		"name": "Nathalie",
+		"morphs": {
+			"CTRLNathalie": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Rahele",
+		"morphs": {
+			"CTRL-FWSARahele": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Eva",
+		"morphs": {
+			"CTRLEva7": 1.0
+		}
+	},
+	{
+		"name": "Fiora",
+		"morphs": {
+			"CTRLFiora": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Dayna",
+		"morphs": {
+			"CTRL-FWSADayna": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Bethany",
+		"morphs": {
+			"CTRLBethany7": 1.0
+		}
+	},
+	{
+		"name": "Camile",
+		"morphs": {
+			"CTRL-FWSACamile": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Xin-Qian",
+		"morphs": {
+			"CTRL-FWSAXin-Qian": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Honey",
+		"morphs": {
+			"CTRL-FWHoney": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Sushmita",
+		"morphs": {
+			"CTRL-FWSushmita": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Karen",
+		"morphs": {
+			"CTRLKaren7": 1.0
+		}
+	},
+	{
+		"name": "Monique",
+		"morphs": {
+			"CTRLMonique7": 1.0
+		}
+	},
+	{
+		"name": "Gia",
+		"morphs": {
+			"CTRLGia7": 1.0
+		}
+	},
+	{
+		"name": "Rune",
+		"morphs": {
+			"CTRLRune7": 1.0
+		}
+	},
+	{
+		"name": "Nala",
+		"morphs": {
+			"CTRLNalaG3": 1.0
+		}
+	},
+	{
+		"name": "Desidora",
+		"morphs": {
+			"CTRLDesidora": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Matti",
+		"morphs": {
+			"CTRL-FWSAMatti": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Uma",
+		"morphs": {
+			"CTRL-FWSAUma": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	}
+]

@@ -1,0 +1,22 @@
+{
+	"file_version" : "0.6.0.0",
+	"asset_info" : {
+		"id" : "/daz-asset-patches/bethany-genitalia.duf",
+		"type" : "preset_material",
+		"contributor" : {
+			"author" : "virtuallynaked",
+			"email" : "",
+			"website" : ""
+		},
+		"revision" : "1.0",
+		"modified" : "2017-08-21T23:15:49Z"
+	},
+	"scene" : {
+		"animations" : [
+			{
+				"url" : "name://@selection#materials/Genitalia:?extra/studio_material_channels/channels/Normal%20Map/image",
+				"keys" : [ [ 0, null ] ]
+			}
+		]
+	}
+}

@@ -1,0 +1,10 @@
+﻿{
+	"subdivision-level": 2,
+	"render-order": [ "Cornea", "EyeMoisture", "Eyelashes" ],
+	"opacities": {
+		"Eyelashes": 0.2,
+		"EyeMoisture": 0,
+		"Cornea": 0
+	},
+	"precompute-scattering": true
+}

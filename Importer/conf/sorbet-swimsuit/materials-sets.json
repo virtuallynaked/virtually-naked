@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/LilFlame/Sorbet Swimwear/Sorbet Swimsuit.duf" ]
+	},
+	{
+		"name": "Style 1",
+		"paths": [ "/People/Genesis 3 Female/Clothing/LilFlame/Sorbet Swimwear/Materials/Iray/01 Suit Style 1 Iray.duf" ]
+	},
+	{
+		"name": "Style 2",
+		"paths": [ "/People/Genesis 3 Female/Clothing/LilFlame/Sorbet Swimwear/Materials/Iray/03 Suit Style 2 Iray.duf" ]
+	},
+	{
+		"name": "Style 3",
+		"paths": [ "/People/Genesis 3 Female/Clothing/LilFlame/Sorbet Swimwear/Materials/Iray/05 Suit Style 3 Iray.duf" ]
+	},
+	{
+		"name": "Style 4",
+		"paths": [ "/People/Genesis 3 Female/Clothing/LilFlame/Sorbet Swimwear/Materials/Iray/07 Suit Style 4 Iray.duf" ]
+	},
+	{
+		"name": "Style 5",
+		"paths": [ "/People/Genesis 3 Female/Clothing/LilFlame/Sorbet Swimwear/Materials/Iray/09 Suit Style 5 Iray.duf" ]
+	}
+]

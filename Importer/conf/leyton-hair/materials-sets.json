@@ -1,0 +1,110 @@
+[
+	{
+		"name": "Base",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Leyton Hair.duf"
+		]
+	},
+	{
+		"name": "Black & Red",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Black & Red.duf"
+		]
+	},
+	{
+		"name": "Black",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Black.duf"
+		]
+	},
+	{
+		"name": "Blonde",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Blonde.duf"
+		]
+	},
+	{
+		"name": "Brown & White",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Brown & White.duf"
+		]
+	},
+	{
+		"name": "Brown",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Brown.duf"
+		]
+	},
+	{
+		"name": "Grey",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Grey.duf"
+		]
+	},
+	{
+		"name": "Red",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M Red.duf"
+		]
+	},
+	{
+		"name": "White",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/10 M White.duf"
+		]
+	},
+	{
+		"name": "D Ash",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D ash.duf"
+		]
+	},
+	{
+		"name": "D Blue",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D blue.duf"
+		]
+	},
+	{
+		"name": "D Green",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D green.duf"
+		]
+	},
+	{
+		"name": "D Pink",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D pink.duf"
+		]
+	},
+	{
+		"name": "D Red",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D red.duf"
+		]
+	},
+	{
+		"name": "D BlackBlue",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D xBlackBlue.duf"
+		]
+	},
+	{
+		"name": "D BlackRed",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D xBlackRed.duf"
+		]
+	},
+	{
+		"name": "D BlackWhite",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D xBlackWhite.duf"
+		]
+	},
+	{
+		"name": "D PurpleGreen",
+		"paths": [
+			"/People/Genesis 3 Female/Hair/Leyton Hair/Materials IRay/20 D xPurpleGreen.duf"
+		]
+	}
+]

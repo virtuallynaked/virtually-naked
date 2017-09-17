@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/BIB Shorts.duf" ]
+	},
+	{
+		"name": "Shadow Rose",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Shadow Rose Shorts Iray.duf" ]
+	},
+	{
+		"name": "Azure Dream",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Azure Dream Shorts.duf" ]
+	},
+	{
+		"name": "Cherry Blossom",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Cherry Blossom Shorts.duf" ]
+	},
+	{
+		"name": "Ebony Dusk",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Ebony Dusk Shorts.duf" ]
+	},
+	{
+		"name": "Violet Sparkle",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Violet Sparkle Shorts.duf" ]
+	}
+]

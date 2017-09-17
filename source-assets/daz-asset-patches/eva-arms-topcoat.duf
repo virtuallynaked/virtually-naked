@@ -1,0 +1,34 @@
+{
+	"file_version" : "0.6.0.0",
+	"asset_info" : {
+		"id" : "/daz-asset-patches/eva-arms.duf",
+		"type" : "preset_material",
+		"contributor" : {
+			"author" : "virtuallynaked",
+			"email" : "",
+			"website" : ""
+		},
+		"revision" : "1.0",
+		"modified" : "2017-09-01T21:47:24Z"
+	},
+	"scene" : {
+		"animations" : [
+			{
+				"url" : "Genesis3Female#materials/Fingernails:?extra/studio_material_channels/channels/Top%20Coat%20Weight/image_file",
+				"keys" : [ [ 0, "/Runtime/Textures/DAZ/Characters/Genesis3/Eva7/Eva7ArmsMapS_1004.jpg" ] ]
+			},
+			{
+				"url" : "Genesis3Female#materials/Fingernails:?extra/studio_material_channels/channels/Top%20Coat%20Color/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			{
+				"url" : "Genesis3Female#materials/Arms:?extra/studio_material_channels/channels/Top%20Coat%20Weight/image_file",
+				"keys" : [ [ 0, "/Runtime/Textures/DAZ/Characters/Genesis3/Eva7/Eva7ArmsMapS_1004.jpg" ] ]
+			},
+			{
+				"url" : "Genesis3Female#materials/Arms:?extra/studio_material_channels/channels/Top%20Coat%20Color/image",
+				"keys" : [ [ 0, null ] ]
+			}
+		]
+	}
+}

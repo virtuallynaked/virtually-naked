@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Maui Days/Maui Days Dress.duf" ]
+	},
+	{
+		"name": "01",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Maui Days/Materials/Iray/Dress 01.duf" ]
+	},
+	{
+		"name": "02",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Maui Days/Materials/Iray/Dress 02.duf" ]
+	},
+	{
+		"name": "03",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Maui Days/Materials/Iray/Dress 03.duf" ]
+	},
+	{
+		"name": "04",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Maui Days/Materials/Iray/Dress 04.duf" ]
+	},
+	{
+		"name": "05",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Maui Days/Materials/Iray/Dress 05.duf" ]
+	}
+]
