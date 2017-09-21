@@ -1,0 +1,7 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <RunWorkingDirectory>$(SolutionDir)</RunWorkingDirectory>
+    <RunCommand>$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)\$(AssemblyName)$(_NativeExecutableExtension)</RunCommand>
+    <RunArguments>--data=$(SolutionDir)work</RunArguments>
+  </PropertyGroup>
+</Project>
