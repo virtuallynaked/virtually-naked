@@ -1,4 +1,6 @@
-﻿[0.4]
+﻿[0.5]
+
+[0.4]
 	Major: Added hair
 	Minor: Companion window now shares HMD view on startup.
 		Press "Space" to re-activate the independent companion window view at cost to performance.
