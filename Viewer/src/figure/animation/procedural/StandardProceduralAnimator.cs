@@ -12,9 +12,9 @@
 		};
 	}
 	
-	public void Update(ChannelInputs inputs, float time) {
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
 		foreach (var animator in animators) {
-			animator.Update(inputs, time);
+			animator.Update(updateParameters, inputs);
 		}
 	}
 }

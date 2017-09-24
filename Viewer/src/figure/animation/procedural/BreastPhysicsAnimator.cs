@@ -25,7 +25,7 @@ public class BreastPhysicsAnimator : IProceduralAnimator {
 		hangForwardChannel = channelSystem.ChannelsByName["pCTRLBreastsHangForward?value"];
 	}
 	
-	public void Update(ChannelInputs inputs, float time) {
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
 		var outputs = channelSystem.Evaluate(null, inputs);
 		var boneTransforms = boneSystem.GetBoneTransforms(outputs);
 		var chestBoneTransform = boneTransforms[chestBone.Index];

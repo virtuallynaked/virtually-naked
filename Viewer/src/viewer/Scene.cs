@@ -44,11 +44,11 @@ class Scene : IDisposable {
 		menu.Dispose();
 	}
 
-	public void Update(DeviceContext context, float frameTime) {
+	public void Update(DeviceContext context, FrameUpdateParameters updateParameters) {
 		menu.Update(context);
 		iblEnvironment.Predraw(context);
 		floor.Update(context);
-		figureGroup.Update(context, frameTime, iblEnvironment);
+		figureGroup.Update(context, updateParameters, iblEnvironment);
 	}
 
 	public void RenderPass(DeviceContext context, RenderingPass pass) {

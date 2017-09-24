@@ -122,15 +122,15 @@ public class SpeechAnimator : IProceduralAnimator {
 		phononStream.HeadRelativePosition = headHmdPosition;
 	}
 
-	public void Update(ChannelInputs inputs, float time) {
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
 		Update3dAudioPosition(inputs);
 
-		currentTime = time;
+		currentTime = updateParameters.Time;
 		if (synth.State == SynthesizerState.Ready) {
 			synth.SpeakAsync(Text);
 		}
 
-		float visimeProgress = MathUtil.Clamp((time - visemeStartTime) / visemeDuration, 0, 1);
+		float visimeProgress = MathUtil.Clamp((updateParameters.Time - visemeStartTime) / visemeDuration, 0, 1);
 
 		Channel currentChannel = visemeChannels[currentViseme];
 		Channel nextChannel = visemeChannels[nextViseme];

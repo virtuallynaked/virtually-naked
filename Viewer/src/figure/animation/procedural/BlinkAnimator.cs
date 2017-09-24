@@ -26,9 +26,9 @@ public class BlinkAnimator : IProceduralAnimator {
 		return time;
 	}
 
-	public void Update(ChannelInputs inputs, float time) {
-		double elapsed = Math.Max(time - lastTime, 0);
-		lastTime = time;
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
+		double elapsed = Math.Max(updateParameters.Time - lastTime, 0);
+		lastTime = updateParameters.Time;
 
 		if (blinking) {
 			eyesClosedAmount += elapsed / CloseDuration;

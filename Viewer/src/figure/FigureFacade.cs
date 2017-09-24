@@ -64,12 +64,12 @@ public class FigureFacade : IDisposable {
 		renderer.RenderPass(context, pass);
 	}
 	
-	public ChannelOutputs UpdateFrame(ChannelOutputs parentOutputs, float time) {
+	public ChannelOutputs UpdateFrame(FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults();
 
 		ChannelInputs inputs;
 		if (behaviour != null) {
-			inputs = behaviour.Update(previousFrameResults, time);
+			inputs = behaviour.Update(updateParameters, previousFrameResults);
 		} else {
 			inputs = model.Inputs;
 		}

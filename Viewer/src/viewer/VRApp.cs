@@ -216,13 +216,15 @@ public class VRApp : IDisposable {
 			}
 		}
 	}
-
+	
 	private void DoFrame() {
-		float nextFrameTime = timeKeeper.GetNextFrameTime(1); //need to go one frame ahead because we haven't called WaitGetPoses yet
+		var updateParameters = new FrameUpdateParameters(
+			timeKeeper.GetNextFrameTime(1) //need to go one frame ahead because we haven't called WaitGetPoses yet
+			);
 
 		immediateContext.WithEvent("VRApp::Update", () => {
 			controllerManager.Update();
-			scene.Update(device.ImmediateContext, nextFrameTime);
+			scene.Update(device.ImmediateContext, updateParameters);
 			passController.PrepareFrame(device.ImmediateContext);
 		});
 		

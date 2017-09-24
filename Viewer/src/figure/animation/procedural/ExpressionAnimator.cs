@@ -51,12 +51,12 @@ public class ExpressionAnimator : IProceduralAnimator {
 		expressionDuration = GenerateExpressionDuration();
 	}
 
-	public void Update(ChannelInputs inputs, float time) {
-		double elapsedSinceStart = time - expressionStartTime;
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
+		double elapsedSinceStart = updateParameters.Time - expressionStartTime;
 		double expressionProgress = expressionDuration == 0 ? Double.PositiveInfinity : elapsedSinceStart / expressionDuration;
 
 		if (expressionProgress >= 1) {
-			PrepareNextExpression(time);
+			PrepareNextExpression(updateParameters.Time);
 			expressionProgress = 0;
 		}
 		

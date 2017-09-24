@@ -41,18 +41,18 @@ public class FigureBehaviour {
 		return blendedPose;
 	}
 
-	public ChannelInputs Update(ControlVertexInfo[] previousFrameControlVertexInfos, float time) {
+	public ChannelInputs Update(FrameUpdateParameters updateParameters, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		ChannelInputs inputs = new ChannelInputs(model.Inputs);
 
 		dragHandle.Update();
 		DualQuaternion rootTransform = DualQuaternion.FromMatrix(dragHandle.Transform);
 		
-		var blendedPose = GetBlendedPose(time);
+		var blendedPose = GetBlendedPose(updateParameters.Time);
 		poser.Apply(inputs, blendedPose, rootTransform);
 
-		ikAnimator.Update(inputs, time, previousFrameControlVertexInfos);
+		ikAnimator.Update(inputs, previousFrameControlVertexInfos);
 
-		proceduralAnimator.Update(inputs, time);
+		proceduralAnimator.Update(updateParameters, inputs);
 
 		return inputs;
 	}

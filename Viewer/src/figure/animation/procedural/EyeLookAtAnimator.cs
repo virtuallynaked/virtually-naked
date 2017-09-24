@@ -33,7 +33,7 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 		eyeBone.SetEffectiveRotation(inputs, outputs, targetRotation);
 	}
 
-	public void Update(ChannelInputs inputs, float time) {
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
 		headPositionForecaster.Update(PlayerPositionUtils.GetHeadGamePosition());
 		var forecastHeadPosition = headPositionForecaster.ForecastValue;
 

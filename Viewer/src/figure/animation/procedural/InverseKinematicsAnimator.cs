@@ -42,7 +42,7 @@ public class InverseKinematicsAnimator {
 		bone.SetEffectiveRotation(inputs, outputs, lerpedRotation, SetMask.ApplyClampAndVisibleOnly);
 	}
 	
-	public void Update(ChannelInputs inputs, float time, ControlVertexInfo[] previousFrameControlVertexInfos) {
+	public void Update(ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		ChannelInputs baseInputs = new ChannelInputs(inputs);
 
 		for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {

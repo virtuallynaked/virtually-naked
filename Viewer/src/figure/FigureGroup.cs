@@ -56,12 +56,12 @@ class FigureGroup : IDisposable {
 		parentDeltas.Dispose();
 	}
 
-	public void Update(DeviceContext context, float frameTime, ImageBasedLightingEnvironment lightingEnvironment) {
+	public void Update(DeviceContext context, FrameUpdateParameters updateParameters, ImageBasedLightingEnvironment lightingEnvironment) {
 		modelToWorldTransform.Update(context, Matrix.Scaling(0.01f));
 		
-		var parentOutputs = parentFigure.UpdateFrame(null, frameTime);
+		var parentOutputs = parentFigure.UpdateFrame(updateParameters, null);
 		foreach (var figure in childFigures) {
-			figure.UpdateFrame(parentOutputs, frameTime);
+			figure.UpdateFrame(updateParameters, parentOutputs);
 		}
 		
 		parentFigure.UpdateVertexPositionsAndGetDeltas(parentDeltas.OutView);

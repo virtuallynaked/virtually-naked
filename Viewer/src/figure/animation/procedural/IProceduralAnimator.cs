@@ -1,3 +1,3 @@
 ﻿public interface IProceduralAnimator {
-	void Update(ChannelInputs inputs, float time);
+	void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs);
 }
