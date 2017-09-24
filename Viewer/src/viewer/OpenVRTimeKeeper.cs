@@ -30,6 +30,8 @@ public class OpenVRTimeKeeper {
 		time += timeDelta;
 	}
 
+	public float TimeDelta => timeDelta;
+
 	public float GetNextFrameTime(int framesAhead) {
 		return time + framesAhead * timeDelta + secondsFromVSyncToPhotons;
 	}

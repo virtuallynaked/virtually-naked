@@ -219,8 +219,8 @@ public class VRApp : IDisposable {
 	
 	private void DoFrame() {
 		var updateParameters = new FrameUpdateParameters(
-			timeKeeper.GetNextFrameTime(1) //need to go one frame ahead because we haven't called WaitGetPoses yet
-			);
+			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet,
+			timeKeeper.TimeDelta);
 
 		immediateContext.WithEvent("VRApp::Update", () => {
 			controllerManager.Update();

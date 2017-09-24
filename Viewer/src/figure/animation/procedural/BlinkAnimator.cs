@@ -10,8 +10,7 @@ public class BlinkAnimator : IProceduralAnimator {
 	private const double MaximumCloseAmount = 1.25;
 	
 	private readonly Channel eyesClosedChannel;
-
-	private double lastTime = 0;
+	
 	private double eyesClosedAmount = 0;
 	private bool blinking = false;
 	private double timeUntilNextBlink = GenerateTimeUntilNextBlink();
@@ -27,8 +26,7 @@ public class BlinkAnimator : IProceduralAnimator {
 	}
 
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
-		double elapsed = Math.Max(updateParameters.Time - lastTime, 0);
-		lastTime = updateParameters.Time;
+		double elapsed = updateParameters.TimeDelta;
 
 		if (blinking) {
 			eyesClosedAmount += elapsed / CloseDuration;
