@@ -25,7 +25,7 @@ public class HeadLookAtAnimator : IProceduralAnimator {
 	}
 		
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
-		headPositionForecaster.Update(PlayerPositionUtils.GetHeadGamePosition());
+		headPositionForecaster.Update(updateParameters.HeadPosition);
 		var forecastHeadPosition = headPositionForecaster.ForecastValue;
 
 		var outputs = channelSystem.Evaluate(null, inputs);

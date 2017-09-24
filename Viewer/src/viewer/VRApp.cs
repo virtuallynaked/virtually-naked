@@ -92,6 +92,7 @@ public class VRApp : IDisposable {
 
 	private OpenVRTimeKeeper timeKeeper;
 	private TrackedDevicePose_t[] poses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+	private TrackedDevicePose_t[] gamePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 	private ControllerManager controllerManager;
 
 	private readonly HiddenAreaMasker hiddenAreaMasker;
@@ -152,6 +153,8 @@ public class VRApp : IDisposable {
 		Size2 targetSize = OpenVR.System.GetRecommendedRenderTargetSize();
 		
 		passController = new RenderPassController(device, shaderCache, targetSize);
+
+		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
 	}
 	
 	private void Run() {
@@ -219,8 +222,9 @@ public class VRApp : IDisposable {
 	
 	private void DoFrame() {
 		var updateParameters = new FrameUpdateParameters(
-			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet,
-			timeKeeper.TimeDelta);
+			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
+			timeKeeper.TimeDelta,
+			PlayerPositionUtils.GetHeadPosition(gamePoses));
 
 		immediateContext.WithEvent("VRApp::Update", () => {
 			controllerManager.Update();
@@ -228,7 +232,7 @@ public class VRApp : IDisposable {
 			passController.PrepareFrame(device.ImmediateContext);
 		});
 		
-		OpenVR.Compositor.WaitGetPoses(poses, new TrackedDevicePose_t[0]);
+		OpenVR.Compositor.WaitGetPoses(poses, gamePoses);
 		timeKeeper.AdvanceFrame();
 
 		Matrix companionWindowProjectionMatrix;
