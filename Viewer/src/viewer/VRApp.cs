@@ -221,10 +221,11 @@ public class VRApp : IDisposable {
 	}
 	
 	private void DoFrame() {
+		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
 		var updateParameters = new FrameUpdateParameters(
 			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
 			timeKeeper.TimeDelta,
-			PlayerPositionUtils.GetHeadPosition(gamePoses));
+			headPosition);
 
 		immediateContext.WithEvent("VRApp::Update", () => {
 			controllerManager.Update();
@@ -241,11 +242,11 @@ public class VRApp : IDisposable {
 			SubmitEye(EVREye.Eye_Left, commandList);
 			SubmitEye(EVREye.Eye_Right, commandList);
 
-			Matrix? companionViewTransform = companionWindow.GetViewTransform();
-			if (companionViewTransform.HasValue) {
+			if (companionWindow.HasIndependentCamera) {
+				Matrix companionViewTransform = companionWindow.GetViewTransform();
 				companionWindowProjectionMatrix = companionWindow.GetDesiredProjectionMatrix();
 				immediateContext.WithEvent("VRApp::RenderCompanionView", () => {
-					RenderView(commandList, (context) => { }, companionViewTransform.Value, companionWindowProjectionMatrix);
+					RenderView(commandList, (context) => { }, companionViewTransform, companionWindowProjectionMatrix);
 				});
 			} else {
 				companionWindowProjectionMatrix = GetProjectionMatrix(EVREye.Eye_Right);

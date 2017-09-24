@@ -85,7 +85,7 @@ class CompanionWindow : IDisposable {
 
 		DebugInitialize();
 	}
-
+	
 	[Conditional("DEBUG")]
 	private void DebugInitialize() {
 		shareHmdView = false;
@@ -109,14 +109,13 @@ class CompanionWindow : IDisposable {
 	}
 
 	public Form Form => form;
-		
-	public Matrix? GetViewTransform() {
-		if (shareHmdView) {
-			return null;
-		} else {
-			UpdatePosition();
-			return Matrix.Translation(viewPosition) * Matrix.RotationY(viewRotation.Y) * Matrix.RotationX(viewRotation.X);
-		}
+	
+	public bool HasIndependentCamera => !shareHmdView;
+	public Vector3 CameraPosition => -viewPosition;
+
+	public Matrix GetViewTransform() {
+		UpdatePosition();
+		return Matrix.Translation(viewPosition) * Matrix.RotationY(viewRotation.Y) * Matrix.RotationX(viewRotation.X);
 	}
 
 	private void OnUserResized(object sender, EventArgs eventArgs) {
