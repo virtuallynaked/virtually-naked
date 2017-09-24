@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using static System.Math;
 
 public static class MathExtensions {
 	public static double Sqr(double d) {
@@ -45,6 +46,21 @@ public static class MathExtensions {
 			return max;
 		} else {
 			return x;
+		}
+	}
+	
+	/**
+	 * Properties:
+	 *     f[x,c] = x when x is close to 0
+	 *     f[x,c] = 0 when Abs[x] > c
+	 */
+	public static float TukeysBiweight(float x, float rejectionThreshold) {
+		float z = x / rejectionThreshold;
+
+		if (Abs(z) > 1) {
+			return 0;
+		} else {
+			return x * Sqr(1 - Sqr(z));
 		}
 	}
 }
