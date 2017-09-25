@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
 public class LookAtPlayerMenuItem : IToggleMenuItem {
-	private readonly BehaviourModel model;
+	private readonly BehaviorModel model;
 
-	public LookAtPlayerMenuItem(BehaviourModel model) {
+	public LookAtPlayerMenuItem(BehaviorModel model) {
 		this.model = model;
 	}
 
@@ -16,10 +16,10 @@ public class LookAtPlayerMenuItem : IToggleMenuItem {
 	}
 }
 
-public class BehaviourMenuLevel : IMenuLevel {
-	private readonly BehaviourModel model;
+public class BehaviorMenuLevel : IMenuLevel {
+	private readonly BehaviorModel model;
 
-	public BehaviourMenuLevel(BehaviourModel model) {
+	public BehaviorMenuLevel(BehaviorModel model) {
 		this.model = model;
 	}
 

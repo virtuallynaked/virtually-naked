@@ -22,7 +22,7 @@ static class FigureGroupMenuProvider {
 		var channelMenuLevel = ChannelMenuLevel.MakeRootLevelForFigure(parentModel);
 		var poseControlsMenuLevel = channelMenuLevel.Extract(new string[] {"Pose Controls"});
 		var expressionsMenuLevel = poseControlsMenuLevel.Extract(new string[] {"Head", "Expressions"});
-		var behaviourMenuLevel = new BehaviourMenuLevel(parentModel.Behaviour);
+		var behaviorMenuLevel = new BehaviorMenuLevel(parentModel.Behavior);
 
 		var charactersMenuLevel = new CharactersMenuLevel(parentModel);
 
@@ -44,7 +44,7 @@ static class FigureGroupMenuProvider {
 		}
 
 		items.Add(new SubLevelMenuItem("Shaping", shapingMenuLevel));
-		items.Add(new SubLevelMenuItem("Behaviour", behaviourMenuLevel));
+		items.Add(new SubLevelMenuItem("Behavior", behaviorMenuLevel));
 		items.Add(new SubLevelMenuItem("Expressions", expressionsMenuLevel));
 		items.Add(new SubLevelMenuItem("Posing", poseControlsMenuLevel));
 		items.Add(new SubLevelMenuItem("Animations", animationsMenuLevel));

@@ -16,8 +16,8 @@ public class FigureModel {
 		ShapesModel shapesModel = ShapesModel.Load(figureDir, channelSystem, shapeName);
 		MaterialsModel materialsModel = MaterialsModel.Load(figureDir, materialSetName);
 		AnimationModel animationModel = AnimationModel.Load(figureDir, boneSystem, animationName);
-		BehaviourModel behaviourModel = parent == null ? new BehaviourModel() : null;
-		return new FigureModel(channelSystem, boneSystem, shapesModel, materialsModel, animationModel, behaviourModel);
+		BehaviorModel behaviorModel = parent == null ? new BehaviorModel() : null;
+		return new FigureModel(channelSystem, boneSystem, shapesModel, materialsModel, animationModel, behaviorModel);
 	}
 
 	private readonly ChannelSystem channelSystem;
@@ -26,18 +26,18 @@ public class FigureModel {
 	private readonly ShapesModel shapes;
 	private readonly MaterialsModel materials;
 	private readonly AnimationModel animation;
-	private readonly BehaviourModel behaviour;
+	private readonly BehaviorModel behavior;
 	
 	private readonly ChannelInputs inputs;
 
-	public FigureModel(ChannelSystem channelSystem, BoneSystem boneSystem, ShapesModel shapes, MaterialsModel materials, AnimationModel animation, BehaviourModel behaviour) {
+	public FigureModel(ChannelSystem channelSystem, BoneSystem boneSystem, ShapesModel shapes, MaterialsModel materials, AnimationModel animation, BehaviorModel behavior) {
 		this.channelSystem = channelSystem;
 		this.boneSystem = boneSystem;
 
 		this.shapes = shapes;
 		this.materials = materials;
 		this.animation = animation;
-		this.behaviour = behaviour;
+		this.behavior = behavior;
 
 		var initialInputs = shapes.Active.ChannelInputs;
 		
@@ -57,7 +57,7 @@ public class FigureModel {
 	public ShapesModel Shapes => shapes;
 	public MaterialsModel Materials => materials;
 	public AnimationModel Animation => animation;
-	public BehaviourModel Behaviour => behaviour;
+	public BehaviorModel Behavior => behavior;
 
 	private static bool IsShapeChannel(Channel channel) {
 		return channel.Path != null && channel.Path.StartsWith("/Shapes/");

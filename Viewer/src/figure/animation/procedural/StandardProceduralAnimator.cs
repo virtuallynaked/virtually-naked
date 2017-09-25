@@ -4,11 +4,11 @@
 	public StandardProceduralAnimator(FigureModel model) {
 		var channelSystem = model.ChannelSystem;
 		var boneSystem = model.BoneSystem;
-		var behaviourModel = model.Behaviour;
+		var behaviorModel = model.Behavior;
 
 		animators = new IProceduralAnimator[] {
 			//new HeadLookAtAnimator(channelSystem, boneSystem),
-			new EyeLookAtAnimator(channelSystem, boneSystem, behaviourModel),
+			new EyeLookAtAnimator(channelSystem, boneSystem, behaviorModel),
 			//new BreastPhysicsAnimator(channelSystem, boneSystem),
 			new BlinkAnimator(channelSystem),
 			//new ExpressionAnimator(channelSystem),

@@ -1,10 +1,7 @@
-﻿using SharpDX;
-using System.IO;
-
-public class FigureBehaviour {
-	public static FigureBehaviour Load(ControllerManager controllerManager, IArchiveDirectory figureDir, FigureModel model) {
+﻿public class FigureBehavior {
+	public static FigureBehavior Load(ControllerManager controllerManager, IArchiveDirectory figureDir, FigureModel model) {
 		InverterParameters inverterParameters = Persistance.Load<InverterParameters>(figureDir.File("inverter-parameters.dat"));
-		return new FigureBehaviour(controllerManager, model, inverterParameters);
+		return new FigureBehavior(controllerManager, model, inverterParameters);
 	}
 
 	private const float FramesPerSecond = 30 * FigureActiveSettings.AnimationSpeed;
@@ -15,7 +12,7 @@ public class FigureBehaviour {
 	private readonly IProceduralAnimator proceduralAnimator;
 	private readonly DragHandle dragHandle;
 
-	public FigureBehaviour(ControllerManager controllerManager, FigureModel model, InverterParameters inverterParameters) {
+	public FigureBehavior(ControllerManager controllerManager, FigureModel model, InverterParameters inverterParameters) {
 		this.model = model;
 		poser = new Poser(model.ChannelSystem, model.BoneSystem);
 		ikAnimator = new InverseKinematicsAnimator(controllerManager, model, inverterParameters);

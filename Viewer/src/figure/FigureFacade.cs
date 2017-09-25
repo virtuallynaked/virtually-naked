@@ -9,13 +9,13 @@ public class FigureFacade : IDisposable {
 		
 		FigureActiveSettings.Shapes.TryGetValue(figureName, out string activeShapeName);
 		var model = FigureModel.Load(figureDir, activeShapeName, FigureActiveSettings.MaterialSets[figureName], FigureActiveSettings.Animation, parent?.model);
-		var behaviour = parent == null ? FigureBehaviour.Load(controllerManager, figureDir, model) : null;
+		var behavior = parent == null ? FigureBehavior.Load(controllerManager, figureDir, model) : null;
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, figureDir, model);
 
 		string materialSetName = model.Materials.Active.Label;
 		var renderer = FigureRenderer.Load(figureDir, device, shaderCache, materialSetName);
 		
-		var facade = new FigureFacade(model, behaviour, controlVertexProvider, renderer);
+		var facade = new FigureFacade(model, behavior, controlVertexProvider, renderer);
 
 		model.Materials.Changed += (oldMaterialSet, newMaterialSet) => {
 			string newMaterialSetName = newMaterialSet.Label;
@@ -27,13 +27,13 @@ public class FigureFacade : IDisposable {
 	}
 	
 	private readonly FigureModel model;
-	private readonly FigureBehaviour behaviour;
+	private readonly FigureBehavior behavior;
 	private readonly ControlVertexProvider controlVertexProvider;
 	private FigureRenderer renderer;
 	
-	public FigureFacade(FigureModel model, FigureBehaviour behaviour, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
+	public FigureFacade(FigureModel model, FigureBehavior behavior, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
 		this.model = model;
-		this.behaviour = behaviour;
+		this.behavior = behavior;
 		this.controlVertexProvider = controlVertexProvider;
 		this.renderer = renderer;
 	}
@@ -68,8 +68,8 @@ public class FigureFacade : IDisposable {
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults();
 
 		ChannelInputs inputs;
-		if (behaviour != null) {
-			inputs = behaviour.Update(updateParameters, previousFrameResults);
+		if (behavior != null) {
+			inputs = behavior.Update(updateParameters, previousFrameResults);
 		} else {
 			inputs = model.Inputs;
 		}

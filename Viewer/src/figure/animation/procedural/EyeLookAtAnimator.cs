@@ -1,5 +1,4 @@
 ﻿using SharpDX;
-using Valve.VR;
 using static MathExtensions;
 
 public class EyeLookAtAnimator : IProceduralAnimator {
@@ -7,17 +6,17 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 	
 	private readonly ChannelSystem channelSystem;
 	private readonly BoneSystem boneSystem;
-	private readonly BehaviourModel behaviourModel;
+	private readonly BehaviorModel behaviorModel;
 	
 	private readonly Bone leftEyeBone;
 	private readonly Bone rightEyeBone;
 	
 	private readonly LaggedVector3Forecaster headPositionForecaster = new LaggedVector3Forecaster(0.08f);
 
-	public EyeLookAtAnimator(ChannelSystem channelSystem, BoneSystem boneSystem, BehaviourModel behaviourModel) {
+	public EyeLookAtAnimator(ChannelSystem channelSystem, BoneSystem boneSystem, BehaviorModel behaviorModel) {
 		this.channelSystem = channelSystem;
 		this.boneSystem = boneSystem;
-		this.behaviourModel = behaviourModel;
+		this.behaviorModel = behaviorModel;
 
 		leftEyeBone = boneSystem.BonesByName["lEye"];
 		rightEyeBone = boneSystem.BonesByName["rEye"];
@@ -39,7 +38,7 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 		headPositionForecaster.Update(updateParameters.HeadPosition);
 		var forecastHeadPosition = headPositionForecaster.ForecastValue;
 
-		if (!behaviourModel.LookAtPlayer) {
+		if (!behaviorModel.LookAtPlayer) {
 			return;
 		}
 
