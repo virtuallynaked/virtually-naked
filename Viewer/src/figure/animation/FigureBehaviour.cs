@@ -19,7 +19,7 @@ public class FigureBehaviour {
 		this.model = model;
 		poser = new Poser(model.ChannelSystem, model.BoneSystem);
 		ikAnimator = new InverseKinematicsAnimator(controllerManager, model, inverterParameters);
-		proceduralAnimator = new StandardProceduralAnimator(model.ChannelSystem, model.BoneSystem);
+		proceduralAnimator = new StandardProceduralAnimator(model);
 		dragHandle = new DragHandle(controllerManager, FigureActiveSettings.InitialTransform);
 	}
 	

@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class FigureModel {
 	public static FigureModel Load(IArchiveDirectory figureDir, string shapeName, string materialSetName, string animationName, FigureModel parent) {
@@ -21,7 +16,8 @@ public class FigureModel {
 		ShapesModel shapesModel = ShapesModel.Load(figureDir, channelSystem, shapeName);
 		MaterialsModel materialsModel = MaterialsModel.Load(figureDir, materialSetName);
 		AnimationModel animationModel = AnimationModel.Load(figureDir, boneSystem, animationName);
-		return new FigureModel(channelSystem, boneSystem, shapesModel, materialsModel, animationModel);
+		BehaviourModel behaviourModel = parent == null ? new BehaviourModel() : null;
+		return new FigureModel(channelSystem, boneSystem, shapesModel, materialsModel, animationModel, behaviourModel);
 	}
 
 	private readonly ChannelSystem channelSystem;
@@ -30,16 +26,18 @@ public class FigureModel {
 	private readonly ShapesModel shapes;
 	private readonly MaterialsModel materials;
 	private readonly AnimationModel animation;
+	private readonly BehaviourModel behaviour;
 	
 	private readonly ChannelInputs inputs;
 
-	public FigureModel(ChannelSystem channelSystem, BoneSystem boneSystem, ShapesModel shapes, MaterialsModel materials, AnimationModel animation) {
+	public FigureModel(ChannelSystem channelSystem, BoneSystem boneSystem, ShapesModel shapes, MaterialsModel materials, AnimationModel animation, BehaviourModel behaviour) {
 		this.channelSystem = channelSystem;
 		this.boneSystem = boneSystem;
 
 		this.shapes = shapes;
 		this.materials = materials;
 		this.animation = animation;
+		this.behaviour = behaviour;
 
 		var initialInputs = shapes.Active.ChannelInputs;
 		
@@ -59,6 +57,7 @@ public class FigureModel {
 	public ShapesModel Shapes => shapes;
 	public MaterialsModel Materials => materials;
 	public AnimationModel Animation => animation;
+	public BehaviourModel Behaviour => behaviour;
 
 	private static bool IsShapeChannel(Channel channel) {
 		return channel.Path != null && channel.Path.StartsWith("/Shapes/");

@@ -7,15 +7,17 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 	
 	private readonly ChannelSystem channelSystem;
 	private readonly BoneSystem boneSystem;
+	private readonly BehaviourModel behaviourModel;
 	
 	private readonly Bone leftEyeBone;
 	private readonly Bone rightEyeBone;
 	
 	private readonly LaggedVector3Forecaster headPositionForecaster = new LaggedVector3Forecaster(0.08f);
 
-	public EyeLookAtAnimator(ChannelSystem channelSystem, BoneSystem boneSystem) {
+	public EyeLookAtAnimator(ChannelSystem channelSystem, BoneSystem boneSystem, BehaviourModel behaviourModel) {
 		this.channelSystem = channelSystem;
 		this.boneSystem = boneSystem;
+		this.behaviourModel = behaviourModel;
 
 		leftEyeBone = boneSystem.BonesByName["lEye"];
 		rightEyeBone = boneSystem.BonesByName["rEye"];
@@ -36,6 +38,10 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
 		headPositionForecaster.Update(updateParameters.HeadPosition);
 		var forecastHeadPosition = headPositionForecaster.ForecastValue;
+
+		if (!behaviourModel.LookAtPlayer) {
+			return;
+		}
 
 		var outputs = channelSystem.Evaluate(null, inputs);
 		var boneTotalTransforms = boneSystem.GetBoneTransforms(outputs);
