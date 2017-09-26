@@ -105,4 +105,8 @@ public static class SystemIOExtensions {
 		var map = MemoryMappedFile.CreateFromFile(stream, Guid.NewGuid().ToString(), fileInfo.Length, MemoryMappedFileAccess.Read, null, HandleInheritability.None, false);
 		return map;
 	}
+
+	public static string GetNameWithoutExtension(this FileInfo fileInfo) {
+		return Path.GetFileNameWithoutExtension(fileInfo.FullName);
+	}
 }

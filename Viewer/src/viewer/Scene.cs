@@ -1,4 +1,5 @@
-﻿using SharpDX;
+﻿using Newtonsoft.Json;
+using SharpDX;
 using SharpDX.Direct3D11;
 using System;
 using System.IO;
@@ -26,7 +27,9 @@ class Scene : IDisposable {
 			new SubLevelMenuItem("Lighting Enviroment", iblMenu),
 			new SubLevelMenuItem("Tone Mapping", toneMappingMenuLevel)
 		);
+		var scenePersistenceMenuLevel = ScenePersistenceMenuLevel.Make(this);
 		var appMenuLevel = new StaticMenuLevel(
+			new SubLevelMenuItem("Scenes", scenePersistenceMenuLevel),
 			new SubLevelMenuItem("Render Settings", renderSettingsMenuLevel)
 		);
 
@@ -67,5 +70,20 @@ class Scene : IDisposable {
 
 	public void RenderCompanionWindowUi(DeviceContext context) {
 		menu.RenderCompanionWindowUi(context);
+	}
+	
+	public class Recipe {
+		[JsonProperty("lighting-environment")]
+		public ImageBasedLightingEnvironment.Recipe lightingEnvironment;
+		
+		public void Merge(Scene scene) {
+			lightingEnvironment?.Merge(scene.iblEnvironment);
+		}
+	}
+
+	public Recipe Recipize() {
+		return new Recipe {
+			lightingEnvironment = iblEnvironment.Recipize()
+		};
 	}
 }

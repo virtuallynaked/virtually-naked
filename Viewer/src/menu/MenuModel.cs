@@ -101,7 +101,7 @@ public class MenuModel {
 
 	public bool IsEditing => activeRangeItem != null;
 
-	private void ActivateLevel() {
+	private void ActivateLevel(bool keepPosition = false) {
 		items = new List<IMenuItem>();
 
 		if (levelStack.Count > 1) {
@@ -110,8 +110,10 @@ public class MenuModel {
 		
 		items.AddRange(levelStack.Peek().GetItems());
 
-		y = 0.5f;
-		selectedItemIdx = 0;
+		if (!keepPosition) {
+			y = 0.5f;
+			selectedItemIdx = 0;
+		}
 		
 		Changed?.Invoke();
 	}
@@ -196,7 +198,7 @@ public class MenuModel {
 
 				case ActionMenuItem actionItem:
 					actionItem.Action.Invoke();
-					Changed?.Invoke();
+					ActivateLevel(true);
 					break;
 
 				default:

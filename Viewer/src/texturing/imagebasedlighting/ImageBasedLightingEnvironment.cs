@@ -1,4 +1,5 @@
-﻿using SharpDX;
+﻿using Newtonsoft.Json;
+using SharpDX;
 using SharpDX.Direct3D11;
 using System;
 using System.Runtime.InteropServices;
@@ -82,5 +83,29 @@ public class ImageBasedLightingEnvironment : IDisposable {
 		stage.SetConstantBuffer(ShaderSlots.EnvironmentParameters, constantBufferManager.Buffer);
 		stage.SetShaderResource(ShaderSlots.DiffuseEnvironmentCube, diffuseEnvironmentCube);
 		stage.SetShaderResource(ShaderSlots.GlossyEnvironmentCube, glossyEnvironmentCube);
+	}
+
+	public class Recipe {
+		[JsonProperty("name")]
+		public string Name { get; set; }
+
+		[JsonProperty("rotation")]
+		public float? Rotation { get; set; }
+
+		public void Merge(ImageBasedLightingEnvironment environment) {
+			if (Name != null) {
+				environment.EnvironmentName = Name;
+			}
+			if (Rotation.HasValue) {
+				environment.Rotation = Rotation.Value;
+			}
+		}
+	}
+
+	public Recipe Recipize() {
+		return new Recipe {
+			Name = environmentName,
+			Rotation = Rotation
+		};
 	}
 }
