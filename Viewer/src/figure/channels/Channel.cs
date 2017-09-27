@@ -65,4 +65,8 @@ public class Channel {
 	public double GetValue(ChannelOutputs outputs) {
 		return outputs.Values[this.Index];
 	}
+
+	public double GetInputValue(ChannelInputs inputs) {
+		return inputs.RawValues[this.Index];
+	}
 }

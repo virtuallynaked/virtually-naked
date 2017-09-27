@@ -63,4 +63,18 @@ public static class MathExtensions {
 			return x * Sqr(1 - Sqr(z));
 		}
 	}
+
+	public static Vector3 DegreesToRadians(Vector3 angles) {
+		return new Vector3(
+			MathUtil.DegreesToRadians(angles.X),
+			MathUtil.DegreesToRadians(angles.Y),
+			MathUtil.DegreesToRadians(angles.Z));
+	}
+
+	public static Vector3 RadiansToDegrees(Vector3 angles) {
+		return new Vector3(
+			MathUtil.RadiansToDegrees(angles.X),
+			MathUtil.RadiansToDegrees(angles.Y),
+			MathUtil.RadiansToDegrees(angles.Z));
+	}
 }

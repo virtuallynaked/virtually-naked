@@ -1,6 +1,5 @@
 ﻿using ProtoBuf;
 using SharpDX;
-using System;
 
 [ProtoContract(UseProtoMembersOnly = true)]
 public struct DualQuaternion {
@@ -77,5 +76,8 @@ public struct DualQuaternion {
 	public DualQuaternion Chain(DualQuaternion dq2) {
 		return Multiply(dq2, this);
 	}
-
+	
+	public Matrix ToMatrix() {
+		return Matrix.RotationQuaternion(Rotation) * Matrix.Translation(Translation);
+	}
 }

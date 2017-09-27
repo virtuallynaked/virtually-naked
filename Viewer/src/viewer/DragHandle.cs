@@ -10,7 +10,14 @@ class DragHandle {
 	private Matrix objectToControllerTransform;
 	private Matrix objectToWorldTransform;
 
-	public Matrix Transform => objectToWorldTransform;
+	public Matrix Transform {
+		get {
+			return objectToWorldTransform;
+		}
+		set {
+			objectToWorldTransform = value;
+		}
+	}
 	
 	public DragHandle(ControllerManager controllerManager, Matrix initialTransform) {
 		this.controllerManager = controllerManager;

@@ -92,7 +92,7 @@ class FigureGroup : IDisposable {
 
 		[JsonProperty("hair")]
 		public FigureFacade.Recipe hair;
-
+		
 		[JsonProperty("animation")]
 		public string animation;
 
@@ -101,6 +101,9 @@ class FigureGroup : IDisposable {
 
 		[JsonProperty("channel-values")]
 		public Dictionary<string, double> channelValues;
+
+		[JsonProperty("pose")]
+		public FigureBehavior.PoseRecipe pose;
 
 		public void Merge(FigureGroup group) {
 			main?.Merge(group.Parent);
@@ -112,6 +115,7 @@ class FigureGroup : IDisposable {
 			if (channelValues != null) {
 				group.Parent.Model.UserValues = channelValues;
 			}
+			pose?.Merge(group.Parent.Behaviour);
 		}
 	}
 
@@ -121,7 +125,8 @@ class FigureGroup : IDisposable {
 			hair = Hair?.Recipize(),
 			animation = Parent.Model.Animation.ActiveName,
 			behaviour = Parent.Model.Behavior.Recipize(),
-			channelValues = Parent.Model.UserValues
+			channelValues = Parent.Model.UserValues,
+			pose = Parent.Behaviour.RecipizePose()
 		};
 	}
 }

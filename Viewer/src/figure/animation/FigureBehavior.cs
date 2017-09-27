@@ -1,4 +1,8 @@
-﻿public class FigureBehavior {
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using SharpDX;
+
+public class FigureBehavior {
 	public static FigureBehavior Load(ControllerManager controllerManager, IArchiveDirectory figureDir, FigureModel model) {
 		InverterParameters inverterParameters = Persistance.Load<InverterParameters>(figureDir.File("inverter-parameters.dat"));
 		return new FigureBehavior(controllerManager, model, inverterParameters);
@@ -52,5 +56,58 @@
 		proceduralAnimator.Update(updateParameters, inputs);
 
 		return inputs;
+	}
+
+	public class PoseRecipe {
+		[JsonProperty("rotation")]
+		public float[] rotation;
+
+		[JsonProperty("translation")]
+		public float[] translation;
+
+		[JsonProperty("bone-rotations")]
+		public Dictionary<string, float[]> boneRotations;
+
+		public void Merge(FigureBehavior behaviour) {
+			Vector3 rootRotation = new Vector3(rotation);
+			Vector3 rootTranslation = new Vector3(translation);
+			DualQuaternion rootTransform = DualQuaternion.FromRotationTranslation(
+				behaviour.model.BoneSystem.RootBone.RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rootRotation)),
+				rootTranslation);
+			behaviour.dragHandle.Transform = rootTransform.ToMatrix();
+
+			var inputs = behaviour.ikAnimator.InputDeltas;
+			inputs.ClearToZero();
+			foreach (var bone in behaviour.model.BoneSystem.Bones) {
+				Vector3 angles;
+				if (boneRotations.TryGetValue(bone.Name, out var values)) {
+					angles = new Vector3(values);
+				} else {
+					angles = Vector3.Zero;
+				}
+				bone.Rotation.SetValue(inputs, angles);
+			}
+		}
+	}
+
+	public PoseRecipe RecipizePose() {
+		var rootTransform = DualQuaternion.FromMatrix(dragHandle.Transform);
+		Vector3 rootRotation = MathExtensions.RadiansToDegrees(model.BoneSystem.RootBone.RotationOrder.ToAngles(rootTransform.Rotation));
+		Vector3 rootTranslation = rootTransform.Translation;
+		
+		Dictionary<string, float[]> boneRotations = new Dictionary<string, float[]>();
+		var inputs = ikAnimator.InputDeltas;
+		foreach (var bone in model.BoneSystem.Bones) {
+			var angles = bone.Rotation.GetInputValue(inputs);
+			if (!angles.IsZero) {
+				boneRotations.Add(bone.Name, angles.ToArray());
+			}
+		}
+
+		return new PoseRecipe {
+			rotation = rootRotation.ToArray(),
+			translation = rootTranslation.ToArray(),
+			boneRotations = boneRotations
+		};
 	}
 }

@@ -27,6 +27,14 @@ public class ChannelTriplet {
 		);
 	}
 
+	public Vector3 GetInputValue(ChannelInputs inputs) {
+		return new Vector3(
+			(float) X.GetInputValue(inputs),
+			(float) Y.GetInputValue(inputs),
+			(float) Z.GetInputValue(inputs)
+		);
+	}
+
 	public void SetValue(ChannelInputs inputs, Vector3 value, SetMask mask = SetMask.Any) {
 		X.SetValue(inputs, value.X, mask);
 		Y.SetValue(inputs, value.Y, mask);

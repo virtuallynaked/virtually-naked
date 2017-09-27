@@ -36,13 +36,6 @@ public class Bone {
 		GeneralScale = generalScale;
 	}
 
-	private static Vector3 DegreesToRadians(Vector3 angles) {
-		return new Vector3(
-			MathUtil.DegreesToRadians(angles.X),
-			MathUtil.DegreesToRadians(angles.Y),
-			MathUtil.DegreesToRadians(angles.Z));
-	}
-
 	private Matrix3x3 GetCombinedScale(ChannelOutputs outputs) {
 		Vector3 scale = Scale.GetValue(outputs);
 		float generalScale = (float) GeneralScale.GetValue(outputs);
@@ -56,7 +49,7 @@ public class Bone {
 
 	public OrientationSpace GetOrientationSpace(ChannelOutputs outputs) {
 		Vector3 orientationAngles = Orientation.GetValue(outputs);
-		Quaternion orientation = RotationOrder.DazStandard.FromAngles(DegreesToRadians(orientationAngles));
+		Quaternion orientation = RotationOrder.DazStandard.FromAngles(MathExtensions.DegreesToRadians(orientationAngles));
 		return new OrientationSpace(orientation);
 	}
 
@@ -64,7 +57,7 @@ public class Bone {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 
 		Vector3 rotationAngles = Rotation.GetValue(outputs);
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(DegreesToRadians(rotationAngles));
+		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
 		return worldSpaceRotation;
@@ -75,10 +68,7 @@ public class Bone {
 		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
 
 		Vector3 rotationAnglesRadians = RotationOrder.ToAngles(orientatedSpaceRotation);
-		Vector3 rotationAnglesDegrees = new Vector3(
-			MathUtil.RadiansToDegrees(rotationAnglesRadians.X),
-			MathUtil.RadiansToDegrees(rotationAnglesRadians.Y),
-			MathUtil.RadiansToDegrees(rotationAnglesRadians.Z));
+		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 
 		return rotationAnglesDegrees;
 	}
@@ -111,7 +101,7 @@ public class Bone {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 
 		Vector3 rotationAngles = Rotation.GetValue(outputs);
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(DegreesToRadians(rotationAngles));
+		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
 		Vector3 translation = Vector3.Transform(Translation.GetValue(outputs), parentScale);

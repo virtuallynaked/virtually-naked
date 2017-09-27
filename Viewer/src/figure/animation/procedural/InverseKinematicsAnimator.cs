@@ -15,6 +15,8 @@ public class InverseKinematicsAnimator {
 		model.PoseReset += Reset;
 	}
 	
+	public ChannelInputs InputDeltas => inputDeltas;
+
 	private void Reset() {
 		inputDeltas.ClearToZero();
 	}

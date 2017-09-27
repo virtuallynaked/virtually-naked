@@ -38,6 +38,8 @@ public class FigureFacade : IDisposable {
 		this.controlVertexProvider = controlVertexProvider;
 		this.renderer = renderer;
 	}
+
+	public FigureBehavior Behaviour => behavior;
 	
 	public void Dispose() {
 		controlVertexProvider.Dispose();
