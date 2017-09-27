@@ -1,4 +1,5 @@
-﻿using SharpDX.Direct3D11;
+﻿using Newtonsoft.Json;
+using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,5 +88,30 @@ public class FigureFacade : IDisposable {
 
 	public void Update(DeviceContext context, ImageBasedLightingEnvironment lightingEnvironment) {
 		renderer.Update(context, lightingEnvironment, controlVertexProvider.ControlVertexInfosView);
+	}
+
+	public class Recipe {
+		[JsonProperty("shape")]
+		public string shape;
+		
+		[JsonProperty("material-set")]
+		public string materialSet;
+
+		public void Merge(FigureFacade figure) {
+			if (shape != null) {
+				figure.model.Shapes.ActiveName = shape;
+			}
+
+			if (materialSet != null) {
+				figure.model.Materials.ActiveName = materialSet;
+			}
+		}
+	}
+	
+	public Recipe Recipize() {
+		return new Recipe {
+			shape = model.Shapes.ActiveName,
+			materialSet = model.Materials.ActiveName
+		};
 	}
 }

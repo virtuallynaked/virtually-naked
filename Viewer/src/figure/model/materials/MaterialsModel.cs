@@ -38,4 +38,13 @@ public class MaterialsModel {
 			Changed?.Invoke(old, value);
 		}
 	}
+
+	public string ActiveName {
+		get {
+			return active.Label;
+		}
+		set {
+			Active = Options.Find(option => option.Label == value);
+		}
+	}
 }

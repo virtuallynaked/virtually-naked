@@ -50,4 +50,13 @@ public class ShapesModel {
 			ShapeChanged?.Invoke(old, value);
 		}
 	}
+
+	public string ActiveName {
+		get {
+			return active.Label;
+		}
+		set {
+			Active = Options.Find(option => option.Label == value);
+		}
+	}
 }

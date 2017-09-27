@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 public class FigureModel {
 	public static FigureModel Load(IArchiveDirectory figureDir, string shapeName, string materialSetName, string animationName, FigureModel parent) {
@@ -97,6 +98,34 @@ public class FigureModel {
 		foreach (Channel channel in channelSystem.Channels) {
 			int idx = channel.Index;
 			inputs.RawValues[idx] += newInputs.RawValues[idx] - oldInputs.RawValues[idx];
+		}
+	}
+
+	public Dictionary<string, double> UserValues {
+		get {
+			Dictionary<string, double> userValues = new Dictionary<string, double>();
+			var initialInputs = shapes.Active.ChannelInputs;
+			foreach (Channel channel in channelSystem.Channels) {
+				int idx = channel.Index;
+				double userValue = inputs.RawValues[idx] - initialInputs.RawValues[idx];
+				if (userValue != 0) {
+					userValues.Add(channel.Name, userValue);
+				}
+			}
+			return userValues;
+		}
+		set {
+			var initialInputs = shapes.Active.ChannelInputs;
+			Dictionary<string, double> userValues = value;
+
+			foreach (Channel channel in channelSystem.Channels) {
+				int idx = channel.Index;
+
+				double initialInput = initialInputs.RawValues[channel.Index];
+				userValues.TryGetValue(channel.Name, out double userValue);
+
+				inputs.RawValues[idx] = userValue + initialInput;
+			}
 		}
 	}
 }

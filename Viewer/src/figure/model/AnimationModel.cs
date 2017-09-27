@@ -89,4 +89,13 @@ public class AnimationModel {
 		this.Animations = animations;
 		this.ActiveAnimation = activeAnimation;
 	}
+	
+	public string ActiveName {
+		get {
+			return ActiveAnimation.Label;
+		}
+		set {
+			ActiveAnimation = Animations.Find(option => option.Label == value);
+		}
+	}
 }

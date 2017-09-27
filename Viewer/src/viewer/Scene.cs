@@ -75,15 +75,20 @@ class Scene : IDisposable {
 	public class Recipe {
 		[JsonProperty("lighting-environment")]
 		public ImageBasedLightingEnvironment.Recipe lightingEnvironment;
+
+		[JsonProperty("actor")]
+		public FigureGroup.Recipe actor;
 		
 		public void Merge(Scene scene) {
 			lightingEnvironment?.Merge(scene.iblEnvironment);
+			actor?.Merge(scene.figureGroup);
 		}
 	}
 
 	public Recipe Recipize() {
 		return new Recipe {
-			lightingEnvironment = iblEnvironment.Recipize()
+			lightingEnvironment = iblEnvironment.Recipize(),
+			actor = figureGroup.Recipize()
 		};
 	}
 }
