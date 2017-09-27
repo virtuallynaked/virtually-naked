@@ -217,6 +217,8 @@ public class VRApp : IDisposable {
 					Debug.WriteLine("hide render models");
 					break;
 			}
+
+			OpenVRKeyboardHelper.ProcessEvent(vrEvent);
 		}
 	}
 	

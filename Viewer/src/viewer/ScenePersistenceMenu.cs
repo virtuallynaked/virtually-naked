@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Valve.VR;
 
 class ScenePersistenceMenuLevel : IMenuLevel {
 	public static ScenePersistenceMenuLevel Make(Scene scene) {
@@ -20,6 +21,8 @@ class ScenePersistenceMenuLevel : IMenuLevel {
 		this.savesDirectory = savesDirectory;
 	}
 
+	public event Action ItemsChanged;
+
 	private void LoadScene(FileInfo sceneFile) {
 		using (var textReader = sceneFile.OpenText())
 		using (var jsonReader = new JsonTextReader(textReader)) {
@@ -28,10 +31,10 @@ class ScenePersistenceMenuLevel : IMenuLevel {
 		}
 	}
 
-	private void SaveScene() {
+	private void SaveScene(string name) {
 		var recipe = scene.Recipize();
 		
-		var sceneFile = savesDirectory.File(Guid.NewGuid().ToString() + ".scene");
+		var sceneFile = savesDirectory.File(name + ".scene");
 		using (var textWriter = sceneFile.CreateText())
 		using (var jsonWriter = new JsonTextWriter(textWriter)) {
 			var serializerSettings = new JsonSerializerSettings {
@@ -39,6 +42,18 @@ class ScenePersistenceMenuLevel : IMenuLevel {
 			};
 			JsonSerializer.Create(serializerSettings).Serialize(jsonWriter, recipe);
 		}
+
+		ItemsChanged?.Invoke();
+	}
+
+	private void SaveScene() {
+		OpenVRKeyboardHelper.PromptForString(
+			EGamepadTextInputMode.k_EGamepadTextInputModeNormal,
+			EGamepadTextInputLineMode.k_EGamepadTextInputLineModeSingleLine,
+			"Scene Name",
+			0,
+			"",
+			SaveScene);
 	}
 	
 	public List<IMenuItem> GetItems() {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public class MaterialSetMenuItem : IToggleMenuItem {
@@ -24,6 +25,11 @@ public class MaterialsMenuLevel : IMenuLevel {
 
 	public MaterialsMenuLevel(MaterialsModel model) {
 		this.model = model;
+	}
+
+	public event Action ItemsChanged {
+		add { }
+		remove { }
 	}
 
 	public List<IMenuItem> GetItems() {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public class ChannelMenuLevel : IMenuLevel {
 	private static readonly HashSet<string> SkipCategories = new HashSet<string> { "Real World", "Fantasy SciFi", "Actor" };
@@ -34,6 +35,11 @@ public class ChannelMenuLevel : IMenuLevel {
 		this.figure = figure;
 	}
 	
+	public event Action ItemsChanged {
+		add { }
+		remove { }
+	}
+
 	public List<IMenuItem> GetItems() {
 		List<IMenuItem> items = new List<IMenuItem>();
 

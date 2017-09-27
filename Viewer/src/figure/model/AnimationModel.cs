@@ -52,6 +52,11 @@ public class AnimationMenuLevel : IMenuLevel {
 		this.model = model;
 	}
 
+	public event Action ItemsChanged {
+		add { }
+		remove { }
+	}
+
 	public List<IMenuItem> GetItems() {
 		return model.Animations
 			.Select(animation => (IMenuItem) new AnimationMenuItem(model, animation))

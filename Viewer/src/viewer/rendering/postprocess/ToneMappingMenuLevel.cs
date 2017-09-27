@@ -88,6 +88,11 @@ public class ToneMappingMenuLevel : IMenuLevel {
 		};
 	}
 
+	public event Action ItemsChanged {
+		add { }
+		remove { }
+	}
+
 	public List<IMenuItem> GetItems() {
 		return items;
 	}

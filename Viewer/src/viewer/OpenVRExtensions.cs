@@ -151,4 +151,11 @@ static class OpenVRExtensions {
 			throw OpenVRException.Make(peError);
 		}
 	}
+
+	public static string GetKeyboardText(this CVROverlay overlay) {
+		uint length = overlay.GetKeyboardText(null, 0) + 1;
+		StringBuilder builder = new StringBuilder((int) length);
+		overlay.GetKeyboardText(builder, length);
+		return builder.ToString();
+	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public class ShapesMenuItem : IToggleMenuItem {
@@ -24,6 +25,11 @@ public class ShapesMenuLevel : IMenuLevel {
 
 	public ShapesMenuLevel(FigureModel model) {
 		this.model = model;
+	}
+
+	public event Action ItemsChanged {
+		add { }
+		remove { }
 	}
 
 	public List<IMenuItem> GetItems() {

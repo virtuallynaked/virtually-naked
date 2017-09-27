@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public class CharacterMenuItem : IToggleMenuItem {
@@ -42,6 +43,11 @@ public class CharactersMenuLevel : IMenuLevel {
 				items.Add(new CharacterMenuItem(model, shape, materialSet));
 			}
 		}
+	}
+
+	public event Action ItemsChanged {
+		add { }
+		remove { }
 	}
 
 	public List<IMenuItem> GetItems() {

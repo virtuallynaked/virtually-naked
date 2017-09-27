@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public class LookAtPlayerMenuItem : IToggleMenuItem {
 	private readonly BehaviorModel model;
@@ -21,6 +22,11 @@ public class BehaviorMenuLevel : IMenuLevel {
 
 	public BehaviorMenuLevel(BehaviorModel model) {
 		this.model = model;
+	}
+
+	public event Action ItemsChanged {
+		add { }
+		remove { }
 	}
 
 	public List<IMenuItem> GetItems() {

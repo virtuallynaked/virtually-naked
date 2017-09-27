@@ -5,6 +5,7 @@ using System.Linq;
 
 public interface IMenuLevel {
 	List<IMenuItem> GetItems();
+	event Action ItemsChanged;
 }
 
 public class StaticMenuLevel : IMenuLevel {
@@ -12,6 +13,11 @@ public class StaticMenuLevel : IMenuLevel {
 
 	public StaticMenuLevel(params IMenuItem[] items) {
 		this.items = items.ToList();
+	}
+
+	public event Action ItemsChanged {
+		add { }
+		remove { }
 	}
 
 	public List<IMenuItem> GetItems() {
@@ -24,6 +30,19 @@ public class CombinedMenuLevel : IMenuLevel {
 
 	public CombinedMenuLevel(params IMenuLevel[] levels) {
 		this.levels = levels;
+	}
+
+	public event Action ItemsChanged {
+		add {
+			foreach (var level in levels) {
+				level.ItemsChanged += value;
+			}
+		}
+		remove {
+			foreach (var level in levels) {
+				level.ItemsChanged -= value;
+			}
+		}
 	}
 
 	public List<IMenuItem> GetItems() {
@@ -80,6 +99,7 @@ public class ActionMenuItem : IMenuItem {
 public class MenuModel {
 	private const int VisibleItems = 4;
 	
+	private IMenuLevel currentlyActiveLevel = null;
 	private Stack<IMenuLevel> levelStack = new Stack<IMenuLevel>();
 	private List<IMenuItem> items;
 	private float y;
@@ -100,24 +120,36 @@ public class MenuModel {
 	public List<IMenuItem> Items => items;
 
 	public bool IsEditing => activeRangeItem != null;
+	
+	private void ActivateLevel() {
+		if (currentlyActiveLevel != null) {
+			currentlyActiveLevel.ItemsChanged -= OnItemsChanged;
+		}
+		currentlyActiveLevel = levelStack.Peek();
+		currentlyActiveLevel.ItemsChanged += OnItemsChanged;
+		
+		y = 0.5f;
+		selectedItemIdx = 0;
 
-	private void ActivateLevel(bool keepPosition = false) {
+		RefreshItems();
+	}
+
+	private void RefreshItems() {
 		items = new List<IMenuItem>();
 
 		if (levelStack.Count > 1) {
 			items.Add(UpMenuItem.Instance);
 		}
 		
-		items.AddRange(levelStack.Peek().GetItems());
-
-		if (!keepPosition) {
-			y = 0.5f;
-			selectedItemIdx = 0;
-		}
+		items.AddRange(currentlyActiveLevel.GetItems());
 		
 		Changed?.Invoke();
 	}
-	
+
+	private void OnItemsChanged() {
+		RefreshItems();
+	}
+
 	public static double Clamp(double value, double min, double max) {
 		if (value < min) {
 			return min;
@@ -198,7 +230,7 @@ public class MenuModel {
 
 				case ActionMenuItem actionItem:
 					actionItem.Action.Invoke();
-					ActivateLevel(true);
+					Changed?.Invoke();
 					break;
 
 				default:
