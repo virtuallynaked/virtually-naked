@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-static class FigureGroupMenuProvider {
+static class ActorMenuProvider {
 	public static IMenuLevel MakeHairMenuLevel(FigureFacade hairFigure) {
 		if (hairFigure == null) {
 			return null;
@@ -17,8 +17,8 @@ static class FigureGroupMenuProvider {
 		return hairMenuLevel;
 	}
 
-	public static IMenuLevel MakeRootMenuLevel(FigureGroup group) {
-		var parentModel = group.Parent.Model;
+	public static IMenuLevel MakeRootMenuLevel(Actor actor) {
+		var parentModel = actor.Main.Model;
 		var channelMenuLevel = ChannelMenuLevel.MakeRootLevelForFigure(parentModel);
 		var poseControlsMenuLevel = channelMenuLevel.Extract(new string[] {"Pose Controls"});
 		var expressionsMenuLevel = poseControlsMenuLevel.Extract(new string[] {"Head", "Expressions"});
@@ -38,7 +38,7 @@ static class FigureGroupMenuProvider {
 		List<IMenuItem> items = new List<IMenuItem> { };
 		items.Add(new SubLevelMenuItem("Characters", charactersMenuLevel));
 		
-		var hairMenuLevel = MakeHairMenuLevel(group.Hair);
+		var hairMenuLevel = MakeHairMenuLevel(actor.Hair);
 		if (hairMenuLevel != null) {
 			items.Add(new SubLevelMenuItem("Hair", hairMenuLevel));
 		}

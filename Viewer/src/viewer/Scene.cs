@@ -11,7 +11,7 @@ class Scene : IDisposable {
 	private readonly PlayspaceFloor floor;
 	private readonly RenderModelRenderer renderModelRenderer;
 	private readonly QuadMeshRenderer primitiveRenderer;
-	private readonly FigureGroup figureGroup;
+	private readonly Actor actor;
 	private readonly Menu menu;
 
 	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDevicePose_t[] poses, ControllerManager controllerManager, IMenuLevel toneMappingMenuLevel) {
@@ -20,7 +20,7 @@ class Scene : IDisposable {
 		floor = new PlayspaceFloor(device, shaderCache);
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, poses);
 		primitiveRenderer = new QuadMeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100));
-		figureGroup = FigureGroup.Load(dataDir, device, shaderCache, controllerManager);
+		actor = Actor.Load(dataDir, device, shaderCache, controllerManager);
 		
 		var iblMenu = LightingEnvironmentMenu.MakeMenuLevel(dataDir, iblEnvironment);
 		var renderSettingsMenuLevel = new StaticMenuLevel(
@@ -33,7 +33,7 @@ class Scene : IDisposable {
 			new SubLevelMenuItem("Render Settings", renderSettingsMenuLevel)
 		);
 
-		var rootMenuLevel = new CombinedMenuLevel(appMenuLevel, figureGroup.MenuLevel);
+		var rootMenuLevel = new CombinedMenuLevel(appMenuLevel, actor.MenuLevel);
 		menu = new Menu(device, shaderCache, controllerManager, rootMenuLevel);
 	}
 
@@ -43,7 +43,7 @@ class Scene : IDisposable {
 		floor.Dispose();
 		renderModelRenderer.Dispose();
 		primitiveRenderer.Dispose();
-		figureGroup.Dispose();
+		actor.Dispose();
 		menu.Dispose();
 	}
 
@@ -51,7 +51,7 @@ class Scene : IDisposable {
 		menu.Update(context);
 		iblEnvironment.Predraw(context);
 		floor.Update(context);
-		figureGroup.Update(context, updateParameters, iblEnvironment);
+		actor.Update(context, updateParameters, iblEnvironment);
 	}
 
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
@@ -64,7 +64,7 @@ class Scene : IDisposable {
 			//primitiveRenderer.Render(context);
 		}
 		
-		figureGroup.RenderPass(context, pass);
+		actor.RenderPass(context, pass);
 		menu.RenderPass(context, pass);
 	}
 
@@ -77,18 +77,18 @@ class Scene : IDisposable {
 		public ImageBasedLightingEnvironment.Recipe lightingEnvironment;
 
 		[JsonProperty("actor")]
-		public FigureGroup.Recipe actor;
+		public Actor.Recipe actor;
 		
 		public void Merge(Scene scene) {
 			lightingEnvironment?.Merge(scene.iblEnvironment);
-			actor?.Merge(scene.figureGroup);
+			actor?.Merge(scene.actor);
 		}
 	}
 
 	public Recipe Recipize() {
 		return new Recipe {
 			lightingEnvironment = iblEnvironment.Recipize(),
-			actor = figureGroup.Recipize()
+			actor = actor.Recipize()
 		};
 	}
 }

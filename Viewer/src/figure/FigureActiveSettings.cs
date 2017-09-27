@@ -11,7 +11,7 @@ public static class FigureActiveSettings {
 	public const string Animation = "idle";
 	public const float AnimationSpeed = 0.8f;
 
-	public static string Parent = "genesis-3-female";
+	public static string Main = "genesis-3-female";
 
 	public static string Hair =
 		//null;
