@@ -45,8 +45,7 @@ public class InverseKinematicsUserInterface {
 	};
 
 	private readonly ControllerManager controllerManager;
-	private readonly ChannelSystem channelSystem;
-	private readonly BoneSystem boneSystem;
+	private readonly FigureDefinition definition;
 	private readonly InverterParameters inverterParameters;
 
 	private bool tracking = false;
@@ -54,10 +53,9 @@ public class InverseKinematicsUserInterface {
 	private Bone sourceBone;
 	private Vector3 boneRelativeSourcePosition;
 
-	public InverseKinematicsUserInterface(ControllerManager controllerManager, ChannelSystem channelSystem, BoneSystem boneSystem, InverterParameters inverterParameters) {
+	public InverseKinematicsUserInterface(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
 		this.controllerManager = controllerManager;
-		this.channelSystem = channelSystem;
-		this.boneSystem = boneSystem;
+		this.definition = definition;
 		this.inverterParameters = inverterParameters;
 	}
 	
@@ -72,12 +70,12 @@ public class InverseKinematicsUserInterface {
 		}
 
 		string boneName = inverterParameters.FaceGroupToNodeMap[grabFaceGroupName];
-		return boneSystem.BonesByName[boneName];
+		return definition.BoneSystem.BonesByName[boneName];
 	}
 
 	public InverseKinematicsProblem GetProblem(ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
-		var outputs = channelSystem.Evaluate(null, inputs);
-		var boneTransforms = boneSystem.GetBoneTransforms(outputs);
+		var outputs = definition.ChannelSystem.Evaluate(null, inputs);
+		var boneTransforms = definition.BoneSystem.GetBoneTransforms(outputs);
 
 		if (!tracking) {
 			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {

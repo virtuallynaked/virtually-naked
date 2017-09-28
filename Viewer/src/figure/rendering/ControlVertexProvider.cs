@@ -33,13 +33,13 @@ public class ControlVertexProvider : IDisposable {
 		var unmorphedOcclusionDirectory = figureDir.Subdirectory("occlusion");
 		var occlusionDirectory = model.Shapes.Active.Directory ?? unmorphedOcclusionDirectory;
 		
-		bool isMainFigure = model.ChannelSystem.Parent == null;
+		bool isMainFigure = model.Definition.ChannelSystem.Parent == null;
 
 		var occluder = LoadOccluder(device, shaderCache, isMainFigure, unmorphedOcclusionDirectory, occlusionDirectory);
 
 		var provider = new ControlVertexProvider(
 			device, shaderCache,
-			model,
+			model.Definition,
 			shaperParameters,
 			occluder);
 
@@ -52,7 +52,7 @@ public class ControlVertexProvider : IDisposable {
 		return provider;
 	}
 
-	private readonly FigureModel model;
+	private readonly FigureDefinition definition;
 	private IOccluder occluder;
 	private readonly GpuShaper shaper;
 	
@@ -62,10 +62,10 @@ public class ControlVertexProvider : IDisposable {
 	private readonly StagingStructuredBufferManager<ControlVertexInfo> controlVertexInfoStagingBufferManager;
 
 	public ControlVertexProvider(Device device, ShaderCache shaderCache,
-		FigureModel model,
+		FigureDefinition definition,
 		ShaperParameters shaperParameters,
 		IOccluder occluder) {
-		this.model = model;
+		this.definition = definition;
 		this.shaper = new GpuShaper(device, shaderCache, shaperParameters);
 		this.occluder = occluder;
 		
@@ -73,7 +73,7 @@ public class ControlVertexProvider : IDisposable {
 		
 		controlVertexInfosBufferManager = new InOutStructuredBufferManager<ControlVertexInfo>(device, vertexCount);
 
-		if (model.ChannelSystem.Parent == null) {
+		if (definition.ChannelSystem.Parent == null) {
 			this.controlVertexInfoStagingBufferManager = new StagingStructuredBufferManager<ControlVertexInfo>(device, vertexCount);
 		}
 	}
@@ -130,8 +130,8 @@ public class ControlVertexProvider : IDisposable {
 	}
 
 	public ChannelOutputs UpdateFrame(ChannelOutputs parentOutputs, ChannelInputs inputs) {
-		var channelOutputs = model.ChannelSystem.Evaluate(parentOutputs, inputs);
-		var boneTransforms = model.BoneSystem.GetBoneTransforms(channelOutputs);
+		var channelOutputs = definition.ChannelSystem.Evaluate(parentOutputs, inputs);
+		var boneTransforms = definition.BoneSystem.GetBoneTransforms(channelOutputs);
 		occluder.SetValues(channelOutputs);
 		shaper.SetValues(channelOutputs, boneTransforms);
 		return channelOutputs;

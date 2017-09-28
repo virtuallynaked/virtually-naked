@@ -18,9 +18,9 @@ public class FigureBehavior {
 
 	public FigureBehavior(ControllerManager controllerManager, FigureModel model, InverterParameters inverterParameters) {
 		this.model = model;
-		poser = new Poser(model.ChannelSystem, model.BoneSystem);
-		ikAnimator = new InverseKinematicsAnimator(controllerManager, model, inverterParameters);
-		proceduralAnimator = new StandardProceduralAnimator(model);
+		poser = new Poser(model.Definition);
+		ikAnimator = new InverseKinematicsAnimator(controllerManager, model.Definition, inverterParameters);
+		proceduralAnimator = new StandardProceduralAnimator(model.Definition, model.Behavior);
 		dragHandle = new DragHandle(controllerManager, FigureActiveSettings.InitialTransform);
 	}
 	
@@ -34,7 +34,7 @@ public class FigureBehavior {
 		Pose prevFramePose = posesByFrame[IntegerUtils.Mod(baseFrameIdx + 0, posesByFrame.Count)];
 		Pose nextFramePose = posesByFrame[IntegerUtils.Mod(baseFrameIdx + 1, posesByFrame.Count)];
 		
-		var poseBlender = new PoseBlender(model.BoneSystem.Bones.Count);
+		var poseBlender = new PoseBlender(model.Definition.BoneSystem.Bones.Count);
 		float alpha = currentFrameIdx - baseFrameIdx;
 		poseBlender.Add(1 - alpha, prevFramePose);
 		poseBlender.Add(alpha, nextFramePose);
@@ -72,13 +72,13 @@ public class FigureBehavior {
 			Vector3 rootRotation = new Vector3(rotation);
 			Vector3 rootTranslation = new Vector3(translation);
 			DualQuaternion rootTransform = DualQuaternion.FromRotationTranslation(
-				behaviour.model.BoneSystem.RootBone.RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rootRotation)),
+				behaviour.model.Definition.BoneSystem.RootBone.RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rootRotation)),
 				rootTranslation);
 			behaviour.dragHandle.Transform = rootTransform.ToMatrix();
 
 			var inputs = behaviour.ikAnimator.InputDeltas;
 			inputs.ClearToZero();
-			foreach (var bone in behaviour.model.BoneSystem.Bones) {
+			foreach (var bone in behaviour.model.Definition.BoneSystem.Bones) {
 				Vector3 angles;
 				if (boneRotations.TryGetValue(bone.Name, out var values)) {
 					angles = new Vector3(values);
@@ -92,12 +92,12 @@ public class FigureBehavior {
 
 	public PoseRecipe RecipizePose() {
 		var rootTransform = DualQuaternion.FromMatrix(dragHandle.Transform);
-		Vector3 rootRotation = MathExtensions.RadiansToDegrees(model.BoneSystem.RootBone.RotationOrder.ToAngles(rootTransform.Rotation));
+		Vector3 rootRotation = MathExtensions.RadiansToDegrees(model.Definition.BoneSystem.RootBone.RotationOrder.ToAngles(rootTransform.Rotation));
 		Vector3 rootTranslation = rootTransform.Translation;
 		
 		Dictionary<string, float[]> boneRotations = new Dictionary<string, float[]>();
 		var inputs = ikAnimator.InputDeltas;
-		foreach (var bone in model.BoneSystem.Bones) {
+		foreach (var bone in model.Definition.BoneSystem.Bones) {
 			var angles = bone.Rotation.GetInputValue(inputs);
 			if (!angles.IsZero) {
 				boneRotations.Add(bone.Name, angles.ToArray());

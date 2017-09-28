@@ -1,18 +1,14 @@
 ﻿using SharpDX;
 
 public class InverseKinematicsAnimator {
-	private readonly ChannelSystem channelSystem;
-	private readonly BoneSystem boneSystem;
+	private readonly FigureDefinition definition;
 	private readonly InverseKinematicsUserInterface ui;
 	private readonly ChannelInputs inputDeltas;
 
-	public InverseKinematicsAnimator(ControllerManager controllerManager, FigureModel model, InverterParameters inverterParameters) {
-		this.channelSystem = model.ChannelSystem;
-		this.boneSystem = model.BoneSystem;
-		this.ui = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
-		this.inputDeltas = channelSystem.MakeZeroChannelInputs();
-
-		model.PoseReset += Reset;
+	public InverseKinematicsAnimator(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
+		this.definition = definition;
+		this.ui = new InverseKinematicsUserInterface(controllerManager, definition, inverterParameters);
+		this.inputDeltas = definition.ChannelSystem.MakeZeroChannelInputs();
 	}
 	
 	public ChannelInputs InputDeltas => inputDeltas;
@@ -57,13 +53,13 @@ public class InverseKinematicsAnimator {
 		}
 		
 		for (int i = 0; i < 1; ++i) {
-			var outputs = channelSystem.Evaluate(null, inputs);
-			var boneTransforms = boneSystem.GetBoneTransforms(outputs);
+			var outputs = definition.ChannelSystem.Evaluate(null, inputs);
+			var boneTransforms = definition.BoneSystem.GetBoneTransforms(outputs);
 			
 			var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.BoneRelativeSourcePosition);
 
 			float weight = 0.5f;
-			for (var bone = problem.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
+			for (var bone = problem.SourceBone; bone != definition.BoneSystem.RootBone && bone.Parent != definition.BoneSystem.RootBone; bone = bone.Parent) {
 				ApplyCorrection(inputs, outputs, boneTransforms, bone, sourcePosition, problem.TargetPosition, weight);
 				weight *= 0.5f;
 			}

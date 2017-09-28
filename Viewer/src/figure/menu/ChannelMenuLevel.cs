@@ -4,14 +4,14 @@ using System.Collections.Generic;
 public class ChannelMenuLevel : IMenuLevel {
 	private static readonly HashSet<string> SkipCategories = new HashSet<string> { "Real World", "Fantasy SciFi", "Actor" };
 
-	private FigureModel figure;
+	private FigureModel model;
 	public Dictionary<string, ChannelMenuLevel> SubLevels { get; } = new Dictionary<string, ChannelMenuLevel>();
 	public Dictionary<string, Channel> Channels { get; } = new Dictionary<string, Channel>();
 
-	public static ChannelMenuLevel MakeRootLevelForFigure(FigureModel figure) {
-		var rootLevel = new ChannelMenuLevel(figure);
+	public static ChannelMenuLevel MakeRootLevelForFigure(FigureModel model) {
+		var rootLevel = new ChannelMenuLevel(model);
 		
-		foreach (Channel channel in figure.ChannelSystem.Channels) {
+		foreach (Channel channel in model.Definition.ChannelSystem.Channels) {
 			if (!channel.Visible) {
 				continue;
 			}
@@ -31,8 +31,8 @@ public class ChannelMenuLevel : IMenuLevel {
 		return rootLevel;
 	}
 
-	public ChannelMenuLevel(FigureModel figure) {
-		this.figure = figure;
+	public ChannelMenuLevel(FigureModel model) {
+		this.model = model;
 	}
 	
 	public event Action ItemsChanged {
@@ -47,7 +47,7 @@ public class ChannelMenuLevel : IMenuLevel {
 			items.Add(new SubLevelMenuItem(pair.Key, pair.Value));
 		}
 		foreach (var pair in Channels) {
-			items.Add(new ChannelMenuItem(pair.Key, figure, pair.Value));
+			items.Add(new ChannelMenuItem(pair.Key, model, pair.Value));
 		}
 
 		return items;
@@ -83,7 +83,7 @@ public class ChannelMenuLevel : IMenuLevel {
 			Channels[pathElem] = channel;
 		} else {
 			if (!SubLevels.TryGetValue(pathElem, out var subLevel)) {
-				subLevel = new ChannelMenuLevel(figure);
+				subLevel = new ChannelMenuLevel(model);
 				SubLevels.Add(pathElem, subLevel);
 			}
 			subLevel.Add(channel, path, levelIdx + 1);
