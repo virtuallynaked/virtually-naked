@@ -56,10 +56,10 @@ public class MenuItemViewMessage {
 		};
 	}
 	
-	public static MenuItemViewMessage MakeActionButton(string label) {
+	public static MenuItemViewMessage MakeActionButton(string label, bool requiresMoreInformation) {
 		return new MenuItemViewMessage {
 			Label = label,
-			Type = MenuItemViewType.ActionButton
+			Type = requiresMoreInformation ? MenuItemViewType.SubLevelButton : MenuItemViewType.ActionButton
 		};
 	}
 }

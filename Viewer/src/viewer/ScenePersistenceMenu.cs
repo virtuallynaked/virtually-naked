@@ -59,7 +59,7 @@ class ScenePersistenceMenuLevel : IMenuLevel {
 	public List<IMenuItem> GetItems() {
 		List<IMenuItem> items = new List<IMenuItem> { };
 		
-		items.Add(new ActionMenuItem("Save", () => SaveScene()));
+		items.Add(new ActionMenuItem("Save", () => SaveScene(), true));
 
 		foreach (var sceneFile in savesDirectory.EnumerateFiles("*.scene")) {
 			string name = sceneFile.GetNameWithoutExtension();

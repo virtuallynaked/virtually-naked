@@ -28,7 +28,7 @@ public class MenuViewMessageAuthor {
 					break;
 
 				case ActionMenuItem actionMenuItem:
-					itemMessage = MenuItemViewMessage.MakeActionButton(actionMenuItem.Label);
+					itemMessage = MenuItemViewMessage.MakeActionButton(actionMenuItem.Label, actionMenuItem.RequiresMoreInformation);
 					break;
 
 				default:

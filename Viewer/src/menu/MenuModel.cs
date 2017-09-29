@@ -89,10 +89,12 @@ public interface IToggleMenuItem : IMenuItem {
 public class ActionMenuItem : IMenuItem {
 	public string Label { get; }
 	public Action Action { get; }
+	public bool RequiresMoreInformation { get; }
 	
-	public ActionMenuItem(string label, Action action) {
+	public ActionMenuItem(string label, Action action, bool requiresMoreInformation = false) {
 		Label = label;
 		Action = action;
+		RequiresMoreInformation = requiresMoreInformation;
 	}
 }
 
