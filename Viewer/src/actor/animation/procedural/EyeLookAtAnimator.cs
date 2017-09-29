@@ -11,7 +11,7 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 	private readonly Bone leftEyeBone;
 	private readonly Bone rightEyeBone;
 	
-	private readonly LaggedVector3Forecaster headPositionForecaster = new LaggedVector3Forecaster(0.08f);
+	private readonly LaggedVector3Forecaster headPositionForecaster = new LaggedVector3Forecaster(0.05f);
 
 	public EyeLookAtAnimator(ChannelSystem channelSystem, BoneSystem boneSystem, BehaviorModel behaviorModel) {
 		this.channelSystem = channelSystem;
