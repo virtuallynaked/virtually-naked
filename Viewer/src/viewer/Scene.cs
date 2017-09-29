@@ -6,6 +6,7 @@ using System.IO;
 using Valve.VR;
 
 class Scene : IDisposable {
+	private readonly ToneMappingSettings toneMappingSettings;
 	private readonly ImageBasedLightingEnvironment iblEnvironment;
 	private readonly Backdrop backdrop;
 	private readonly PlayspaceFloor floor;
@@ -14,7 +15,8 @@ class Scene : IDisposable {
 	private readonly Actor actor;
 	private readonly Menu menu;
 
-	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDevicePose_t[] poses, ControllerManager controllerManager, IMenuLevel toneMappingMenuLevel) {
+	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDevicePose_t[] poses, ControllerManager controllerManager) {
+		toneMappingSettings = new ToneMappingSettings();
 		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, InitialSettings.Environment);
 		backdrop = new Backdrop(device, shaderCache);
 		floor = new PlayspaceFloor(device, shaderCache);
@@ -23,6 +25,7 @@ class Scene : IDisposable {
 		actor = Actor.Load(dataDir, device, shaderCache, controllerManager);
 		
 		var iblMenu = LightingEnvironmentMenu.MakeMenuLevel(dataDir, iblEnvironment);
+		var toneMappingMenuLevel = new ToneMappingMenuLevel(toneMappingSettings);
 		var renderSettingsMenuLevel = new StaticMenuLevel(
 			new SubLevelMenuItem("Lighting Enviroment", iblMenu),
 			new SubLevelMenuItem("Tone Mapping", toneMappingMenuLevel)
@@ -47,6 +50,8 @@ class Scene : IDisposable {
 		menu.Dispose();
 	}
 
+	public ToneMappingSettings ToneMappingSettings => toneMappingSettings;
+	
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters) {
 		menu.Update(context);
 		iblEnvironment.Predraw(context);
@@ -73,6 +78,9 @@ class Scene : IDisposable {
 	}
 	
 	public class Recipe {
+		[JsonProperty("tone-mapping")]
+		public ToneMappingSettings.Recipe toneMapping;
+
 		[JsonProperty("lighting-environment")]
 		public ImageBasedLightingEnvironment.Recipe lightingEnvironment;
 
@@ -80,6 +88,7 @@ class Scene : IDisposable {
 		public Actor.Recipe actor;
 		
 		public void Merge(Scene scene) {
+			toneMapping?.Merge(scene.toneMappingSettings);
 			lightingEnvironment?.Merge(scene.iblEnvironment);
 			actor?.Merge(scene.actor);
 		}
@@ -87,6 +96,7 @@ class Scene : IDisposable {
 
 	public Recipe Recipize() {
 		return new Recipe {
+			toneMapping = toneMappingSettings.Recipize(),
 			lightingEnvironment = iblEnvironment.Recipize(),
 			actor = actor.Recipize()
 		};

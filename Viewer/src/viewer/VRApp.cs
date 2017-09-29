@@ -113,8 +113,7 @@ public class VRApp : IDisposable {
 
 		Init();
 		
-		var toneMappingMenuLevel = passController.RenderSettingsMenuLevel;
-		scene = new Scene(dataDir, device, shaderCache, standardSamplers, poses, controllerManager, toneMappingMenuLevel);
+		scene = new Scene(dataDir, device, shaderCache, standardSamplers, poses, controllerManager);
 		hiddenAreaMasker = new HiddenAreaMasker(device, shaderCache);
 	}
 	
@@ -232,7 +231,7 @@ public class VRApp : IDisposable {
 		immediateContext.WithEvent("VRApp::Update", () => {
 			controllerManager.Update();
 			scene.Update(device.ImmediateContext, updateParameters);
-			passController.PrepareFrame(device.ImmediateContext);
+			passController.PrepareFrame(device.ImmediateContext, scene.ToneMappingSettings);
 		});
 		
 		OpenVR.Compositor.WaitGetPoses(poses, gamePoses);

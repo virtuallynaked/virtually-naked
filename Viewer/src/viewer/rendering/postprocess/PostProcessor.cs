@@ -19,8 +19,7 @@ public class PostProcessor : IDisposable {
 	public Texture2D ResultTexture { get; }
 	private RenderTargetView ResultTargetView { get; }
 	public ShaderResourceView ResultSourceView { get; }
-
-	public ToneMappingSettings ToneMappingSettings { get; } = new ToneMappingSettings();
+	
 	private ConstantBufferManager<PostProcessorConstants> constantsBuffer;
 
 	private readonly States postProcessingStates;
@@ -67,19 +66,19 @@ public class PostProcessor : IDisposable {
 	}
 
 	private static readonly Vector3 NeutralWhiteBalanceAsLinearSRGB = ColorConversion.FromTemperatureToLinearSRGB(ToneMappingSettings.NeutralWhiteBalance);
-	private PostProcessorConstants GenerateConstants() {
-		float exposureAdjustment = (float) Math.Pow(2, ToneMappingSettings.ExposureValue - 12);
-		Vector3 balanceAdjustment = ColorConversion.FromTemperatureToLinearSRGB(ToneMappingSettings.WhiteBalance) / NeutralWhiteBalanceAsLinearSRGB;
+	private PostProcessorConstants GenerateConstants(ToneMappingSettings toneMappingSettings) {
+		float exposureAdjustment = (float) Math.Pow(2, toneMappingSettings.ExposureValue - 12);
+		Vector3 balanceAdjustment = ColorConversion.FromTemperatureToLinearSRGB(toneMappingSettings.WhiteBalance) / NeutralWhiteBalanceAsLinearSRGB;
 
 		return new PostProcessorConstants {
 			exposureAndBalanceAdjustment = exposureAdjustment * balanceAdjustment,
-			burnHighlightsValue = (float) ToneMappingSettings.BurnHighlights,
-			crushBlacksValue = (float) ToneMappingSettings.CrushBlacks
+			burnHighlightsValue = (float) toneMappingSettings.BurnHighlights,
+			crushBlacksValue = (float) toneMappingSettings.CrushBlacks
 		};
 	}
 
-	public void Prepare(DeviceContext context) {
-		constantsBuffer.Update(context, GenerateConstants());
+	public void Prepare(DeviceContext context, ToneMappingSettings toneMappingSettings) {
+		constantsBuffer.Update(context, GenerateConstants(toneMappingSettings));
 	}
 
 	public void PostProcess(DeviceContext context, ShaderResourceView source) {

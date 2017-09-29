@@ -13,8 +13,6 @@ public class RenderPassController : IDisposable {
 	private readonly States opaquePassStates;
 	private readonly States backToFrontTransparencyPassStates;
 	private readonly States unorderedTransparencyPassStates;
-	
-	private readonly IMenuLevel renderSettingsMenuLevel;
 
 	public RenderPassController(Device device, ShaderCache shaderCache, Size2 targetSize) {
 		this.viewport = new Viewport(
@@ -25,8 +23,6 @@ public class RenderPassController : IDisposable {
 		standardTarget = new StandardTarget(device, targetSize);
 		oitBlendTarget = new OitBlendTarget(device, shaderCache, targetSize);
 		postProcessor = new PostProcessor(device, shaderCache, targetSize);
-		
-		renderSettingsMenuLevel = new ToneMappingMenuLevel(postProcessor.ToneMappingSettings);
 
 		StateDescriptions opaquePassStateDesc = StateDescriptions.Common.Clone();
 		opaquePassStateDesc.rasterizer.IsMultisampleEnabled = true;
@@ -72,10 +68,9 @@ public class RenderPassController : IDisposable {
 
 	public Texture2D ResultTexture => postProcessor.ResultTexture;
 	public ShaderResourceView ResultSourceView => postProcessor.ResultSourceView;
-	public IMenuLevel RenderSettingsMenuLevel => renderSettingsMenuLevel;
 
-	public void PrepareFrame(DeviceContext context) {
-		postProcessor.Prepare(context);
+	public void PrepareFrame(DeviceContext context, ToneMappingSettings toneMappingSettings) {
+		postProcessor.Prepare(context, toneMappingSettings);
 	}
 
 	public void Prepare(DeviceContext context, Color color, byte stencil, Action prepareMask) {
