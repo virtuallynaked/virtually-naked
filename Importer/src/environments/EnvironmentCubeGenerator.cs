@@ -141,7 +141,7 @@ public class EnvironmentCubeGenerator {
 
 		foreach (FileInfo sourceFile in sourceEnvironmentsDir.EnumerateFiles()) {
 			string environmentName = Path.GetFileNameWithoutExtension(sourceFile.Name);
-			if (environmentName != FigureActiveSettings.Environment) {
+			if (environmentName != InitialSettings.Environment) {
 				continue;
 			}
 

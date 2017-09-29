@@ -10,7 +10,7 @@ class ShapeDumper {
 
 		ShapeDumper dumper = new ShapeDumper(fileLocator, device, shaderCache, parentFigure, figure, baseConf);
 		
-		FigureActiveSettings.Shapes.TryGetValue(figure.Name, out string activeConfigurationName);
+		InitialSettings.Shapes.TryGetValue(figure.Name, out string activeConfigurationName);
 
 		foreach (var conf in configurations) {
 			if (conf.name != activeConfigurationName) {

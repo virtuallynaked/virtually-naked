@@ -51,10 +51,10 @@ public class ImporterMain : IDisposable {
 		Figure parentFigure = genesis3FemaleWithGenitalia;
 		
 		List<string> childFiguresNames = new List<string>();
-		if (FigureActiveSettings.Hair != null) {
-			childFiguresNames.Add(FigureActiveSettings.Hair);
+		if (InitialSettings.Hair != null) {
+			childFiguresNames.Add(InitialSettings.Hair);
 		}
-		childFiguresNames.AddRange(FigureActiveSettings.Clothing);
+		childFiguresNames.AddRange(InitialSettings.Clothing);
 		
 		List<Figure> childFigures = childFiguresNames
 			.Select(figureName => loader.LoadFigureRecipe(figureName, genesis3FemaleRecipe).Bake(figureName, parentFigure))

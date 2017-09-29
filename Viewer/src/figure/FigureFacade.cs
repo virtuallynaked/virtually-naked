@@ -11,8 +11,8 @@ public class FigureFacade : IDisposable {
 		
 		FigureDefinition definition = FigureDefinition.Load(figureDir, parent?.definition);
 
-		FigureActiveSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
-		FigureActiveSettings.MaterialSets.TryGetValue(figureName, out string initialMaterialSetName);
+		InitialSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
+		InitialSettings.MaterialSets.TryGetValue(figureName, out string initialMaterialSetName);
 		var model = new FigureModel(definition) {
 			ShapeName = initialShapeName,
 			MaterialSetName = initialMaterialSetName

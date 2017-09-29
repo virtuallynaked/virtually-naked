@@ -1,7 +1,7 @@
 ﻿using SharpDX;
 using System.Collections.Generic;
 
-public static class FigureActiveSettings {
+public static class InitialSettings {
 	public const string Environment = "Ruins B";
 
 	public const string Character = "Eva";

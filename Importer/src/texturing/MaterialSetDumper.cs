@@ -61,7 +61,7 @@ class MaterialSetDumper {
 
 		var baseConf = configurations.Single(conf => conf.name == "Base");
 
-		FigureActiveSettings.MaterialSets.TryGetValue(figure.Name, out string activeConfiguration);
+		InitialSettings.MaterialSets.TryGetValue(figure.Name, out string activeConfiguration);
 
 		foreach (var conf in configurations) {
 			if (conf == baseConf) {

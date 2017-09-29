@@ -6,13 +6,13 @@ using System.Linq;
 
 public class Actor : IDisposable {
 	public static Actor Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager) {
-		var mainFigure = FigureFacade.Load(dataDir, device, shaderCache, controllerManager, FigureActiveSettings.Main, null);
+		var mainFigure = FigureFacade.Load(dataDir, device, shaderCache, controllerManager, InitialSettings.Main, null);
 
-		var actorModel = ActorModel.Load(mainFigure.Definition, FigureActiveSettings.Animation);
+		var actorModel = ActorModel.Load(mainFigure.Definition, InitialSettings.Animation);
 
-		var hairFigure = FigureActiveSettings.Hair != null ? FigureFacade.Load(dataDir, device, shaderCache, controllerManager, FigureActiveSettings.Hair, mainFigure) : null;
+		var hairFigure = InitialSettings.Hair != null ? FigureFacade.Load(dataDir, device, shaderCache, controllerManager, InitialSettings.Hair, mainFigure) : null;
 
-		var clothingFigures = FigureActiveSettings.Clothing
+		var clothingFigures = InitialSettings.Clothing
 			.Select(figureName => FigureFacade.Load(dataDir, device, shaderCache, controllerManager, figureName, mainFigure))
 			.ToArray();
 		

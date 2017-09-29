@@ -8,7 +8,7 @@ public class ActorBehavior {
 		return new ActorBehavior(controllerManager, model, inverterParameters);
 	}
 
-	private const float FramesPerSecond = 30 * FigureActiveSettings.AnimationSpeed;
+	private const float FramesPerSecond = 30 * InitialSettings.AnimationSpeed;
 	
 	private readonly ActorModel model;
 	private readonly Poser poser;
@@ -21,7 +21,7 @@ public class ActorBehavior {
 		poser = new Poser(model.MainDefinition);
 		ikAnimator = new InverseKinematicsAnimator(controllerManager, model.MainDefinition, inverterParameters);
 		proceduralAnimator = new StandardProceduralAnimator(model.MainDefinition, model.Behavior);
-		dragHandle = new DragHandle(controllerManager, FigureActiveSettings.InitialTransform);
+		dragHandle = new DragHandle(controllerManager, InitialSettings.InitialTransform);
 
 		model.PoseReset += ikAnimator.Reset;
 	}

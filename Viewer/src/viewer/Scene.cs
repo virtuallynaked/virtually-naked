@@ -15,7 +15,7 @@ class Scene : IDisposable {
 	private readonly Menu menu;
 
 	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDevicePose_t[] poses, ControllerManager controllerManager, IMenuLevel toneMappingMenuLevel) {
-		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, FigureActiveSettings.Environment);
+		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, InitialSettings.Environment);
 		backdrop = new Backdrop(device, shaderCache);
 		floor = new PlayspaceFloor(device, shaderCache);
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, poses);
