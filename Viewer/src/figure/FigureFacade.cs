@@ -6,10 +6,7 @@ using System.Linq;
 
 public class FigureFacade : IDisposable {
 	public static FigureFacade Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager, string figureName, FigureFacade parent) {
-		IArchiveDirectory figureDir = dataDir.Subdirectory("figures").Subdirectory(figureName);
-		
-		
-		FigureDefinition definition = FigureDefinition.Load(figureDir, parent?.definition);
+		FigureDefinition definition = FigureDefinition.Load(dataDir, figureName, parent?.definition);
 
 		InitialSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
 		InitialSettings.MaterialSets.TryGetValue(figureName, out string initialMaterialSetName);
@@ -21,13 +18,13 @@ public class FigureFacade : IDisposable {
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition, model);
 
 		string materialSetName = model.MaterialSet.Label;
-		var renderer = FigureRenderer.Load(figureDir, device, shaderCache, materialSetName);
+		var renderer = FigureRenderer.Load(definition.Directory, device, shaderCache, materialSetName);
 		
 		var facade = new FigureFacade(definition, model, controlVertexProvider, renderer);
 
 		model.MaterialSetChanged += (oldMaterialSet, newMaterialSet) => {
 			string newMaterialSetName = newMaterialSet.Label;
-			var newRenderer = FigureRenderer.Load(figureDir, device, shaderCache, newMaterialSetName);
+			var newRenderer = FigureRenderer.Load(definition.Directory, device, shaderCache, newMaterialSetName);
 			facade.SetRenderer(newRenderer);
 		};
 
@@ -97,6 +94,9 @@ public class FigureFacade : IDisposable {
 	}
 
 	public class Recipe {
+		[JsonProperty("name")]
+		public string name;
+
 		[JsonProperty("shape")]
 		public string shape;
 		
@@ -116,6 +116,7 @@ public class FigureFacade : IDisposable {
 	
 	public Recipe Recipize() {
 		return new Recipe {
+			name = definition.Name,
 			shape = model.ShapeName,
 			materialSet = model.MaterialSetName
 		};
