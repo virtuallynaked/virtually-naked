@@ -11,13 +11,15 @@
 			boneSystem = boneSystemRecipe.Bake(channelSystem.ChannelsByName);
 		}
 
-		return new FigureDefinition(channelSystem, boneSystem);
+		return new FigureDefinition(figureDir, channelSystem, boneSystem);
 	}
 	
+	public IArchiveDirectory Directory { get; }
 	public ChannelSystem ChannelSystem { get; }
 	public BoneSystem BoneSystem { get; }
 
-	public FigureDefinition(ChannelSystem channelSystem, BoneSystem boneSystem) {
+	public FigureDefinition(IArchiveDirectory directory, ChannelSystem channelSystem, BoneSystem boneSystem) {
+		Directory = directory;
 		ChannelSystem = channelSystem;
 		BoneSystem = boneSystem;
 	}

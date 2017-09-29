@@ -1,6 +1,4 @@
-﻿using System;
-
-public class BehaviorModel {
+﻿public class BehaviorModel {
 	public bool LookAtPlayer { get; set; } = true;
 
 	public class Recipe {

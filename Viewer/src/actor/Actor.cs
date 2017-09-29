@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-class Actor : IDisposable {
+public class Actor : IDisposable {
 	public static Actor Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager) {
 		var mainFigure = FigureFacade.Load(dataDir, device, shaderCache, controllerManager, FigureActiveSettings.Main, null);
+
+		var actorModel = ActorModel.Load(mainFigure.Model.Definition, FigureActiveSettings.Animation);
 
 		var hairFigure = FigureActiveSettings.Hair != null ? FigureFacade.Load(dataDir, device, shaderCache, controllerManager, FigureActiveSettings.Hair, mainFigure) : null;
 
@@ -14,16 +16,35 @@ class Actor : IDisposable {
 			.Select(figureName => FigureFacade.Load(dataDir, device, shaderCache, controllerManager, figureName, mainFigure))
 			.ToArray();
 		
-		return new Actor(device, mainFigure, hairFigure, clothingFigures);
+		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Model.Definition.Directory, actorModel);
+
+		return new Actor(device, actorModel, mainFigure, hairFigure, clothingFigures, behavior);
+	}
+
+	class MainFigureAnimator : IFigureAnimator {
+		private readonly Actor actor;
+
+		public MainFigureAnimator(Actor actor) {
+			this.actor = actor;
+		}
+
+		public ChannelInputs GetFrameInputs(ChannelInputs shapeInputs, FrameUpdateParameters updateParameters, ControlVertexInfo[] previousFrameControlVertexInfos) {
+			return actor.Behavior.Update(shapeInputs, updateParameters, previousFrameControlVertexInfos);
+		}
 	}
 	
+	private readonly ActorModel model;
+
 	private readonly FigureFacade mainFigure;
 	private readonly FigureFacade hairFigure;
 	private readonly FigureFacade[] clothingFigures;
 
 	private readonly FigureGroup figureGroup;
+
+	private readonly ActorBehavior behavior;
 	
-	public Actor(Device device, FigureFacade mainFigure, FigureFacade hairFigure, FigureFacade[] clothingFigures) {
+	public Actor(Device device, ActorModel model, FigureFacade mainFigure, FigureFacade hairFigure, FigureFacade[] clothingFigures, ActorBehavior behavior) {
+		this.model = model;
 		this.mainFigure = mainFigure;
 		this.hairFigure = hairFigure;
 		this.clothingFigures = clothingFigures;
@@ -32,17 +53,23 @@ class Actor : IDisposable {
 			.Concat(clothingFigures)
 			.ToArray();
 		figureGroup = new FigureGroup(device, mainFigure, childFigures);
+
+		this.behavior = behavior;
+
+		mainFigure.Animator = new MainFigureAnimator(this);
 	}
 
 	public void Dispose() {
 		figureGroup.Dispose();
 	}
 	
+	public ActorModel Model => model;
 	public FigureFacade Main => mainFigure;
 	public FigureFacade Hair => hairFigure;
+	public ActorBehavior Behavior => behavior;
 	
 	public IMenuLevel MenuLevel => ActorMenuProvider.MakeRootMenuLevel(this);
-
+	
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		figureGroup.RenderPass(context, pass);
 	}
@@ -68,19 +95,19 @@ class Actor : IDisposable {
 		public Dictionary<string, double> channelValues;
 
 		[JsonProperty("pose")]
-		public FigureBehavior.PoseRecipe pose;
+		public ActorBehavior.PoseRecipe pose;
 
 		public void Merge(Actor actor) {
 			main?.Merge(actor.Main);
 			hair?.Merge(actor.Hair);
 			if (animation != null) {
-				actor.Main.Model.Animation.ActiveName = animation;
+				actor.model.Animation.ActiveName = animation;
 			}
-			behaviour?.Merge(actor.Main.Model.Behavior);
+			behaviour?.Merge(actor.model.Behavior);
 			if (channelValues != null) {
-				actor.Main.Model.UserValues = channelValues;
+				actor.model.UserValues = channelValues;
 			}
-			pose?.Merge(actor.Main.Behaviour);
+			pose?.Merge(actor.Behavior);
 		}
 	}
 
@@ -88,10 +115,10 @@ class Actor : IDisposable {
 		return new Recipe {
 			main = Main.Recipize(),
 			hair = Hair?.Recipize(),
-			animation = Main.Model.Animation.ActiveName,
-			behaviour = Main.Model.Behavior.Recipize(),
-			channelValues = Main.Model.UserValues,
-			pose = Main.Behaviour.RecipizePose()
+			animation = model.Animation.ActiveName,
+			behaviour = model.Behavior.Recipize(),
+			channelValues = model.UserValues,
+			pose = Behavior.RecipizePose()
 		};
 	}
 }

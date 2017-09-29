@@ -4,14 +4,14 @@ using System.Collections.Generic;
 public class ChannelMenuLevel : IMenuLevel {
 	private static readonly HashSet<string> SkipCategories = new HashSet<string> { "Real World", "Fantasy SciFi", "Actor" };
 
-	private FigureModel model;
+	private ActorModel model;
 	public Dictionary<string, ChannelMenuLevel> SubLevels { get; } = new Dictionary<string, ChannelMenuLevel>();
 	public Dictionary<string, Channel> Channels { get; } = new Dictionary<string, Channel>();
 
-	public static ChannelMenuLevel MakeRootLevelForFigure(FigureModel model) {
+	public static ChannelMenuLevel MakeRootLevelForFigure(ActorModel model) {
 		var rootLevel = new ChannelMenuLevel(model);
 		
-		foreach (Channel channel in model.Definition.ChannelSystem.Channels) {
+		foreach (Channel channel in model.MainDefinition.ChannelSystem.Channels) {
 			if (!channel.Visible) {
 				continue;
 			}
@@ -31,7 +31,7 @@ public class ChannelMenuLevel : IMenuLevel {
 		return rootLevel;
 	}
 
-	public ChannelMenuLevel(FigureModel model) {
+	public ChannelMenuLevel(ActorModel model) {
 		this.model = model;
 	}
 	

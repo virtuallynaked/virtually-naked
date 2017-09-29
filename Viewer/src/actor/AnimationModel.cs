@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class Animation {
 	public string Label { get; }
@@ -65,17 +63,17 @@ public class AnimationMenuLevel : IMenuLevel {
 }
 
 public class AnimationModel {
-	public static AnimationModel Load(IArchiveDirectory figureDir, BoneSystem boneSystem, string startingAnimationName) {
+	public static AnimationModel Load(FigureDefinition figureDefinition, string startingAnimationName) {
 		List<Animation> animations = new List<Animation>();
 		Animation activeAnimation = null;
 
-		Animation noneAnimation = Animation.MakeNone(boneSystem);
+		Animation noneAnimation = Animation.MakeNone(figureDefinition.BoneSystem);
 		animations.Add(noneAnimation);
 		activeAnimation = noneAnimation;
 
-		IArchiveDirectory animationDir = figureDir.Subdirectory("animations");
+		IArchiveDirectory animationDir = figureDefinition.Directory.Subdirectory("animations");
 		if (animationDir != null) {
-			foreach (IArchiveFile animationFile in figureDir.Subdirectory("animations").GetFiles()) {
+			foreach (IArchiveFile animationFile in animationDir.GetFiles()) {
 				Animation animation = Animation.Load(animationFile);
 				animations.Add(animation);
 				if (animation.Label == startingAnimationName) {

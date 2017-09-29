@@ -18,22 +18,21 @@ static class ActorMenuProvider {
 	}
 
 	public static IMenuLevel MakeRootMenuLevel(Actor actor) {
-		var parentModel = actor.Main.Model;
-		var channelMenuLevel = ChannelMenuLevel.MakeRootLevelForFigure(parentModel);
+		var model = actor.Model;
+		var channelMenuLevel = ChannelMenuLevel.MakeRootLevelForFigure(model);
 		var poseControlsMenuLevel = channelMenuLevel.Extract(new string[] {"Pose Controls"});
 		var expressionsMenuLevel = poseControlsMenuLevel.Extract(new string[] {"Head", "Expressions"});
-		var behaviorMenuLevel = new BehaviorMenuLevel(parentModel.Behavior);
+		var behaviorMenuLevel = new BehaviorMenuLevel(model.Behavior);
 
-		var charactersMenuLevel = new CharactersMenuLevel(parentModel);
+		var charactersMenuLevel = new CharactersMenuLevel(actor.Main.Model);
 
 		var shapingItems = new List<IMenuItem>();
 		var channelShapesMenuLevel = channelMenuLevel.Extract(new string[] {"Shapes"});
-		shapingItems.Add(new ActionMenuItem("Reset Shape", () => parentModel.ResetShape()));
+		shapingItems.Add(new ActionMenuItem("Reset Shape", () => model.ResetShape()));
 		shapingItems.AddRange(channelShapesMenuLevel.GetItems());
 		var shapingMenuLevel = new StaticMenuLevel(shapingItems.ToArray());
 		
-		var animationsMenuLevel = new AnimationMenuLevel(parentModel.Animation);
-		
+		var animationsMenuLevel = new AnimationMenuLevel(model.Animation);
 		
 		List<IMenuItem> items = new List<IMenuItem> { };
 		items.Add(new SubLevelMenuItem("Characters", charactersMenuLevel));
@@ -48,7 +47,7 @@ static class ActorMenuProvider {
 		items.Add(new SubLevelMenuItem("Expressions", expressionsMenuLevel));
 		items.Add(new SubLevelMenuItem("Posing", poseControlsMenuLevel));
 		items.Add(new SubLevelMenuItem("Animations", animationsMenuLevel));
-		items.Add(new ActionMenuItem("Reset Pose", () => parentModel.ResetPose()));
+		items.Add(new ActionMenuItem("Reset Pose", () => model.ResetPose()));
 
 		var figureMenuLevel = new StaticMenuLevel(items.ToArray());
 		

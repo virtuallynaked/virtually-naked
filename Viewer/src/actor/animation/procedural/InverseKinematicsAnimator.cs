@@ -13,7 +13,7 @@ public class InverseKinematicsAnimator {
 	
 	public ChannelInputs InputDeltas => inputDeltas;
 
-	private void Reset() {
+	public void Reset() {
 		inputDeltas.ClearToZero();
 	}
 

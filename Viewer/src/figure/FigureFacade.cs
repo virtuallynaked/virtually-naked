@@ -9,14 +9,13 @@ public class FigureFacade : IDisposable {
 		IArchiveDirectory figureDir = dataDir.Subdirectory("figures").Subdirectory(figureName);
 		
 		FigureActiveSettings.Shapes.TryGetValue(figureName, out string activeShapeName);
-		var model = FigureModel.Load(figureDir, activeShapeName, FigureActiveSettings.MaterialSets[figureName], FigureActiveSettings.Animation, parent?.model);
-		var behavior = parent == null ? FigureBehavior.Load(controllerManager, figureDir, model) : null;
+		var model = FigureModel.Load(figureDir, activeShapeName, FigureActiveSettings.MaterialSets[figureName], parent?.model);
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, figureDir, model);
 
 		string materialSetName = model.Materials.Active.Label;
 		var renderer = FigureRenderer.Load(figureDir, device, shaderCache, materialSetName);
 		
-		var facade = new FigureFacade(model, behavior, controlVertexProvider, renderer);
+		var facade = new FigureFacade(model, controlVertexProvider, renderer);
 
 		model.Materials.Changed += (oldMaterialSet, newMaterialSet) => {
 			string newMaterialSetName = newMaterialSet.Label;
@@ -28,25 +27,23 @@ public class FigureFacade : IDisposable {
 	}
 	
 	private readonly FigureModel model;
-	private readonly FigureBehavior behavior;
 	private readonly ControlVertexProvider controlVertexProvider;
 	private FigureRenderer renderer;
 	
-	public FigureFacade(FigureModel model, FigureBehavior behavior, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
+	public IFigureAnimator Animator { get; set; } = null;
+
+	public FigureFacade(FigureModel model, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
 		this.model = model;
-		this.behavior = behavior;
 		this.controlVertexProvider = controlVertexProvider;
 		this.renderer = renderer;
 	}
-
-	public FigureBehavior Behaviour => behavior;
 	
 	public void Dispose() {
 		controlVertexProvider.Dispose();
 		renderer.Dispose();
 	}
-
-	public void SetRenderer(FigureRenderer newRenderer) {
+	
+	private void SetRenderer(FigureRenderer newRenderer) {
 		renderer.Dispose();
 		renderer = newRenderer;
 	}
@@ -54,6 +51,7 @@ public class FigureFacade : IDisposable {
 	public int VertexCount => controlVertexProvider.VertexCount;
 	
 	public FigureModel Model => model;
+
 
 	public void RegisterChildren(List<FigureFacade> children) {
 		var childControlVertexProviders = children
@@ -70,12 +68,8 @@ public class FigureFacade : IDisposable {
 	public ChannelOutputs UpdateFrame(FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults();
 
-		ChannelInputs inputs;
-		if (behavior != null) {
-			inputs = behavior.Update(updateParameters, previousFrameResults);
-		} else {
-			inputs = model.Inputs;
-		}
+		ChannelInputs shapeInputs = model.Shapes.Active.ChannelInputs;
+		ChannelInputs inputs = Animator != null ? Animator.GetFrameInputs(shapeInputs, updateParameters, previousFrameResults) : shapeInputs;
 		
 		return controlVertexProvider.UpdateFrame(parentOutputs, inputs);
 	}
