@@ -8,16 +8,24 @@ public class FigureFacade : IDisposable {
 	public static FigureFacade Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager, string figureName, FigureFacade parent) {
 		IArchiveDirectory figureDir = dataDir.Subdirectory("figures").Subdirectory(figureName);
 		
-		FigureActiveSettings.Shapes.TryGetValue(figureName, out string activeShapeName);
-		var model = FigureModel.Load(figureDir, activeShapeName, FigureActiveSettings.MaterialSets[figureName], parent?.model);
-		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, figureDir, model);
+		
+		FigureDefinition definition = FigureDefinition.Load(figureDir, parent?.definition);
 
-		string materialSetName = model.Materials.Active.Label;
+		FigureActiveSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
+		FigureActiveSettings.MaterialSets.TryGetValue(figureName, out string initialMaterialSetName);
+		var model = new FigureModel(definition) {
+			ShapeName = initialShapeName,
+			MaterialSetName = initialMaterialSetName
+		};
+		
+		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition, model);
+
+		string materialSetName = model.MaterialSet.Label;
 		var renderer = FigureRenderer.Load(figureDir, device, shaderCache, materialSetName);
 		
-		var facade = new FigureFacade(model, controlVertexProvider, renderer);
+		var facade = new FigureFacade(definition, model, controlVertexProvider, renderer);
 
-		model.Materials.Changed += (oldMaterialSet, newMaterialSet) => {
+		model.MaterialSetChanged += (oldMaterialSet, newMaterialSet) => {
 			string newMaterialSetName = newMaterialSet.Label;
 			var newRenderer = FigureRenderer.Load(figureDir, device, shaderCache, newMaterialSetName);
 			facade.SetRenderer(newRenderer);
@@ -26,13 +34,15 @@ public class FigureFacade : IDisposable {
 		return facade;
 	}
 	
+	private readonly FigureDefinition definition;
 	private readonly FigureModel model;
 	private readonly ControlVertexProvider controlVertexProvider;
 	private FigureRenderer renderer;
 	
 	public IFigureAnimator Animator { get; set; } = null;
 
-	public FigureFacade(FigureModel model, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
+	public FigureFacade(FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
+		this.definition = definition;
 		this.model = model;
 		this.controlVertexProvider = controlVertexProvider;
 		this.renderer = renderer;
@@ -42,17 +52,17 @@ public class FigureFacade : IDisposable {
 		controlVertexProvider.Dispose();
 		renderer.Dispose();
 	}
+
+	public FigureDefinition Definition => definition;
+	public FigureModel Model => model;
+	public int VertexCount => controlVertexProvider.VertexCount;
+	
 	
 	private void SetRenderer(FigureRenderer newRenderer) {
 		renderer.Dispose();
 		renderer = newRenderer;
 	}
 	
-	public int VertexCount => controlVertexProvider.VertexCount;
-	
-	public FigureModel Model => model;
-
-
 	public void RegisterChildren(List<FigureFacade> children) {
 		var childControlVertexProviders = children
 			.Select(child => child.controlVertexProvider)
@@ -68,7 +78,7 @@ public class FigureFacade : IDisposable {
 	public ChannelOutputs UpdateFrame(FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults();
 
-		ChannelInputs shapeInputs = model.Shapes.Active.ChannelInputs;
+		ChannelInputs shapeInputs = model.Shape.ChannelInputs;
 		ChannelInputs inputs = Animator != null ? Animator.GetFrameInputs(shapeInputs, updateParameters, previousFrameResults) : shapeInputs;
 		
 		return controlVertexProvider.UpdateFrame(parentOutputs, inputs);
@@ -95,19 +105,19 @@ public class FigureFacade : IDisposable {
 
 		public void Merge(FigureFacade figure) {
 			if (shape != null) {
-				figure.model.Shapes.ActiveName = shape;
+				figure.Model.ShapeName = shape;
 			}
 
 			if (materialSet != null) {
-				figure.model.Materials.ActiveName = materialSet;
+				figure.Model.MaterialSetName = materialSet;
 			}
 		}
 	}
 	
 	public Recipe Recipize() {
 		return new Recipe {
-			shape = model.Shapes.ActiveName,
-			materialSet = model.Materials.ActiveName
+			shape = model.ShapeName,
+			materialSet = model.MaterialSetName
 		};
 	}
 }

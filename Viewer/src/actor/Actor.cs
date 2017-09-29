@@ -8,7 +8,7 @@ public class Actor : IDisposable {
 	public static Actor Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager) {
 		var mainFigure = FigureFacade.Load(dataDir, device, shaderCache, controllerManager, FigureActiveSettings.Main, null);
 
-		var actorModel = ActorModel.Load(mainFigure.Model.Definition, FigureActiveSettings.Animation);
+		var actorModel = ActorModel.Load(mainFigure.Definition, FigureActiveSettings.Animation);
 
 		var hairFigure = FigureActiveSettings.Hair != null ? FigureFacade.Load(dataDir, device, shaderCache, controllerManager, FigureActiveSettings.Hair, mainFigure) : null;
 
@@ -16,7 +16,7 @@ public class Actor : IDisposable {
 			.Select(figureName => FigureFacade.Load(dataDir, device, shaderCache, controllerManager, figureName, mainFigure))
 			.ToArray();
 		
-		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Model.Definition.Directory, actorModel);
+		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Definition.Directory, actorModel);
 
 		return new Actor(device, actorModel, mainFigure, hairFigure, clothingFigures, behavior);
 	}

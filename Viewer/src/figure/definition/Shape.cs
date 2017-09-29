@@ -1,5 +1,24 @@
-﻿public class Shape {
-	public static Shape Load(ChannelSystem channelSystem, IArchiveDirectory shapeDirectory) {
+﻿using System.Collections.Generic;
+
+public class Shape {
+	public static List<Shape> LoadAllForFigure(IArchiveDirectory figureDir, ChannelSystem channelSystem) {
+		List<Shape> shapes = new List<Shape>();
+		
+		IArchiveDirectory shapesDirectory = figureDir.Subdirectory("shapes");
+		if (shapesDirectory != null) {
+			foreach (var shapeDirectory in shapesDirectory.Subdirectories) {
+				var shape = Shape.Load(shapeDirectory);
+				shapes.Add(shape);
+			}
+		} else {
+			var defaultShape = Shape.MakeDefault(channelSystem);
+			shapes.Add(defaultShape);
+		}
+		
+		return shapes;
+	}
+
+	public static Shape Load(IArchiveDirectory shapeDirectory) {
 		var channelInputsFile = shapeDirectory.File("channel-inputs.dat");
 		ChannelInputs channelInputs = Persistance.Load<ChannelInputs>(channelInputsFile);
 		return new Shape(shapeDirectory.Name, shapeDirectory, channelInputs);

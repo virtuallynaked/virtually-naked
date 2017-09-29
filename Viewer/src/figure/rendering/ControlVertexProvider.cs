@@ -27,24 +27,24 @@ public class ControlVertexProvider : IDisposable {
 		}
 	}
 
-	public static ControlVertexProvider Load(Device device, ShaderCache shaderCache, IArchiveDirectory figureDir, FigureModel model) {
-		var shaperParameters = Persistance.Load<ShaperParameters>(figureDir.File("shaper-parameters.dat"));
+	public static ControlVertexProvider Load(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model) {
+		var shaperParameters = Persistance.Load<ShaperParameters>(definition.Directory.File("shaper-parameters.dat"));
 								
-		var unmorphedOcclusionDirectory = figureDir.Subdirectory("occlusion");
-		var occlusionDirectory = model.Shapes.Active.Directory ?? unmorphedOcclusionDirectory;
+		var unmorphedOcclusionDirectory = definition.Directory.Subdirectory("occlusion");
+		var occlusionDirectory = model.Shape.Directory ?? unmorphedOcclusionDirectory;
 		
-		bool isMainFigure = model.Definition.ChannelSystem.Parent == null;
+		bool isMainFigure = definition.ChannelSystem.Parent == null;
 
 		var occluder = LoadOccluder(device, shaderCache, isMainFigure, unmorphedOcclusionDirectory, occlusionDirectory);
 
 		var provider = new ControlVertexProvider(
 			device, shaderCache,
-			model.Definition,
+			definition,
 			shaperParameters,
 			occluder);
 
-		model.Shapes.ShapeChanged += (oldShape, newShape) => {
-			var newOcclusionDirectory = model.Shapes.Active.Directory ?? unmorphedOcclusionDirectory;
+		model.ShapeChanged += (oldShape, newShape) => {
+			var newOcclusionDirectory = model.Shape.Directory ?? unmorphedOcclusionDirectory;
 			var newOccluder = LoadOccluder(device, shaderCache, isMainFigure, unmorphedOcclusionDirectory, newOcclusionDirectory);
 			provider.SetOccluder(newOccluder);
 		};

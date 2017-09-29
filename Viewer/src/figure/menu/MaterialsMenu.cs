@@ -3,27 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class MaterialSetMenuItem : IToggleMenuItem {
-	private readonly MaterialsModel model;
+	private readonly FigureModel model;
 	private readonly MaterialSetOption materialSet;
 
-	public MaterialSetMenuItem(MaterialsModel model, MaterialSetOption materialSet) {
+	public MaterialSetMenuItem(FigureModel model, MaterialSetOption materialSet) {
 		this.model = model;
 		this.materialSet = materialSet;
 	}
 
 	public string Label => materialSet.Label;
 
-	public bool IsSet => model.Active == materialSet;
+	public bool IsSet => model.MaterialSet == materialSet;
 
 	public void Toggle() {
-		model.Active = materialSet;
+		model.MaterialSet = materialSet;
 	}
 }
 
 public class MaterialsMenuLevel : IMenuLevel {
-	private readonly MaterialsModel model;
+	private readonly FigureDefinition definition;
+	private readonly FigureModel model;
 
-	public MaterialsMenuLevel(MaterialsModel model) {
+	public MaterialsMenuLevel(FigureDefinition definition, FigureModel model) {
+		this.definition = definition;
 		this.model = model;
 	}
 
@@ -33,7 +35,7 @@ public class MaterialsMenuLevel : IMenuLevel {
 	}
 
 	public List<IMenuItem> GetItems() {
-		return model.Options
+		return definition.MaterialSetOptions
 			.Select(materialSet => (IMenuItem) new MaterialSetMenuItem(model, materialSet))
 			.ToList();
 	}

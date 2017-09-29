@@ -6,8 +6,8 @@ static class ActorMenuProvider {
 			return null;
 		}
 
-		var shapesMenuLevel = new ShapesMenuLevel(hairFigure.Model);
-		var materialsMenuLevel = new MaterialsMenuLevel(hairFigure.Model.Materials);
+		var shapesMenuLevel = new ShapesMenuLevel(hairFigure.Definition, hairFigure.Model);
+		var materialsMenuLevel = new MaterialsMenuLevel(hairFigure.Definition, hairFigure.Model);
 
 		var hairMenuLevel = new StaticMenuLevel(
 			new SubLevelMenuItem("Style", shapesMenuLevel),
@@ -24,7 +24,7 @@ static class ActorMenuProvider {
 		var expressionsMenuLevel = poseControlsMenuLevel.Extract(new string[] {"Head", "Expressions"});
 		var behaviorMenuLevel = new BehaviorMenuLevel(model.Behavior);
 
-		var charactersMenuLevel = new CharactersMenuLevel(actor.Main.Model);
+		var charactersMenuLevel = new CharactersMenuLevel(actor.Main.Definition, actor.Main.Model);
 
 		var shapingItems = new List<IMenuItem>();
 		var channelShapesMenuLevel = channelMenuLevel.Extract(new string[] {"Shapes"});

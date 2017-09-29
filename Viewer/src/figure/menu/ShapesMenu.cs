@@ -13,17 +13,19 @@ public class ShapesMenuItem : IToggleMenuItem {
 
 	public string Label => shape.Label;
 
-	public bool IsSet => model.Shapes.Active == shape;
+	public bool IsSet => model.Shape == shape;
 
 	public void Toggle() {
-		model.Shapes.Active = shape;
+		model.Shape = shape;
 	}
 }
 
 public class ShapesMenuLevel : IMenuLevel {
+	private readonly FigureDefinition definition;
 	private readonly FigureModel model;
 
-	public ShapesMenuLevel(FigureModel model) {
+	public ShapesMenuLevel(FigureDefinition definition, FigureModel model) {
+		this.definition = definition;
 		this.model = model;
 	}
 
@@ -33,7 +35,7 @@ public class ShapesMenuLevel : IMenuLevel {
 	}
 
 	public List<IMenuItem> GetItems() {
-		return model.Shapes.Options
+		return definition.ShapeOptions
 			.Select(shape => (IMenuItem) new ShapesMenuItem(model, shape))
 			.ToList();
 	}
