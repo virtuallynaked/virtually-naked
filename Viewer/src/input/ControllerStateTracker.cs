@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System;
 using Valve.VR;
 
 public class ControllerStateTracker {
@@ -24,6 +25,7 @@ public class ControllerStateTracker {
 
 		if (!OpenVR.System.GetControllerState(deviceIdx, out var controllerState)) {
 			active = false;
+			return;
 		}
 
 		if (active) {
@@ -35,8 +37,8 @@ public class ControllerStateTracker {
 
 		if (!active) {
 			//activate
+			Console.WriteLine("activate");
 			active = true;
-			menuOpen = false;
 			secondPreviousState = default(VRControllerState_t);
 			previousState = default(VRControllerState_t);
 		} else {
