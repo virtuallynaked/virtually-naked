@@ -32,6 +32,10 @@ class ScenePersistenceMenuLevel : IMenuLevel {
 	}
 
 	private void SaveScene(string name) {
+		if (String.IsNullOrEmpty(name)) {
+			return;
+		}
+
 		var recipe = scene.Recipize();
 		
 		var sceneFile = savesDirectory.File(name + ".scene");
