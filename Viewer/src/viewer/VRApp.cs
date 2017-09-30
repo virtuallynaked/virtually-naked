@@ -171,6 +171,23 @@ public class VRApp : IDisposable {
 		return context.FinishCommandList(false);
 	}
 
+	
+	private CommandList RecordUpdateCommandList() {
+		DeviceContext context = deferredContext;
+
+		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
+		var updateParameters = new FrameUpdateParameters(
+			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
+			timeKeeper.TimeDelta,
+			headPosition);
+
+		controllerManager.Update();
+		scene.Update(deferredContext, updateParameters);
+		passController.PrepareFrame(deferredContext, scene.ToneMappingSettings);
+
+		return context.FinishCommandList(false);
+	}
+
 	private void RenderView(CommandList commandList, Action<DeviceContext> prepareMaskAction, Matrix viewTransform, Matrix projectionTransform) {
 		DeviceContext context = immediateContext;
 		
@@ -222,18 +239,12 @@ public class VRApp : IDisposable {
 	}
 	
 	private void DoFrame() {
-		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
-		var updateParameters = new FrameUpdateParameters(
-			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
-			timeKeeper.TimeDelta,
-			headPosition);
+		using (var commandList = RecordUpdateCommandList()) {
+			immediateContext.WithEvent("VRApp::Update", () => {
+				immediateContext.ExecuteCommandList(commandList, false);
+			});
+		}
 
-		immediateContext.WithEvent("VRApp::Update", () => {
-			controllerManager.Update();
-			scene.Update(device.ImmediateContext, updateParameters);
-			passController.PrepareFrame(device.ImmediateContext, scene.ToneMappingSettings);
-		});
-		
 		OpenVR.Compositor.WaitGetPoses(poses, gamePoses);
 		timeKeeper.AdvanceFrame();
 

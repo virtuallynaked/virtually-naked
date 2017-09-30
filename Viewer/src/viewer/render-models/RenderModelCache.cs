@@ -44,7 +44,7 @@ class RenderModelCache : IDisposable {
 		}
 	}
 
-	public RenderModel LookupModel(string name) {
+	public RenderModel LookupModel(DeviceContext context, string name) {
 		if (modelCache.TryGetValue(name, out RenderModel model)) {
 			return model;
 		}
@@ -59,7 +59,7 @@ class RenderModelCache : IDisposable {
 
 		int textureId = definition.textureId;
 		if (!materialCache.TryGetValue(textureId, out IOpaqueMaterial material)) {
-			var textureView = TryLoadTexture(textureId);
+			var textureView = TryLoadTexture(context, textureId);
 			if (textureView == null) {
 				return null;
 			}
@@ -78,7 +78,7 @@ class RenderModelCache : IDisposable {
 		return model;
 	}
 
-	public RenderModelComponent[] LookupComponents(string renderModelName) {
+	public RenderModelComponent[] LookupComponents(DeviceContext context, string renderModelName) {
 		if (componentsCache.TryGetValue(renderModelName, out RenderModelComponent[] components)) {
 			return components;
 		}
@@ -92,7 +92,7 @@ class RenderModelCache : IDisposable {
 			RenderModel model;
 			var componentModelName = OpenVR.RenderModels.GetComponentRenderModelName(renderModelName, name);
 			if (componentModelName != null) {
-				model = LookupModel(componentModelName);
+				model = LookupModel(context, componentModelName);
 
 				if (model == null) {
 					return null;
@@ -145,7 +145,7 @@ class RenderModelCache : IDisposable {
 		return definition;
 	}
 
-	private ShaderResourceView TryLoadTexture(int textureId) {
+	private ShaderResourceView TryLoadTexture(DeviceContext context, int textureId) {
 		IntPtr pTexture = IntPtr.Zero;
 		var errorCode = OpenVR.RenderModels.LoadTextureD3D11_Async(textureId, device.NativePointer, ref pTexture);
 		if (errorCode == EVRRenderModelError.Loading) {
@@ -169,7 +169,7 @@ class RenderModelCache : IDisposable {
 		OpenVR.RenderModels.FreeTextureD3D11(pTexture);
 		
 		if (textureDescription.OptionFlags.HasFlag(ResourceOptionFlags.GenerateMipMaps)) {
-			device.ImmediateContext.GenerateMips(textureView);
+			context.GenerateMips(textureView);
 		}
 
 		return textureView;

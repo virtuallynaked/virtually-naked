@@ -37,14 +37,14 @@ class FigureGroup : IDisposable {
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters, ImageBasedLightingEnvironment lightingEnvironment) {
 		modelToWorldTransform.Update(context, Matrix.Scaling(0.01f));
 		
-		var parentOutputs = parentFigure.UpdateFrame(updateParameters, null);
+		var parentOutputs = parentFigure.UpdateFrame(context, updateParameters, null);
 		foreach (var figure in childFigures) {
-			figure.UpdateFrame(updateParameters, parentOutputs);
+			figure.UpdateFrame(context, updateParameters, parentOutputs);
 		}
 		
-		parentFigure.UpdateVertexPositionsAndGetDeltas(parentDeltas.OutView);
+		parentFigure.UpdateVertexPositionsAndGetDeltas(context, parentDeltas.OutView);
 		foreach (var figure in childFigures) {
-			figure.UpdateVertexPositions(parentDeltas.InView);
+			figure.UpdateVertexPositions(context, parentDeltas.InView);
 		}
 		
 		parentFigure.Update(context, lightingEnvironment);

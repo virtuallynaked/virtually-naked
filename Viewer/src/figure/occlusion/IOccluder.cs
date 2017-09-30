@@ -6,8 +6,8 @@ public interface IOccluder : IDisposable {
 	OcclusionInfo[] ParentOcclusionInfos { get; }
 	void RegisterChildOccluders(List<IOccluder> childOccluders);
 
-	void SetValues(ChannelOutputs channelOutputs);
-	void CalculateOcclusion();
+	void SetValues(DeviceContext context, ChannelOutputs channelOutputs);
+	void CalculateOcclusion(DeviceContext context);
 
 
 	ShaderResourceView OcclusionInfosView { get; }

@@ -146,8 +146,8 @@ private static InputElement[] InputElements = new[] {
 			context.ClearState();
 						
 			var opacityCounterStagingBufferManager = new StagingStructuredBufferManager<OpacityCounters>(device, faceIdxMap.Count);
-			opacityCounterStagingBufferManager.CopyToStagingBuffer(opacityCounterBufferManager.Buffer);
-			opacityCounterStagingBufferManager.FillArayFromStagingBuffer();
+			opacityCounterStagingBufferManager.CopyToStagingBuffer(context, opacityCounterBufferManager.Buffer);
+			opacityCounterStagingBufferManager.FillArayFromStagingBuffer(context);
 			
 			for (int faceIdx = 0; faceIdx < faceIdxMap.Count; ++faceIdx) {
 				OpacityCounters opacityCounter = opacityCounterStagingBufferManager.Array[faceIdx];

@@ -90,7 +90,7 @@ public class FigureOcclusionCalculator : IDisposable {
 		
 		DeviceContext context = device.ImmediateContext;
 
-		vertexPositionsBufferManager.Update(controlPositions.ToArray());
+		vertexPositionsBufferManager.Update(context, controlPositions.ToArray());
 		ShaderResourceView vertexInfosView = vertexRefiner.Refine(context, vertexPositionsBufferManager.View);
 		OcclusionInfo[] allOcclusionInfos = occlusionCalculator.Run(device.ImmediateContext, vertexInfosView);
 

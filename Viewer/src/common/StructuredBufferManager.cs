@@ -34,7 +34,7 @@ public class StructuredBufferManager<T> : IDisposable where T : struct {
 
 	public ShaderResourceView View => view;
 
-	public void Update(T[] data) {
-		device.ImmediateContext.UpdateSubresource(data, buffer);
+	public void Update(DeviceContext context, T[] data) {
+		context.UpdateSubresource(data, buffer);
 	}
 }

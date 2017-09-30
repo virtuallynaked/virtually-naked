@@ -5,20 +5,19 @@ using System.Linq;
 
 public class DeformableOccluder : IOccluder {
 	private const int ShaderNumThreads = 64;
-	
-	private readonly Device device;
-		
+			
 	private ComputeShader shader;
 	
 	private readonly OcclusionInfo[] unmorphedOcclusionInfos;
 
 	public readonly ShaderResourceView unmorphedWithoutChildrenOcclusionInfosView;
+
 	private readonly StructuredBufferManager<uint> unmorphedWithChildrenOcclusionInfosBufferManager;
+	private uint[] unmorphedWithChildrenOcclusionInfosToUpload;
 
 	private readonly OccluderParametersResources parametersResources;
 		
 	public DeformableOccluder(Device device, ShaderCache shaderCache, OcclusionInfo[] unmorphedOcclusionInfos, OccluderParameters parameters) {
-		this.device = device;
 		this.unmorphedOcclusionInfos = unmorphedOcclusionInfos;
 				
 		shader = shaderCache.GetComputeShader<DeformableOccluder>("figure/occlusion/shader/Occluder");
@@ -69,25 +68,28 @@ public class DeformableOccluder : IOccluder {
 			results[i] = blenders[i].GetResult();
 		}
 		
-		unmorphedWithChildrenOcclusionInfosBufferManager.Update(OcclusionInfo.PackArray(results));
+		unmorphedWithChildrenOcclusionInfosToUpload = OcclusionInfo.PackArray(results);
 	}
 
-	public void SetValues(ChannelOutputs channelOutputs) {
+	public void SetValues(DeviceContext context, ChannelOutputs channelOutputs) {
 		if (parametersResources == null) {
 			return;
 		}
 
 		float[] weights = parametersResources.Parameters.ChannelIndices.Select(idx => (float) channelOutputs.Values[idx]).ToArray();
-		parametersResources.channelWeightsBufferManager.Update(weights);
+		parametersResources.channelWeightsBufferManager.Update(context, weights);
 	}
 
-	public void CalculateOcclusion() {
+	public void CalculateOcclusion(DeviceContext context) {
+		if (unmorphedWithChildrenOcclusionInfosToUpload != null) {
+			unmorphedWithChildrenOcclusionInfosBufferManager.Update(context, unmorphedWithChildrenOcclusionInfosToUpload);
+			unmorphedWithChildrenOcclusionInfosToUpload = null;
+		}
+
 		if (parametersResources == null) {
 			return;
 		}
-
-		DeviceContext context = device.ImmediateContext;
-
+		
 		context.WithEvent("Occluder::CalculateOcclusion", () => {
 			context.ClearState();
 

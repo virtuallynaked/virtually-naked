@@ -72,21 +72,21 @@ public class FigureFacade : IDisposable {
 		renderer.RenderPass(context, pass);
 	}
 	
-	public ChannelOutputs UpdateFrame(FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
-		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults();
+	public ChannelOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
+		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults(context);
 
 		ChannelInputs shapeInputs = model.Shape.ChannelInputs;
 		ChannelInputs inputs = Animator != null ? Animator.GetFrameInputs(shapeInputs, updateParameters, previousFrameResults) : shapeInputs;
 		
-		return controlVertexProvider.UpdateFrame(parentOutputs, inputs);
+		return controlVertexProvider.UpdateFrame(context, parentOutputs, inputs);
 	}
 
-	public void UpdateVertexPositionsAndGetDeltas(UnorderedAccessView deltasOutView) {
-		controlVertexProvider.UpdateVertexPositionsAndGetDeltas(deltasOutView);
+	public void UpdateVertexPositionsAndGetDeltas(DeviceContext context, UnorderedAccessView deltasOutView) {
+		controlVertexProvider.UpdateVertexPositionsAndGetDeltas(context, deltasOutView);
 	}
 
-	public void UpdateVertexPositions(ShaderResourceView parentDeltasView) {
-		controlVertexProvider.UpdateVertexPositions(parentDeltasView);
+	public void UpdateVertexPositions(DeviceContext context, ShaderResourceView parentDeltasView) {
+		controlVertexProvider.UpdateVertexPositions(context, parentDeltasView);
 	}
 
 	public void Update(DeviceContext context, ImageBasedLightingEnvironment lightingEnvironment) {

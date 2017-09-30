@@ -119,9 +119,9 @@ public class ControlVertexProvider : IDisposable {
 		occluder.RegisterChildOccluders(childOccluders);
 	}
 
-	public ControlVertexInfo[] GetPreviousFrameResults() {
+	public ControlVertexInfo[] GetPreviousFrameResults(DeviceContext context) {
 		if (controlVertexInfoStagingBufferManager != null) {
-			controlVertexInfoStagingBufferManager.FillArayFromStagingBuffer();
+			//controlVertexInfoStagingBufferManager.FillArayFromStagingBuffer(context);
 			ControlVertexInfo[] previousFrameControlVertexInfos = controlVertexInfoStagingBufferManager.Array;
 			return previousFrameControlVertexInfos;
 		} else {
@@ -129,26 +129,28 @@ public class ControlVertexProvider : IDisposable {
 		}
 	}
 
-	public ChannelOutputs UpdateFrame(ChannelOutputs parentOutputs, ChannelInputs inputs) {
+	public ChannelOutputs UpdateFrame(DeviceContext context, ChannelOutputs parentOutputs, ChannelInputs inputs) {
 		var channelOutputs = definition.ChannelSystem.Evaluate(parentOutputs, inputs);
 		var boneTransforms = definition.BoneSystem.GetBoneTransforms(channelOutputs);
-		occluder.SetValues(channelOutputs);
-		shaper.SetValues(channelOutputs, boneTransforms);
+		occluder.SetValues(context, channelOutputs);
+		shaper.SetValues(context, channelOutputs, boneTransforms);
 		return channelOutputs;
 	}
 
-	public void UpdateVertexPositionsAndGetDeltas(UnorderedAccessView deltasOutView) {
-		occluder.CalculateOcclusion();
+	public void UpdateVertexPositionsAndGetDeltas(DeviceContext context, UnorderedAccessView deltasOutView) {
+		occluder.CalculateOcclusion(context);
 		shaper.CalculatePositionsAndDeltas(
+			context,
 			controlVertexInfosBufferManager.OutView,
 			occluder.OcclusionInfosView,
 			deltasOutView);
-		controlVertexInfoStagingBufferManager.CopyToStagingBuffer(controlVertexInfosBufferManager.Buffer);
+		controlVertexInfoStagingBufferManager.CopyToStagingBuffer(context, controlVertexInfosBufferManager.Buffer);
 	}
 
-	public void UpdateVertexPositions(ShaderResourceView parentDeltasView) {
-		occluder.CalculateOcclusion();
+	public void UpdateVertexPositions(DeviceContext context, ShaderResourceView parentDeltasView) {
+		occluder.CalculateOcclusion(context);
 		shaper.CalculatePositions(
+			context,
 			controlVertexInfosBufferManager.OutView,
 			occluder.OcclusionInfosView,
 			parentDeltasView);

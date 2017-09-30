@@ -66,7 +66,7 @@ class RenderModelRenderer : IDisposable {
 	}
 
 	private void RenderSingleComponentModel(DeviceContext context, Matrix worldMatrix, string renderModelName) {
-		var model = cache.LookupModel(renderModelName);
+		var model = cache.LookupModel(context, renderModelName);
 		if (model != null) {
 			worldTransformBufferManager.Update(context, worldMatrix);
 			model.Render(context);
@@ -74,7 +74,7 @@ class RenderModelRenderer : IDisposable {
 	}
 
 	private void RenderMultiComponentModel(DeviceContext context, Matrix worldMatrix, uint trackedDeviceIdx, string renderModelName) {
-		var components = cache.LookupComponents(renderModelName);
+		var components = cache.LookupComponents(context, renderModelName);
 		if (components == null) {
 			return;
 		}

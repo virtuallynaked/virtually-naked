@@ -62,22 +62,22 @@ public class GpuShaper : IDisposable {
 		boneTransformsBufferManager.Dispose();
 	}
 
-	public void SetValues(ChannelOutputs channelOutputs, StagedSkinningTransform[] allBoneTransforms) {
+	public void SetValues(DeviceContext context, ChannelOutputs channelOutputs, StagedSkinningTransform[] allBoneTransforms) {
 		float[] morphWeights = morphChannelIndices.Select(idx => (float) channelOutputs.Values[idx]).ToArray();
 		StagedSkinningTransform[] boneTransforms = boneIndices.Select(idx => allBoneTransforms[idx]).ToArray();
 
-		device.ImmediateContext.WithEvent("GpuShader::SetValues", () => {
-			morphWeightsBufferManager.Update(morphWeights);
-			boneTransformsBufferManager.Update(boneTransforms);
+		context.WithEvent("GpuShader::SetValues", () => {
+			morphWeightsBufferManager.Update(context, morphWeights);
+			boneTransformsBufferManager.Update(context, boneTransforms);
 		});
 	}
 	
 	private void CalculatePositionsCommon(
+		DeviceContext context,
 		UnorderedAccessView vertexInfosOutView,
 		ShaderResourceView occlusionInfosView,
 		ShaderResourceView parentDeltasInView,
 		UnorderedAccessView deltasOutView) {
-		DeviceContext context = device.ImmediateContext;
 
 		context.WithEvent("GpuShaper::CalculatePositions", () => {
 			context.ClearState();
@@ -112,17 +112,18 @@ public class GpuShaper : IDisposable {
 	}
 	
 	public void CalculatePositionsAndDeltas(
+		DeviceContext context,
 		UnorderedAccessView vertexInfosOutView,
 		ShaderResourceView occlusionInfosView,
 		UnorderedAccessView deltasOutView) {
-		CalculatePositionsCommon(vertexInfosOutView, occlusionInfosView, null, deltasOutView);
+		CalculatePositionsCommon(context, vertexInfosOutView, occlusionInfosView, null, deltasOutView);
 	}
 
 	public void CalculatePositions(
+		DeviceContext context,
 		UnorderedAccessView vertexInfosOutView,
 		ShaderResourceView occlusionInfosView,
 		ShaderResourceView parentDeltasView) {
-		DeviceContext context = device.ImmediateContext;
-		CalculatePositionsCommon(vertexInfosOutView, occlusionInfosView, parentDeltasView, null);
+		CalculatePositionsCommon(context, vertexInfosOutView, occlusionInfosView, parentDeltasView, null);
 	}
 }
