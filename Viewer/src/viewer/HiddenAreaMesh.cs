@@ -2,14 +2,10 @@
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Valve.VR;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
-class HiddenAreaMesh : IDisposable {
+public class HiddenAreaMesh : IDisposable {
 	public static readonly InputElement[] InputElements = new [] {
 		new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32_Float, 0)
 	};

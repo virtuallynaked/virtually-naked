@@ -146,7 +146,7 @@ class CompanionWindow : IDisposable {
 		return Matrix.PerspectiveFovRH(DesiredFov, aspectRatio, RenderingConstants.ZNear, RenderingConstants.ZFar);
 	}
 
-	public void Display(ShaderResourceView sourceView, Matrix sourceProjectionMatrix, Action renderUi) {
+	public void Display(Texture2D sourceTexture, Matrix sourceProjectionMatrix, Action renderUi) {
 		var context = device.ImmediateContext;
 
 		float sourceAspectRatio = sourceProjectionMatrix.M22 / sourceProjectionMatrix.M11;
@@ -166,8 +166,10 @@ class CompanionWindow : IDisposable {
 
 		context.PixelShader.Set(copyFromSourcePixelShader);
 		standardSamplers.Apply(context.PixelShader);
-		context.PixelShader.SetShaderResource(0, sourceView);
-
+		using (var sourceView = new ShaderResourceView(device, sourceTexture)) {
+			context.PixelShader.SetShaderResource(0, sourceView);
+		}
+		
 		context.Draw(4, 0);
 
 		context.OutputMerger.SetBlendState(uiBlendState);

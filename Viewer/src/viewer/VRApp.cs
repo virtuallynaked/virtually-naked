@@ -85,21 +85,16 @@ public class VRApp : IDisposable {
 
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
-	private readonly DeviceContext deferredContext;
 	private readonly DeviceContext immediateContext;
-		
-	private ViewProjectionConstantBufferManager viewProjectionTransformBufferManager;
 
 	private OpenVRTimeKeeper timeKeeper;
 	private TrackedDevicePose_t[] poses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 	private TrackedDevicePose_t[] gamePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-	private ControllerManager controllerManager;
 
-	private readonly HiddenAreaMasker hiddenAreaMasker;
-	private RenderPassController passController;
+	private readonly HiddenAreaMeshes hiddenAreaMeshes;
 
 	private readonly StandardSamplers standardSamplers;
-	private readonly Scene scene;
+	private readonly FramePreparer framePreparer;
 
 	public VRApp(IArchiveDirectory dataDir, string title) {
 		device = new Device(DriverType.Hardware, debugDevice ? DeviceCreationFlags.Debug : DeviceCreationFlags.None);
@@ -109,26 +104,27 @@ public class VRApp : IDisposable {
 		companionWindow = new CompanionWindow(device, shaderCache, standardSamplers, title, dataDir);
 				
 		immediateContext = device.ImmediateContext;
-		deferredContext = new DeviceContext(device);
 
-		Init();
+		OpenVRExtensions.Init();
 		
-		scene = new Scene(dataDir, device, shaderCache, standardSamplers, poses, controllerManager);
-		hiddenAreaMasker = new HiddenAreaMasker(device, shaderCache);
+		timeKeeper = new OpenVRTimeKeeper();
+
+		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
+		
+		Size2 targetSize = OpenVR.System.GetRecommendedRenderTargetSize();
+		framePreparer = new FramePreparer(dataDir, device, shaderCache, standardSamplers, targetSize, poses);
+
+		hiddenAreaMeshes = new HiddenAreaMeshes(device);
 	}
 	
 	public void Dispose() {
-		passController.Dispose();
-		
-		Utilities.Dispose(ref viewProjectionTransformBufferManager);
+		hiddenAreaMeshes.Dispose();
 
-		scene.Dispose();
+		framePreparer.Dispose();
 		standardSamplers.Dispose();
-		hiddenAreaMasker.Dispose();
 
 		OpenVR.Shutdown();
-
-		deferredContext.Dispose();
+		
 		immediateContext.Dispose();
 		
 		companionWindow.Dispose();
@@ -136,71 +132,30 @@ public class VRApp : IDisposable {
 		shaderCache.Dispose();
 		device.Dispose();
 	}
-
-	private void Init() {
-		viewProjectionTransformBufferManager = new ViewProjectionConstantBufferManager(device);
-		
-		InitVR();
-	}
-
-	public void InitVR() {
-		OpenVRExtensions.Init();
-		
-		timeKeeper = new OpenVRTimeKeeper();
-		controllerManager = new ControllerManager();
-
-		Size2 targetSize = OpenVR.System.GetRecommendedRenderTargetSize();
-		
-		passController = new RenderPassController(device, shaderCache, targetSize);
-
-		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
-	}
 	
 	private void Run() {
 		RenderLoop.Run(companionWindow.Form, DoFrame);
 	}
 	
-	private CommandList RecordCommandList() {
-		DeviceContext context = deferredContext;
+	private Texture2D mostRecentRenderTexture;
+	private Matrix mostRecentProjectionTransform;
 
-		standardSamplers.Apply(context.PixelShader);
-		context.VertexShader.SetConstantBuffer(0, viewProjectionTransformBufferManager.Buffer);
-
-		passController.RenderAllPases(context, pass => scene.RenderPass(context, pass));
-
-		return context.FinishCommandList(false);
-	}
-
-	
-	private CommandList RecordUpdateCommandList() {
-		DeviceContext context = deferredContext;
-
-		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
-		var updateParameters = new FrameUpdateParameters(
-			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
-			timeKeeper.TimeDelta,
-			headPosition);
-
-		controllerManager.Update();
-		scene.Update(deferredContext, updateParameters);
-		passController.PrepareFrame(deferredContext, scene.ToneMappingSettings);
-
-		return context.FinishCommandList(false);
-	}
-
-	private void RenderView(CommandList commandList, Action<DeviceContext> prepareMaskAction, Matrix viewTransform, Matrix projectionTransform) {
-		DeviceContext context = immediateContext;
+	private Texture2D RenderView(IPreparedFrame preparedFrame, HiddenAreaMesh hiddenAreaMesh, Matrix viewTransform, Matrix projectionTransform) {
+		var renderTexture = preparedFrame.RenderView(device.ImmediateContext, hiddenAreaMesh, viewTransform, projectionTransform);
 		
-		float c = ColorUtils.SrgbToLinear(68/255f);
-		passController.Prepare(context, new Color(c, c, c), 255, () => prepareMaskAction.Invoke(context));
-
-		viewProjectionTransformBufferManager.Update(immediateContext, viewTransform, projectionTransform);
-
-		context.ExecuteCommandList(commandList, false);
+		mostRecentProjectionTransform = projectionTransform;
+		mostRecentRenderTexture = renderTexture;
+		
+		return renderTexture;
 	}
 
-	private void SubmitEye(EVREye eye, CommandList commandList) {
+	private void SubmitEye(EVREye eye, IPreparedFrame preparedFrame) {
 		immediateContext.WithEvent($"VRApp::SubmitEye({eye})", () => {
+			HiddenAreaMesh hiddenAreaMesh = hiddenAreaMeshes.GetMesh(eye);
+			Matrix viewMatrix = GetViewMatrix(eye);
+			Matrix projectionMatrix = GetProjectionMatrix(eye);
+			var resultTexture = RenderView(preparedFrame, hiddenAreaMesh, viewMatrix, projectionMatrix);
+
 			VRTextureBounds_t bounds;
 			bounds.uMin = 0;
 			bounds.uMax = 1;
@@ -208,15 +163,10 @@ public class VRApp : IDisposable {
 			bounds.vMax = 1;
 		
 			Texture_t eyeTexture;
-			eyeTexture.handle = passController.ResultTexture.NativePointer;
+			eyeTexture.handle = resultTexture.NativePointer;
 			eyeTexture.eType = ETextureType.DirectX;
 			eyeTexture.eColorSpace = EColorSpace.Auto;
 		
-			Action<DeviceContext> prepareMaskAction = (context) => hiddenAreaMasker.PrepareMask(context, eye);
-			Matrix viewMatrix = GetViewMatrix(eye);
-			Matrix projectionMatrix = GetProjectionMatrix(eye);
-			RenderView(commandList, prepareMaskAction, viewMatrix, projectionMatrix);
-
 			OpenVR.Compositor.Submit(eye, ref eyeTexture, ref bounds, EVRSubmitFlags.Submit_Default);
 		});
 	}
@@ -239,40 +189,40 @@ public class VRApp : IDisposable {
 	}
 	
 	private void DoFrame() {
-		using (var commandList = RecordUpdateCommandList()) {
-			immediateContext.WithEvent("VRApp::Update", () => {
-				immediateContext.ExecuteCommandList(commandList, false);
-			});
-		}
+		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
+		var updateParameters = new FrameUpdateParameters(
+			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
+			timeKeeper.TimeDelta,
+			headPosition);
 
+		IPreparedFrame preparedFrame = framePreparer.PrepareFrame(updateParameters);
+		
 		OpenVR.Compositor.WaitGetPoses(poses, gamePoses);
 		timeKeeper.AdvanceFrame();
 
-		Matrix companionWindowProjectionMatrix;
-
-		using (var commandList = RecordCommandList()) {
-			SubmitEye(EVREye.Eye_Left, commandList);
-			SubmitEye(EVREye.Eye_Right, commandList);
-
-			if (companionWindow.HasIndependentCamera) {
-				Matrix companionViewTransform = companionWindow.GetViewTransform();
-				companionWindowProjectionMatrix = companionWindow.GetDesiredProjectionMatrix();
-				immediateContext.WithEvent("VRApp::RenderCompanionView", () => {
-					RenderView(commandList, (context) => { }, companionViewTransform, companionWindowProjectionMatrix);
-				});
-			} else {
-				companionWindowProjectionMatrix = GetProjectionMatrix(EVREye.Eye_Right);
-			}
-		}
-		
-		companionWindow.Display(
-			passController.ResultSourceView,
-			companionWindowProjectionMatrix,
-			() => scene.RenderCompanionWindowUi(immediateContext));
-		
-		OpenVR.Compositor.PostPresentHandoff();
-
 		PumpVREvents();
+		
+		immediateContext.WithEvent("VRApp::Prework", () => {
+			preparedFrame.DoPrework(device.ImmediateContext);
+		});
+		
+		SubmitEye(EVREye.Eye_Left, preparedFrame);
+		SubmitEye(EVREye.Eye_Right, preparedFrame);
+
+		if (companionWindow.HasIndependentCamera) {
+			Matrix companionViewTransform = companionWindow.GetViewTransform();
+			Matrix companionWindowProjectionMatrix = companionWindow.GetDesiredProjectionMatrix();
+			immediateContext.WithEvent("VRApp::RenderCompanionView", () => {
+				RenderView(preparedFrame, null, companionViewTransform, companionWindowProjectionMatrix);
+			});
+		}
+
+		companionWindow.Display(
+			mostRecentRenderTexture,
+			mostRecentProjectionTransform,
+			() => preparedFrame.DrawCompanionWindowUi(device.ImmediateContext));
+		
+		preparedFrame.Dispose();
 	}
 	
 	private Matrix GetViewMatrix(EVREye eye) {
