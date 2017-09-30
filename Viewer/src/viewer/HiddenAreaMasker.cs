@@ -40,6 +40,7 @@ class HiddenAreaMasker : IDisposable {
 
 	private DepthStencilState MakeWriteStencilState(Device device) {
 		DepthStencilStateDescription desc = DepthStencilStateDescription.Default();
+		desc.DepthComparison = Comparison.Greater;
 		desc.IsStencilEnabled = true;
 		desc.FrontFace.PassOperation = StencilOperation.Zero;
 		desc.BackFace.PassOperation = StencilOperation.Zero;
