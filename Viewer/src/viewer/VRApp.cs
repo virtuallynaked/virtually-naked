@@ -95,6 +95,9 @@ public class VRApp : IDisposable {
 
 	private readonly StandardSamplers standardSamplers;
 	private readonly FramePreparer framePreparer;
+	private readonly AsyncFramePreparer asyncFramePreparer;
+
+	private IPreparedFrame preparedFrame;
 
 	public VRApp(IArchiveDirectory dataDir, string title) {
 		device = new Device(DriverType.Hardware, debugDevice ? DeviceCreationFlags.Debug : DeviceCreationFlags.None);
@@ -108,20 +111,21 @@ public class VRApp : IDisposable {
 		OpenVRExtensions.Init();
 		
 		timeKeeper = new OpenVRTimeKeeper();
+				
+		hiddenAreaMeshes = new HiddenAreaMeshes(device);
 
-		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
-		
 		Size2 targetSize = OpenVR.System.GetRecommendedRenderTargetSize();
 		framePreparer = new FramePreparer(dataDir, device, shaderCache, standardSamplers, targetSize, poses);
-
-		hiddenAreaMeshes = new HiddenAreaMeshes(device);
+		asyncFramePreparer = new AsyncFramePreparer(framePreparer);
 	}
 	
 	public void Dispose() {
-		hiddenAreaMeshes.Dispose();
+		preparedFrame?.Dispose();
 
 		framePreparer.Dispose();
+
 		standardSamplers.Dispose();
+		hiddenAreaMeshes.Dispose();
 
 		OpenVR.Shutdown();
 		
@@ -134,6 +138,11 @@ public class VRApp : IDisposable {
 	}
 	
 	private void Run() {
+		//setup initial frame
+		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
+		KickoffFramePreparation();
+		preparedFrame = asyncFramePreparer.FinishPreparingFrame();
+
 		RenderLoop.Run(companionWindow.Form, DoFrame);
 	}
 	
@@ -188,19 +197,22 @@ public class VRApp : IDisposable {
 		}
 	}
 	
-	private void DoFrame() {
+	private void KickoffFramePreparation() {
 		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
 		var updateParameters = new FrameUpdateParameters(
-			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because we haven't called WaitGetPoses yet
+			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because this is for the next frame
 			timeKeeper.TimeDelta,
 			headPosition);
+		asyncFramePreparer.StartPreparingFrame(updateParameters);
+	}
 
-		IPreparedFrame preparedFrame = framePreparer.PrepareFrame(updateParameters);
-		
+	private void DoFrame() {
 		OpenVR.Compositor.WaitGetPoses(poses, gamePoses);
 		timeKeeper.AdvanceFrame();
 
 		PumpVREvents();
+
+		KickoffFramePreparation();
 		
 		immediateContext.WithEvent("VRApp::Prework", () => {
 			preparedFrame.DoPrework(device.ImmediateContext);
@@ -222,7 +234,10 @@ public class VRApp : IDisposable {
 			mostRecentProjectionTransform,
 			() => preparedFrame.DrawCompanionWindowUi(device.ImmediateContext));
 		
+		OpenVR.Compositor.PostPresentHandoff();
+
 		preparedFrame.Dispose();
+		preparedFrame = asyncFramePreparer.FinishPreparingFrame();
 	}
 	
 	private Matrix GetViewMatrix(EVREye eye) {
