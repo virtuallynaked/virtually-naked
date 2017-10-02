@@ -147,10 +147,10 @@ private static InputElement[] InputElements = new[] {
 						
 			var opacityCounterStagingBufferManager = new StagingStructuredBufferManager<OpacityCounters>(device, faceIdxMap.Count);
 			opacityCounterStagingBufferManager.CopyToStagingBuffer(context, opacityCounterBufferManager.Buffer);
-			opacityCounterStagingBufferManager.FillArayFromStagingBuffer(context);
+			var array = opacityCounterStagingBufferManager.FillArrayFromStagingBuffer(context);
 			
 			for (int faceIdx = 0; faceIdx < faceIdxMap.Count; ++faceIdx) {
-				OpacityCounters opacityCounter = opacityCounterStagingBufferManager.Array[faceIdx];
+				OpacityCounters opacityCounter = array[faceIdx];
 			
 				if (opacityCounter.pixelCount > (1<<24)) {
 					throw new Exception("pixel count overflow");

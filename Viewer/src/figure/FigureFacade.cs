@@ -59,7 +59,11 @@ public class FigureFacade : IDisposable {
 		renderer.Dispose();
 		renderer = newRenderer;
 	}
-	
+
+	public void ReadbackPosedControlVertices(DeviceContext context) {
+		controlVertexProvider.ReadbackPosedControlVertices(context);
+	}
+
 	public void RegisterChildren(List<FigureFacade> children) {
 		var childControlVertexProviders = children
 			.Select(child => child.controlVertexProvider)

@@ -234,6 +234,8 @@ public class VRApp : IDisposable {
 			mostRecentProjectionTransform,
 			() => preparedFrame.DrawCompanionWindowUi(device.ImmediateContext));
 		
+		preparedFrame.DoPostwork(device.ImmediateContext);
+
 		OpenVR.Compositor.PostPresentHandoff();
 
 		preparedFrame.Dispose();

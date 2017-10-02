@@ -51,7 +51,7 @@ public class ControlVertexProvider : IDisposable {
 
 		return provider;
 	}
-
+	
 	private readonly FigureDefinition definition;
 	private IOccluder occluder;
 	private readonly GpuShaper shaper;
@@ -59,6 +59,8 @@ public class ControlVertexProvider : IDisposable {
 	private readonly int vertexCount;
 
 	private readonly InOutStructuredBufferManager<ControlVertexInfo> controlVertexInfosBufferManager;
+
+	private const int BackingArrayCount = 2;
 	private readonly StagingStructuredBufferManager<ControlVertexInfo> controlVertexInfoStagingBufferManager;
 
 	public ControlVertexProvider(Device device, ShaderCache shaderCache,
@@ -74,7 +76,7 @@ public class ControlVertexProvider : IDisposable {
 		controlVertexInfosBufferManager = new InOutStructuredBufferManager<ControlVertexInfo>(device, vertexCount);
 
 		if (definition.ChannelSystem.Parent == null) {
-			this.controlVertexInfoStagingBufferManager = new StagingStructuredBufferManager<ControlVertexInfo>(device, vertexCount);
+			this.controlVertexInfoStagingBufferManager = new StagingStructuredBufferManager<ControlVertexInfo>(device, vertexCount, BackingArrayCount);
 		}
 	}
 	
@@ -119,16 +121,6 @@ public class ControlVertexProvider : IDisposable {
 		occluder.RegisterChildOccluders(childOccluders);
 	}
 
-	public ControlVertexInfo[] GetPreviousFrameResults(DeviceContext context) {
-		if (controlVertexInfoStagingBufferManager != null) {
-			//controlVertexInfoStagingBufferManager.FillArayFromStagingBuffer(context);
-			ControlVertexInfo[] previousFrameControlVertexInfos = controlVertexInfoStagingBufferManager.Array;
-			return previousFrameControlVertexInfos;
-		} else {
-			return null;
-		}
-	}
-
 	public ChannelOutputs UpdateFrame(DeviceContext context, ChannelOutputs parentOutputs, ChannelInputs inputs) {
 		var channelOutputs = definition.ChannelSystem.Evaluate(parentOutputs, inputs);
 		var boneTransforms = definition.BoneSystem.GetBoneTransforms(channelOutputs);
@@ -154,5 +146,17 @@ public class ControlVertexProvider : IDisposable {
 			controlVertexInfosBufferManager.OutView,
 			occluder.OcclusionInfosView,
 			parentDeltasView);
+	}
+	
+	private volatile ControlVertexInfo[] previousFramePosedVertices;
+
+	public void ReadbackPosedControlVertices(DeviceContext context) {
+		if (controlVertexInfoStagingBufferManager != null) {
+			previousFramePosedVertices = controlVertexInfoStagingBufferManager.FillArrayFromStagingBuffer(context);
+		}
+	}
+
+	public ControlVertexInfo[] GetPreviousFrameResults(DeviceContext context) {
+		return previousFramePosedVertices;
 	}
 }

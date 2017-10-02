@@ -62,7 +62,7 @@ public class FramePreparer : IDisposable {
 		return context.FinishCommandList(false);
 	}
 
-	private void PrepareViewAction(DeviceContext context, HiddenAreaMesh hiddenAreaMesh, Matrix viewTransform, Matrix projectionTransform) {
+	private void PrepareView(DeviceContext context, HiddenAreaMesh hiddenAreaMesh, Matrix viewTransform, Matrix projectionTransform) {
 		float c = ColorUtils.SrgbToLinear(68/255f);
 
 		Action prepareMask = () => {
@@ -74,15 +74,21 @@ public class FramePreparer : IDisposable {
 		viewProjectionTransformBufferManager.Update(context, viewTransform, projectionTransform);
 	}
 
+	private void DoPostwork(DeviceContext deviceContext) {
+		scene.DoPostwork(deviceContext);
+	}
+
 	public IPreparedFrame PrepareFrame(FrameUpdateParameters updateParameters) {
 		return new PreparedFrame(
 			UpdateAndRecordUpdateCommandList(updateParameters),
 
-			PrepareViewAction,
+			PrepareView,
 			RecordDrawCommandList(),
 			passController.ResultTexture,
 
-			RecordDrawCommandUiCommandList()
+			RecordDrawCommandUiCommandList(),
+
+			DoPostwork
 		);
 	}
 }
@@ -96,10 +102,13 @@ public class PreparedFrame : IPreparedFrame {
 
 	private CommandList drawCompanionWindowUiCommandList;
 
+	private Action<DeviceContext> postworkAction;
+
 	public PreparedFrame(
 		CommandList updateCommandList,
 		Action<DeviceContext, HiddenAreaMesh, Matrix, Matrix> prepareViewAction, CommandList drawViewCommandList, Texture2D renderTexture,
-		CommandList drawCompanionWindowUiCommandList) {
+		CommandList drawCompanionWindowUiCommandList,
+		Action<DeviceContext> postworkAction) {
 		this.updateCommandList = updateCommandList;
 
 		this.prepareViewAction = prepareViewAction;
@@ -107,6 +116,8 @@ public class PreparedFrame : IPreparedFrame {
 		this.renderTexture = renderTexture;
 
 		this.drawCompanionWindowUiCommandList = drawCompanionWindowUiCommandList;
+
+		this.postworkAction = postworkAction;
 	}
 
 	public void Dispose() {
@@ -127,5 +138,9 @@ public class PreparedFrame : IPreparedFrame {
 
 	public void DrawCompanionWindowUi(DeviceContext context) {
 		context.ExecuteCommandList(drawCompanionWindowUiCommandList, false);
+	}
+
+	public void DoPostwork(DeviceContext context) {
+		postworkAction(context);
 	}
 }

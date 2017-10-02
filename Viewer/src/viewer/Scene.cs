@@ -72,11 +72,15 @@ class Scene : IDisposable {
 		actor.RenderPass(context, pass);
 		menu.RenderPass(context, pass);
 	}
-
+	
 	public void RenderCompanionWindowUi(DeviceContext context) {
 		menu.RenderCompanionWindowUi(context);
 	}
 	
+	public void DoPostwork(DeviceContext context) {
+		actor.DoPostwork(context);
+	}
+
 	public class Recipe {
 		[JsonProperty("tone-mapping")]
 		public ToneMappingSettings.Recipe toneMapping;

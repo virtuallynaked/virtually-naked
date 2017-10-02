@@ -61,4 +61,8 @@ class FigureGroup : IDisposable {
 			figure.RenderPass(context, pass);
 		}
 	}
+
+	public void DoPostwork(DeviceContext context) {
+		parentFigure.ReadbackPosedControlVertices(context);
+	}
 }

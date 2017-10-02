@@ -70,14 +70,18 @@ public class Actor : IDisposable {
 	
 	public IMenuLevel MenuLevel => ActorMenuProvider.MakeRootMenuLevel(this);
 	
-	public void RenderPass(DeviceContext context, RenderingPass pass) {
-		figureGroup.RenderPass(context, pass);
-	}
-
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters, ImageBasedLightingEnvironment iblEnvironment) {
 		figureGroup.Update(context, updateParameters, iblEnvironment);
 	}
 
+	public void RenderPass(DeviceContext context, RenderingPass pass) {
+		figureGroup.RenderPass(context, pass);
+	}
+
+	public void DoPostwork(DeviceContext context) {
+		figureGroup.DoPostwork(context);
+	}
+	
 	public class Recipe {
 		[JsonProperty("main")]
 		public FigureFacade.Recipe main;
@@ -110,7 +114,7 @@ public class Actor : IDisposable {
 			pose?.Merge(actor.Behavior);
 		}
 	}
-
+	
 	public Recipe Recipize() {
 		return new Recipe {
 			main = Main.Recipize(),

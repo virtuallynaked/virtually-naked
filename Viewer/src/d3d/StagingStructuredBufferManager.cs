@@ -6,31 +6,42 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 using Device = SharpDX.Direct3D11.Device;
 
 public class StagingStructuredBufferManager<T> : IDisposable where T : struct {
-	private Buffer Buffer { get; }
-	public T[] Array { get; }
+	private Buffer buffer;
 
-	public StagingStructuredBufferManager(Device device, int elementCount) {
+	private T[][] arrays;
+	private int nextArrayIdx;
+
+	public StagingStructuredBufferManager(Device device, int elementCount, int arrayCount = 1) {
 		int elementSizeInBytes = Marshal.SizeOf<T>();
 
-		Buffer = new Buffer(device, elementCount * elementSizeInBytes, ResourceUsage.Staging, BindFlags.None, CpuAccessFlags.Read, ResourceOptionFlags.BufferStructured, structureByteStride: elementSizeInBytes);
-		Array = new T[elementCount];
+		buffer = new Buffer(device, elementCount * elementSizeInBytes, ResourceUsage.Staging, BindFlags.None, CpuAccessFlags.Read, ResourceOptionFlags.BufferStructured, structureByteStride: elementSizeInBytes);
+
+		arrays = new T[arrayCount][];
+		for (int i = 0; i < arrayCount; ++i) {
+			arrays[i] = new T[elementCount];
+		}
 	}
 	
 	public void Dispose() {
-		Buffer.Dispose();
+		buffer.Dispose();
 	}
 
 	public void CopyToStagingBuffer(DeviceContext context, Buffer sourceBuffer) {
-		context.CopyResource(sourceBuffer, Buffer);
+		context.CopyResource(sourceBuffer, buffer);
 	}
 
-	public void FillArayFromStagingBuffer(DeviceContext context) {
-		DataBox dataBox = context.MapSubresource(Buffer, 0, MapMode.Read, MapFlags.None, out DataStream dataStream);
+	public T[] FillArrayFromStagingBuffer(DeviceContext context) {
+		T[] array = arrays[nextArrayIdx];
+		nextArrayIdx = (nextArrayIdx + 1) % arrays.Length;
+		
+		DataBox dataBox = context.MapSubresource(buffer, 0, MapMode.Read, MapFlags.None, out DataStream dataStream);
 		try {
-			dataStream.ReadRange(Array, 0, Array.Length);
+			dataStream.ReadRange(array, 0, array.Length);
 		} finally {
-			context.UnmapSubresource(Buffer, 0);
+			context.UnmapSubresource(buffer, 0);
 			dataStream.Dispose();
 		}
+		
+		return array;
 	}
 }

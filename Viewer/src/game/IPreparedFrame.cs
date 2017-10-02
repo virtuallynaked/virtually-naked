@@ -6,4 +6,5 @@ public interface IPreparedFrame : IDisposable {
 	void DoPrework(DeviceContext context);
 	Texture2D RenderView(DeviceContext context, HiddenAreaMesh mesh, Matrix viewTransform, Matrix projectionTransform);
 	void DrawCompanionWindowUi(DeviceContext context);
+	void DoPostwork(DeviceContext context);
 }
