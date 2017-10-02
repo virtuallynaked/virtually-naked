@@ -74,12 +74,17 @@ public class FramePreparer : IDisposable {
 		viewProjectionTransformBufferManager.Update(context, viewTransform, projectionTransform);
 	}
 
-	private void DoPostwork(DeviceContext deviceContext) {
-		scene.DoPostwork(deviceContext);
+	private void DoPrework(DeviceContext context) {
+		scene.DoPrework(context);
+	}
+
+	private void DoPostwork(DeviceContext context) {
+		scene.DoPostwork(context);
 	}
 
 	public IPreparedFrame PrepareFrame(FrameUpdateParameters updateParameters) {
 		return new PreparedFrame(
+			DoPrework,
 			UpdateAndRecordUpdateCommandList(updateParameters),
 
 			PrepareView,
@@ -94,6 +99,7 @@ public class FramePreparer : IDisposable {
 }
 
 public class PreparedFrame : IPreparedFrame {
+	private Action<DeviceContext> preworkAction;
 	private CommandList updateCommandList;
 
 	private Action<DeviceContext, HiddenAreaMesh, Matrix, Matrix> prepareViewAction;
@@ -105,10 +111,11 @@ public class PreparedFrame : IPreparedFrame {
 	private Action<DeviceContext> postworkAction;
 
 	public PreparedFrame(
-		CommandList updateCommandList,
+		Action<DeviceContext> preworkAction, CommandList updateCommandList,
 		Action<DeviceContext, HiddenAreaMesh, Matrix, Matrix> prepareViewAction, CommandList drawViewCommandList, Texture2D renderTexture,
 		CommandList drawCompanionWindowUiCommandList,
 		Action<DeviceContext> postworkAction) {
+		this.preworkAction = preworkAction;
 		this.updateCommandList = updateCommandList;
 
 		this.prepareViewAction = prepareViewAction;
@@ -127,6 +134,7 @@ public class PreparedFrame : IPreparedFrame {
 	}
 
 	public void DoPrework(DeviceContext context) {
+		preworkAction.Invoke(context);
 		context.ExecuteCommandList(updateCommandList, false);
 	}
 		

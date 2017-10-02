@@ -21,7 +21,7 @@ public class Menu : IDisposable {
 	
 	public void Update(DeviceContext context) {
 		controller.Update();
-		//visualRenderer.Update(context);
+		visualRenderer.Update(context);
 	}
 	
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
@@ -30,5 +30,13 @@ public class Menu : IDisposable {
 
 	public void RenderCompanionWindowUi(DeviceContext context) {
 		renderer.RenderCompanionWindowUi(context);
+	}
+	
+	public void DoPrework(DeviceContext context) {
+		visualRenderer.DoPrework(context);
+	}
+
+	public void DoPostwork(DeviceContext context) {
+		visualRenderer.DoPostwork(context);
 	}
 }

@@ -77,8 +77,13 @@ class Scene : IDisposable {
 		menu.RenderCompanionWindowUi(context);
 	}
 	
+	public void DoPrework(DeviceContext context) {
+		menu.DoPrework(context);
+	}
+
 	public void DoPostwork(DeviceContext context) {
 		actor.DoPostwork(context);
+		menu.DoPostwork(context);
 	}
 
 	public class Recipe {
