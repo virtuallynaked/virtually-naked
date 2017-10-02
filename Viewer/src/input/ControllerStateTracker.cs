@@ -37,7 +37,6 @@ public class ControllerStateTracker {
 
 		if (!active) {
 			//activate
-			Console.WriteLine("activate");
 			active = true;
 			secondPreviousState = default(VRControllerState_t);
 			previousState = default(VRControllerState_t);
