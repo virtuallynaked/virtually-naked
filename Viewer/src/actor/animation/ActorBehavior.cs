@@ -51,13 +51,13 @@ public class ActorBehavior {
 			inputs.RawValues[idx] += model.Inputs.RawValues[idx];
 		}
 
-		dragHandle.Update();
+		dragHandle.Update(updateParameters);
 		DualQuaternion rootTransform = DualQuaternion.FromMatrix(dragHandle.Transform);
 		
 		var blendedPose = GetBlendedPose(updateParameters.Time);
 		poser.Apply(inputs, blendedPose, rootTransform);
 
-		ikAnimator.Update(inputs, previousFrameControlVertexInfos);
+		ikAnimator.Update(updateParameters, inputs, previousFrameControlVertexInfos);
 
 		proceduralAnimator.Update(updateParameters, inputs);
 

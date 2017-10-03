@@ -40,14 +40,14 @@ public class InverseKinematicsAnimator {
 		bone.SetEffectiveRotation(inputs, outputs, lerpedRotation, SetMask.ApplyClampAndVisibleOnly);
 	}
 	
-	public void Update(ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		ChannelInputs baseInputs = new ChannelInputs(inputs);
 
 		for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
 			inputs.RawValues[i] += inputDeltas.RawValues[i];
 		}
 
-		InverseKinematicsProblem problem = ui.GetProblem(inputs, previousFrameControlVertexInfos);
+		InverseKinematicsProblem problem = ui.GetProblem(updateParameters, inputs, previousFrameControlVertexInfos);
 		if (problem == null) {
 			return;
 		}

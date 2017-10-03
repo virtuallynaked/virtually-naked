@@ -15,12 +15,12 @@ class Scene : IDisposable {
 	private readonly Actor actor;
 	private readonly Menu menu;
 
-	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDevicePose_t[] poses, ControllerManager controllerManager) {
+	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDeviceBufferManager trackedDeviceBufferManager, ControllerManager controllerManager) {
 		toneMappingSettings = new ToneMappingSettings();
 		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, InitialSettings.Environment);
 		backdrop = new Backdrop(device, shaderCache);
 		floor = new PlayspaceFloor(device, shaderCache);
-		renderModelRenderer = new RenderModelRenderer(device, shaderCache, poses);
+		renderModelRenderer = new RenderModelRenderer(device, shaderCache, trackedDeviceBufferManager);
 		primitiveRenderer = new QuadMeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100));
 		actor = Actor.Load(dataDir, device, shaderCache, controllerManager);
 		
@@ -37,7 +37,7 @@ class Scene : IDisposable {
 		);
 
 		var rootMenuLevel = new CombinedMenuLevel(appMenuLevel, actor.MenuLevel);
-		menu = new Menu(device, shaderCache, controllerManager, rootMenuLevel);
+		menu = new Menu(device, shaderCache, trackedDeviceBufferManager, controllerManager, rootMenuLevel);
 	}
 
 	public void Dispose() {

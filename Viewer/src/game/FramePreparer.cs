@@ -10,22 +10,25 @@ public class FramePreparer : IDisposable {
 	private RenderPassController passController;
 	private HiddenAreaMasker masker;
 	private ViewProjectionConstantBufferManager viewProjectionTransformBufferManager;
+	private readonly TrackedDeviceBufferManager trackedDeviceBufferManager;
 	private readonly ControllerManager controllerManager;
 	private readonly Scene scene;
 
-	public FramePreparer(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, Size2 targetSize, TrackedDevicePose_t[] poses) {
+	public FramePreparer(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, Size2 targetSize) {
 		this.standardSamplers = standardSamplers;
 
 		deferredContext = new DeviceContext(device);
 		viewProjectionTransformBufferManager = new ViewProjectionConstantBufferManager(device);
 		passController = new RenderPassController(device, shaderCache, targetSize);
 		masker = new HiddenAreaMasker(device, shaderCache);
+		trackedDeviceBufferManager = new TrackedDeviceBufferManager(device);
 		controllerManager = new ControllerManager();
-		scene = new Scene(dataDir, device, shaderCache, standardSamplers, poses, controllerManager);
+		scene = new Scene(dataDir, device, shaderCache, standardSamplers, trackedDeviceBufferManager, controllerManager);
 	}
 
 	public void Dispose() {
 		scene.Dispose();
+		trackedDeviceBufferManager.Dispose();
 
 		deferredContext.Dispose();
 		passController.Dispose();
@@ -36,6 +39,7 @@ public class FramePreparer : IDisposable {
 	private CommandList UpdateAndRecordUpdateCommandList(FrameUpdateParameters updateParameters) {
 		DeviceContext context = deferredContext;
 
+		trackedDeviceBufferManager.Update(updateParameters);
 		controllerManager.Update();
 		scene.Update(deferredContext, updateParameters);
 		passController.PrepareFrame(deferredContext, scene.ToneMappingSettings);

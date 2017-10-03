@@ -5,6 +5,7 @@ using SharpDX;
 using Valve.VR;
 
 public class MenuRenderer : IDisposable {
+	private readonly TrackedDeviceBufferManager trackedDeviceBufferManager;
 	private readonly ControllerManager controllerManager;
 	private readonly ShaderResourceView menuViewTexture;
 	private readonly VertexShader vertexShader;
@@ -13,7 +14,8 @@ public class MenuRenderer : IDisposable {
 
 	private readonly CoordinateNormalMatrixPairConstantBufferManager objectToWorldTransform;
 
-	public MenuRenderer(Device device, ShaderCache shaderCache, ControllerManager controllerManager, ShaderResourceView menuViewTexture) {
+	public MenuRenderer(Device device, ShaderCache shaderCache, TrackedDeviceBufferManager trackedDeviceBufferManager, ControllerManager controllerManager, ShaderResourceView menuViewTexture) {
+		this.trackedDeviceBufferManager = trackedDeviceBufferManager;
 		this.controllerManager = controllerManager;
 		this.menuViewTexture = menuViewTexture;
 		vertexShader = shaderCache.GetVertexShader<MenuRenderer>("menu/renderer/Menu");
@@ -54,9 +56,7 @@ public class MenuRenderer : IDisposable {
 				continue;
 			}
 
-			TrackedDevicePose_t pose = default(TrackedDevicePose_t);
-			TrackedDevicePose_t gamePose = default(TrackedDevicePose_t);
-			OpenVR.Compositor.GetLastPoseForTrackedDeviceIndex(deviceIdx, ref pose, ref gamePose);
+			TrackedDevicePose_t pose = trackedDeviceBufferManager.GetPose(deviceIdx);
 			Matrix controllerToWorldTransform = pose.mDeviceToAbsoluteTracking.Convert();
 			Matrix menuToControllerTransform = Matrix.Scaling(0.10f) * Matrix.Translation(0, 0, 0f) * Matrix.RotationX(MathUtil.PiOverTwo);
 			objectToWorldTransform.Update(context, menuToControllerTransform * controllerToWorldTransform);

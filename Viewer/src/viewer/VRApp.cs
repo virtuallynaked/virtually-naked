@@ -115,7 +115,7 @@ public class VRApp : IDisposable {
 		hiddenAreaMeshes = new HiddenAreaMeshes(device);
 
 		Size2 targetSize = OpenVR.System.GetRecommendedRenderTargetSize();
-		framePreparer = new FramePreparer(dataDir, device, shaderCache, standardSamplers, targetSize, poses);
+		framePreparer = new FramePreparer(dataDir, device, shaderCache, standardSamplers, targetSize);
 		asyncFramePreparer = new AsyncFramePreparer(framePreparer);
 	}
 	
@@ -202,6 +202,7 @@ public class VRApp : IDisposable {
 		var updateParameters = new FrameUpdateParameters(
 			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because this is for the next frame
 			timeKeeper.TimeDelta,
+			gamePoses,
 			headPosition);
 		asyncFramePreparer.StartPreparingFrame(updateParameters);
 	}

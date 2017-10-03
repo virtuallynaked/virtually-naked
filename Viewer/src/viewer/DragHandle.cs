@@ -27,7 +27,7 @@ class DragHandle {
 	public DragHandle(ControllerManager controllerManager) : this(controllerManager, Matrix.Identity) {
 	}
 
-	public void Update() {
+	public void Update(FrameUpdateParameters updateParameters) {
 		if (trackedDeviceIdx == UnattachedSentinel) {
 			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {
 				ControllerStateTracker stateTracker = controllerManager.StateTrackers[deviceIdx];
@@ -41,9 +41,7 @@ class DragHandle {
 			
 				trackedDeviceIdx = deviceIdx;
 
-				TrackedDevicePose_t pose = default(TrackedDevicePose_t);
-				TrackedDevicePose_t gamePose = default(TrackedDevicePose_t);
-				OpenVR.Compositor.GetLastPoseForTrackedDeviceIndex(deviceIdx, ref pose, ref gamePose);
+				TrackedDevicePose_t gamePose = updateParameters.GamePoses[deviceIdx];
 				Matrix controllerToWorldTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
 			
 				Matrix worldToControllerTransform = Matrix.Invert(controllerToWorldTransform);
@@ -60,9 +58,7 @@ class DragHandle {
 				return;
 			}
 
-			TrackedDevicePose_t pose = default(TrackedDevicePose_t);
-			TrackedDevicePose_t gamePose = default(TrackedDevicePose_t);
-			OpenVR.Compositor.GetLastPoseForTrackedDeviceIndex(trackedDeviceIdx, ref pose, ref gamePose);
+			TrackedDevicePose_t gamePose = updateParameters.GamePoses[trackedDeviceIdx];
 			Matrix controllerToWorldTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
 
 			objectToWorldTransform = objectToControllerTransform * controllerToWorldTransform;

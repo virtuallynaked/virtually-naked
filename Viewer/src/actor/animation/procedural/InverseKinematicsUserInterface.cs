@@ -73,7 +73,7 @@ public class InverseKinematicsUserInterface {
 		return definition.BoneSystem.BonesByName[boneName];
 	}
 
-	public InverseKinematicsProblem GetProblem(ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+	public InverseKinematicsProblem GetProblem(FrameUpdateParameters updateParameters, ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		var outputs = definition.ChannelSystem.Evaluate(null, inputs);
 		var boneTransforms = definition.BoneSystem.GetBoneTransforms(outputs);
 
@@ -92,9 +92,7 @@ public class InverseKinematicsUserInterface {
 				tracking = true;
 				trackedDeviceIdx = deviceIdx;
 				
-				TrackedDevicePose_t pose = default(TrackedDevicePose_t);
-				TrackedDevicePose_t gamePose = default(TrackedDevicePose_t);
-				OpenVR.Compositor.GetLastPoseForTrackedDeviceIndex(deviceIdx, ref pose, ref gamePose);
+				TrackedDevicePose_t gamePose = updateParameters.GamePoses[deviceIdx];
 				Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
 				var worldSourcePosition = controllerTransform.TranslationVector * 100;
 
@@ -117,9 +115,7 @@ public class InverseKinematicsUserInterface {
 				return null;
 			}
 
-			TrackedDevicePose_t pose = default(TrackedDevicePose_t);
-			TrackedDevicePose_t gamePose = default(TrackedDevicePose_t);
-			OpenVR.Compositor.GetLastPoseForTrackedDeviceIndex(trackedDeviceIdx, ref pose, ref gamePose);
+			TrackedDevicePose_t gamePose = updateParameters.GamePoses[trackedDeviceIdx];
 			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
 			var targetPosition = controllerTransform.TranslationVector * 100;
 

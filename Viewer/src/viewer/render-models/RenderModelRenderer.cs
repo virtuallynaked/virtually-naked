@@ -13,15 +13,16 @@ class RenderModelRenderer : IDisposable {
 		new InputElement("TEXCOORD", 0, Format.R32G32_Float, InputElement.AppendAligned, 0)
 	};
 
+	private readonly TrackedDeviceBufferManager trackedDeviceBufferManager;
 	private readonly RenderModelCache cache;
-	private readonly TrackedDevicePose_t[] poses;
 	private readonly VertexShader vertexShader;
 	private readonly InputLayout inputLayout;
 	private readonly CoordinateNormalMatrixPairConstantBufferManager worldTransformBufferManager;
 	
-	public RenderModelRenderer(Device device, ShaderCache shaderCache, TrackedDevicePose_t[] poses) {
+	public RenderModelRenderer(Device device, ShaderCache shaderCache, TrackedDeviceBufferManager trackedDeviceBufferManager) {
+		this.trackedDeviceBufferManager = trackedDeviceBufferManager;
+
 		this.cache = new RenderModelCache(device, new BasicSpecularMaterial.Factory(device, shaderCache));
-		this.poses = poses;
 
 		var vertexShaderWithBytecode = shaderCache.GetVertexShader<RenderModelRenderer>("viewer/render-models/RenderModelVertex");
 		vertexShader = vertexShaderWithBytecode;
@@ -41,8 +42,8 @@ class RenderModelRenderer : IDisposable {
 		context.VertexShader.Set(vertexShader);
 		context.VertexShader.SetConstantBuffer(1, worldTransformBufferManager.Buffer);
 
-		for (uint trackedDeviceIdx = 0; trackedDeviceIdx < poses.Length; ++trackedDeviceIdx) {
-			var pose = poses[trackedDeviceIdx];
+		for (uint trackedDeviceIdx = 0; trackedDeviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++trackedDeviceIdx) {
+			var pose = trackedDeviceBufferManager.GetPose(trackedDeviceIdx);
 			if (!pose.bPoseIsValid) {
 				continue;
 			}

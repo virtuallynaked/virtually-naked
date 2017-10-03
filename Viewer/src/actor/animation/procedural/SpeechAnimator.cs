@@ -102,11 +102,8 @@ public class SpeechAnimator : IProceduralAnimator {
 		nextViseme = e.NextViseme;
 	}
 	
-	private void Update3dAudioPosition(ChannelInputs inputs) {
-		
-		TrackedDevicePose_t pose = default(TrackedDevicePose_t);
-		TrackedDevicePose_t gamePose = default(TrackedDevicePose_t);
-		OpenVR.Compositor.GetLastPoseForTrackedDeviceIndex(OpenVR.k_unTrackedDeviceIndex_Hmd, ref pose, ref gamePose);
+	private void Update3dAudioPosition(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
+		TrackedDevicePose_t gamePose = updateParameters.GamePoses[OpenVR.k_unTrackedDeviceIndex_Hmd];
 		Matrix hmdToWorldTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
 		hmdToWorldTransform.Invert();
 		
@@ -123,7 +120,7 @@ public class SpeechAnimator : IProceduralAnimator {
 	}
 
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
-		Update3dAudioPosition(inputs);
+		Update3dAudioPosition(updateParameters, inputs);
 
 		currentTime = updateParameters.Time;
 		if (synth.State == SynthesizerState.Ready) {
