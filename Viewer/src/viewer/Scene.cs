@@ -83,7 +83,10 @@ class Scene : IDisposable {
 	}
 
 	public void DoPostwork(DeviceContext context) {
+		//this can block (while waiting for pose-feedback buffer to copy, so don't place expensive operations after this)
 		actor.DoPostwork(context);
+		
+		//this is OK to go after actor.DoPostwork because its cheap and should happen as late in the frame as possible
 		menu.DoPostwork(context);
 	}
 
