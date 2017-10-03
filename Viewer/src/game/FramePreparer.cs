@@ -53,15 +53,7 @@ public class FramePreparer : IDisposable {
 
 		return context.FinishCommandList(false);
 	}
-
-	private CommandList RecordDrawCommandUiCommandList() {
-		DeviceContext context = deferredContext;
-
-		scene.RenderCompanionWindowUi(context);
-
-		return context.FinishCommandList(false);
-	}
-
+	
 	private void PrepareView(DeviceContext context, HiddenAreaMesh hiddenAreaMesh, Matrix viewTransform, Matrix projectionTransform) {
 		float c = ColorUtils.SrgbToLinear(68/255f);
 
@@ -78,9 +70,14 @@ public class FramePreparer : IDisposable {
 		scene.DoPrework(context);
 	}
 
+	private void DoDrawCompanionWindowUi(DeviceContext context) {
+		scene.DoDrawCompanionWindowUi(context);
+	}
+
 	private void DoPostwork(DeviceContext context) {
 		scene.DoPostwork(context);
 	}
+
 
 	public IPreparedFrame PrepareFrame(FrameUpdateParameters updateParameters) {
 		return new PreparedFrame(
@@ -91,7 +88,7 @@ public class FramePreparer : IDisposable {
 			RecordDrawCommandList(),
 			passController.ResultTexture,
 
-			RecordDrawCommandUiCommandList(),
+			DoDrawCompanionWindowUi,
 
 			DoPostwork
 		);
@@ -106,14 +103,14 @@ public class PreparedFrame : IPreparedFrame {
 	private CommandList drawViewCommandList;
 	private Texture2D renderTexture;
 
-	private CommandList drawCompanionWindowUiCommandList;
+	private Action<DeviceContext> drawCompanionWindowUiAction;
 
 	private Action<DeviceContext> postworkAction;
 
 	public PreparedFrame(
 		Action<DeviceContext> preworkAction, CommandList updateCommandList,
 		Action<DeviceContext, HiddenAreaMesh, Matrix, Matrix> prepareViewAction, CommandList drawViewCommandList, Texture2D renderTexture,
-		CommandList drawCompanionWindowUiCommandList,
+		Action<DeviceContext> drawCompanionWindowUiAction,
 		Action<DeviceContext> postworkAction) {
 		this.preworkAction = preworkAction;
 		this.updateCommandList = updateCommandList;
@@ -122,7 +119,7 @@ public class PreparedFrame : IPreparedFrame {
 		this.drawViewCommandList = drawViewCommandList;
 		this.renderTexture = renderTexture;
 
-		this.drawCompanionWindowUiCommandList = drawCompanionWindowUiCommandList;
+		this.drawCompanionWindowUiAction = drawCompanionWindowUiAction;
 
 		this.postworkAction = postworkAction;
 	}
@@ -130,7 +127,6 @@ public class PreparedFrame : IPreparedFrame {
 	public void Dispose() {
 		updateCommandList.Dispose();
 		drawViewCommandList.Dispose();
-		drawCompanionWindowUiCommandList.Dispose();
 	}
 
 	public void DoPrework(DeviceContext context) {
@@ -145,7 +141,7 @@ public class PreparedFrame : IPreparedFrame {
 	}
 
 	public void DrawCompanionWindowUi(DeviceContext context) {
-		context.ExecuteCommandList(drawCompanionWindowUiCommandList, false);
+		drawCompanionWindowUiAction.Invoke(context);
 	}
 
 	public void DoPostwork(DeviceContext context) {

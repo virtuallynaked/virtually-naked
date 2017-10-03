@@ -25,6 +25,12 @@ public class MenuRenderer : IDisposable {
 	public void Dispose() {
 		objectToWorldTransform.Dispose();
 	}
+
+	public volatile bool anyMenuActive = false;
+
+	public void Update() {
+		anyMenuActive = controllerManager.AnyMenuActive;
+	}
 		
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		if (pass.Layer != RenderingLayer.UiElements) {
@@ -59,11 +65,11 @@ public class MenuRenderer : IDisposable {
 		}
 	}
 	
-	public void RenderCompanionWindowUi(DeviceContext context) {
-		if (!controllerManager.AnyMenuActive) {
+	public void DoDrawCompanionWindowUi(DeviceContext context) {
+		if (!anyMenuActive) {
 			return;
 		}
-		
+
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 		
 		context.VertexShader.Set(companionWindowVertexShader);

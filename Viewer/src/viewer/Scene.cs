@@ -72,13 +72,13 @@ class Scene : IDisposable {
 		actor.RenderPass(context, pass);
 		menu.RenderPass(context, pass);
 	}
-	
-	public void RenderCompanionWindowUi(DeviceContext context) {
-		menu.RenderCompanionWindowUi(context);
-	}
-	
+		
 	public void DoPrework(DeviceContext context) {
 		menu.DoPrework(context);
+	}
+
+	public void DoDrawCompanionWindowUi(DeviceContext context) {
+		menu.DoDrawCompanionWindowUi(context);
 	}
 
 	public void DoPostwork(DeviceContext context) {

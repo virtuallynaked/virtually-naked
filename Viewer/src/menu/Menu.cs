@@ -22,14 +22,15 @@ public class Menu : IDisposable {
 	public void Update(DeviceContext context) {
 		controller.Update();
 		visualRenderer.Update(context);
+		renderer.Update();
 	}
 	
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		renderer.RenderPass(context, pass);
 	}
 
-	public void RenderCompanionWindowUi(DeviceContext context) {
-		renderer.RenderCompanionWindowUi(context);
+	public void DoDrawCompanionWindowUi(DeviceContext context) {
+		renderer.DoDrawCompanionWindowUi(context);
 	}
 	
 	public void DoPrework(DeviceContext context) {
