@@ -12,7 +12,7 @@ public class MenuRenderer : IDisposable {
 	private readonly VertexShader companionWindowVertexShader;
 	private readonly PixelShader pixelShader;
 
-	private readonly CoordinateNormalMatrixPairConstantBufferManager objectToWorldTransform;
+	private readonly CoordinateNormalMatrixPairConstantBufferManager menuToControllerSpaceTransform;
 
 	public MenuRenderer(Device device, ShaderCache shaderCache, TrackedDeviceBufferManager trackedDeviceBufferManager, ControllerManager controllerManager, ShaderResourceView menuViewTexture) {
 		this.trackedDeviceBufferManager = trackedDeviceBufferManager;
@@ -21,11 +21,14 @@ public class MenuRenderer : IDisposable {
 		vertexShader = shaderCache.GetVertexShader<MenuRenderer>("menu/renderer/Menu");
 		companionWindowVertexShader = shaderCache.GetVertexShader<MenuRenderer>("menu/renderer/CompanionWindowMenu");
 		pixelShader = shaderCache.GetPixelShader<MenuRenderer>("menu/renderer/Menu");
-		objectToWorldTransform = new CoordinateNormalMatrixPairConstantBufferManager(device);
+		menuToControllerSpaceTransform = new CoordinateNormalMatrixPairConstantBufferManager(device);
+
+		Matrix menuToControllerTransform = Matrix.Scaling(0.10f) * Matrix.Translation(0, 0, 0f) * Matrix.RotationX(MathUtil.PiOverTwo);
+		menuToControllerSpaceTransform.Update(device.ImmediateContext, menuToControllerTransform);
 	}
 
 	public void Dispose() {
-		objectToWorldTransform.Dispose();
+		menuToControllerSpaceTransform.Dispose();
 	}
 
 	public volatile bool anyMenuActive = false;
@@ -46,7 +49,7 @@ public class MenuRenderer : IDisposable {
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 		
 		context.VertexShader.Set(vertexShader);
-		context.VertexShader.SetConstantBuffer(1, objectToWorldTransform.Buffer);
+		context.VertexShader.SetConstantBuffer(2, menuToControllerSpaceTransform.Buffer);
 
 		context.PixelShader.Set(pixelShader);
 		context.PixelShader.SetShaderResource(ShaderSlots.MaterialTextureStart, menuViewTexture);
@@ -55,11 +58,8 @@ public class MenuRenderer : IDisposable {
 			if (!controllerManager.StateTrackers[deviceIdx].MenuActive) {
 				continue;
 			}
-
-			TrackedDevicePose_t pose = trackedDeviceBufferManager.GetPose(deviceIdx);
-			Matrix controllerToWorldTransform = pose.mDeviceToAbsoluteTracking.Convert();
-			Matrix menuToControllerTransform = Matrix.Scaling(0.10f) * Matrix.Translation(0, 0, 0f) * Matrix.RotationX(MathUtil.PiOverTwo);
-			objectToWorldTransform.Update(context, menuToControllerTransform * controllerToWorldTransform);
+			
+			context.VertexShader.SetConstantBuffer(1, trackedDeviceBufferManager.GetObjectToWorldSpaceTransformBuffer(deviceIdx));
 			
 			context.Draw(2 * 20, 0);
 		}

@@ -1,8 +1,6 @@
-﻿using SharpDX.D3DCompiler;
-using SharpDX.Direct3D11;
+﻿using SharpDX.Direct3D11;
 using Format = SharpDX.DXGI.Format;
 using System;
-using System.Collections.Generic;
 using Valve.VR;
 using SharpDX;
 
@@ -17,7 +15,8 @@ class RenderModelRenderer : IDisposable {
 	private readonly RenderModelCache cache;
 	private readonly VertexShader vertexShader;
 	private readonly InputLayout inputLayout;
-	private readonly CoordinateNormalMatrixPairConstantBufferManager worldTransformBufferManager;
+	private readonly CoordinateNormalMatrixPairConstantBufferManager componentSpaceToObjectTransformBufferManager;
+	private readonly bool[] isPoseValid = new bool[OpenVR.k_unMaxTrackedDeviceCount];
 	
 	public RenderModelRenderer(Device device, ShaderCache shaderCache, TrackedDeviceBufferManager trackedDeviceBufferManager) {
 		this.trackedDeviceBufferManager = trackedDeviceBufferManager;
@@ -28,23 +27,28 @@ class RenderModelRenderer : IDisposable {
 		vertexShader = vertexShaderWithBytecode;
 		inputLayout = new InputLayout(device, vertexShaderWithBytecode.Bytecode, InputElements);
 		
-		this.worldTransformBufferManager = new CoordinateNormalMatrixPairConstantBufferManager(device);
+		this.componentSpaceToObjectTransformBufferManager = new CoordinateNormalMatrixPairConstantBufferManager(device);
 	}
 	
 	public void Dispose() {
-		worldTransformBufferManager.Dispose();
+		componentSpaceToObjectTransformBufferManager.Dispose();
 		cache.Dispose();
 		inputLayout.Dispose();
+	}
+
+	public void Update(FrameUpdateParameters updateParameters) {
+		for (uint trackedDeviceIdx = 0; trackedDeviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++trackedDeviceIdx) {
+			isPoseValid[trackedDeviceIdx] = updateParameters.GamePoses[trackedDeviceIdx].bPoseIsValid;
+		}
 	}
 	
 	public void Render(DeviceContext context) {
 		context.InputAssembler.InputLayout = inputLayout;
 		context.VertexShader.Set(vertexShader);
-		context.VertexShader.SetConstantBuffer(1, worldTransformBufferManager.Buffer);
+		context.VertexShader.SetConstantBuffer(2, componentSpaceToObjectTransformBufferManager.Buffer);
 
 		for (uint trackedDeviceIdx = 0; trackedDeviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++trackedDeviceIdx) {
-			var pose = trackedDeviceBufferManager.GetPose(trackedDeviceIdx);
-			if (!pose.bPoseIsValid) {
+			if (!isPoseValid[trackedDeviceIdx]) {
 				continue;
 			}
 
@@ -53,28 +57,28 @@ class RenderModelRenderer : IDisposable {
 				continue;
 			}
 			
-			Matrix worldMatrix = pose.mDeviceToAbsoluteTracking.Convert();
+			context.VertexShader.SetConstantBuffer(1, trackedDeviceBufferManager.GetObjectToWorldSpaceTransformBuffer(trackedDeviceIdx));
 			
 			string renderModelName = OpenVR.System.GetStringTrackedDeviceProperty(trackedDeviceIdx, ETrackedDeviceProperty.Prop_RenderModelName_String);
 			uint componentCount = OpenVR.RenderModels.GetComponentCount(renderModelName);
-
+			
 			if (componentCount == 0) {
-				RenderSingleComponentModel(context, worldMatrix, renderModelName);
+				RenderSingleComponentModel(context, renderModelName);
 			} else {
-				RenderMultiComponentModel(context, worldMatrix, trackedDeviceIdx, renderModelName);
+				RenderMultiComponentModel(context, trackedDeviceIdx, renderModelName);
 			}
 		}
 	}
 
-	private void RenderSingleComponentModel(DeviceContext context, Matrix worldMatrix, string renderModelName) {
+	private void RenderSingleComponentModel(DeviceContext context, string renderModelName) {
 		var model = cache.LookupModel(context, renderModelName);
 		if (model != null) {
-			worldTransformBufferManager.Update(context, worldMatrix);
+			componentSpaceToObjectTransformBufferManager.Update(context, Matrix.Identity);
 			model.Render(context);
 		}
 	}
 
-	private void RenderMultiComponentModel(DeviceContext context, Matrix worldMatrix, uint trackedDeviceIdx, string renderModelName) {
+	private void RenderMultiComponentModel(DeviceContext context, uint trackedDeviceIdx, string renderModelName) {
 		var components = cache.LookupComponents(context, renderModelName);
 		if (components == null) {
 			return;
@@ -85,7 +89,7 @@ class RenderModelRenderer : IDisposable {
 		RenderModel_ControllerMode_State_t controllerMode = new RenderModel_ControllerMode_State_t {
 			bScrollWheelVisible = false
 		};
-
+		
 		for (uint componentIdx = 0; componentIdx < components.Length; ++componentIdx) {
 			var component = components[componentIdx];
 			
@@ -99,10 +103,8 @@ class RenderModelRenderer : IDisposable {
 			
 			bool isVisible = ((EVRComponentProperty) componentState.uProperties).HasFlag(EVRComponentProperty.IsVisible);
 			if (isVisible) {
-				Matrix componentWorldMatrix = componentState.mTrackingToComponentRenderModel.Convert();
-				componentWorldMatrix *= worldMatrix;
-				worldTransformBufferManager.Update(context, componentWorldMatrix);
-				
+				Matrix componentToObjectMatrix = componentState.mTrackingToComponentRenderModel.Convert();
+				componentSpaceToObjectTransformBufferManager.Update(context, componentToObjectMatrix);
 				component.model.Render(context);
 			}
 		}

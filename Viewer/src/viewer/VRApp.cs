@@ -216,7 +216,7 @@ public class VRApp : IDisposable {
 		KickoffFramePreparation();
 		
 		immediateContext.WithEvent("VRApp::Prework", () => {
-			preparedFrame.DoPrework(device.ImmediateContext);
+			preparedFrame.DoPrework(device.ImmediateContext, poses);
 		});
 		
 		SubmitEye(EVREye.Eye_Left, preparedFrame);

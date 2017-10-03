@@ -54,6 +54,7 @@ class Scene : IDisposable {
 	
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters) {
 		menu.Update(context);
+		renderModelRenderer.Update(updateParameters);
 		iblEnvironment.Predraw(context);
 		floor.Update(context);
 		actor.Update(context, updateParameters, iblEnvironment);

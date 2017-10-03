@@ -39,7 +39,6 @@ public class FramePreparer : IDisposable {
 	private CommandList UpdateAndRecordUpdateCommandList(FrameUpdateParameters updateParameters) {
 		DeviceContext context = deferredContext;
 
-		trackedDeviceBufferManager.Update(updateParameters);
 		controllerManager.Update();
 		scene.Update(deferredContext, updateParameters);
 		passController.PrepareFrame(deferredContext, scene.ToneMappingSettings);
@@ -70,7 +69,8 @@ public class FramePreparer : IDisposable {
 		viewProjectionTransformBufferManager.Update(context, viewTransform, projectionTransform);
 	}
 
-	private void DoPrework(DeviceContext context) {
+	private void DoPrework(DeviceContext context, TrackedDevicePose_t[] poses) {
+		trackedDeviceBufferManager.DoPrework(context, poses);
 		scene.DoPrework(context);
 	}
 
@@ -100,7 +100,7 @@ public class FramePreparer : IDisposable {
 }
 
 public class PreparedFrame : IPreparedFrame {
-	private Action<DeviceContext> preworkAction;
+	private Action<DeviceContext, TrackedDevicePose_t[]> preworkAction;
 	private CommandList updateCommandList;
 
 	private Action<DeviceContext, HiddenAreaMesh, Matrix, Matrix> prepareViewAction;
@@ -112,7 +112,7 @@ public class PreparedFrame : IPreparedFrame {
 	private Action<DeviceContext> postworkAction;
 
 	public PreparedFrame(
-		Action<DeviceContext> preworkAction, CommandList updateCommandList,
+		Action<DeviceContext, TrackedDevicePose_t[]> preworkAction, CommandList updateCommandList,
 		Action<DeviceContext, HiddenAreaMesh, Matrix, Matrix> prepareViewAction, CommandList drawViewCommandList, Texture2D renderTexture,
 		Action<DeviceContext> drawCompanionWindowUiAction,
 		Action<DeviceContext> postworkAction) {
@@ -133,8 +133,8 @@ public class PreparedFrame : IPreparedFrame {
 		drawViewCommandList.Dispose();
 	}
 
-	public void DoPrework(DeviceContext context) {
-		preworkAction.Invoke(context);
+	public void DoPrework(DeviceContext context, TrackedDevicePose_t[] poses) {
+		preworkAction.Invoke(context, poses);
 		context.ExecuteCommandList(updateCommandList, false);
 	}
 		
