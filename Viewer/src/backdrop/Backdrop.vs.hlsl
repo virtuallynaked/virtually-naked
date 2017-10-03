@@ -1,4 +1,4 @@
-#include <viewer/VertexCommon.hlsl>
+#include <d3d/VertexCommon.hlsl>
 #include "BackdropVsToPs.hlsl"
 
 struct VertexIn {

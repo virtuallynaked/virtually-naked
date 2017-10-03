@@ -47,8 +47,8 @@ public class PostProcessor : IDisposable {
 		postProcessingStateDesc.rasterizer.CullMode = CullMode.None;
 		postProcessingStates = new States(device, postProcessingStateDesc);
 
-		fullScreenVertexShader = shaderCache.GetVertexShader<RenderPassController>("viewer/rendering/FullScreenVertexShader");
-		postProcessingShader = shaderCache.GetPixelShader<RenderPassController>("viewer/rendering/postprocess/PostProcessingShader");
+		fullScreenVertexShader = shaderCache.GetVertexShader<RenderPassController>("game/rendering/FullScreenVertexShader");
+		postProcessingShader = shaderCache.GetPixelShader<RenderPassController>("game/rendering/postprocess/PostProcessingShader");
 	}
 
 	public void Dispose() {

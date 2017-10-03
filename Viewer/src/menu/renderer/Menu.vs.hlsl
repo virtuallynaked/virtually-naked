@@ -1,4 +1,4 @@
-#include <viewer/VertexCommon.hlsl>
+#include <d3d/VertexCommon.hlsl>
 #include "MenuPsToVs.hlsl"
 
 static const float PI = 3.14159265f;

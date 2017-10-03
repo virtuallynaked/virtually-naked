@@ -1,4 +1,4 @@
-#include <viewer/VertexCommon.hlsl>
+#include <d3d/VertexCommon.hlsl>
 
 struct VertexIn {
 	float3 position : POSITION;

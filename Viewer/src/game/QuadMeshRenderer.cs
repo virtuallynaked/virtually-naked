@@ -16,7 +16,7 @@ class QuadMeshRenderer {
 
 		this.modelToWorldTransform = new CoordinateNormalMatrixPairConstantBufferManager(device);
 
-		var vertexShaderAndBytecode = shaderCache.GetVertexShader<QuadMeshRenderer>("viewer/QuadMeshVertex");
+		var vertexShaderAndBytecode = shaderCache.GetVertexShader<QuadMeshRenderer>("game/QuadMeshVertex");
 		this.vertexShader = vertexShaderAndBytecode;
 		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, QuadMeshBuffers.InputElements);
 

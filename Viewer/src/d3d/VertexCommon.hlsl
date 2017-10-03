@@ -1,4 +1,4 @@
-#include <viewer/VertexOutput.hlsl>
+#include <d3d/VertexOutput.hlsl>
 
 cbuffer ViewProjectionBuffer : register(b0) {
 	float4x4 viewProjectionMatrix;

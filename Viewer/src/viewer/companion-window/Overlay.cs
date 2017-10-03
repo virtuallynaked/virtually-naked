@@ -27,7 +27,7 @@ public class Overlay : IDisposable {
 		this.overlaySize = overlaySize;
 		this.overlayTextureView = overlayTextureView;
 
-		fullScreenVertexShader = shaderCache.GetVertexShader<RenderPassController>("viewer/rendering/FullScreenVertexShader");
+		fullScreenVertexShader = shaderCache.GetVertexShader<RenderPassController>("game/rendering/FullScreenVertexShader");
 		pixelShader = shaderCache.GetPixelShader<Overlay>("viewer/companion-window/Overlay");
 	}
 	

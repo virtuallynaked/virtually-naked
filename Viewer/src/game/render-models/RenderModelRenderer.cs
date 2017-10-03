@@ -23,7 +23,7 @@ class RenderModelRenderer : IDisposable {
 
 		this.cache = new RenderModelCache(device, new BasicSpecularMaterial.Factory(device, shaderCache));
 
-		var vertexShaderWithBytecode = shaderCache.GetVertexShader<RenderModelRenderer>("viewer/render-models/RenderModelVertex");
+		var vertexShaderWithBytecode = shaderCache.GetVertexShader<RenderModelRenderer>("game/render-models/RenderModelVertex");
 		vertexShader = vertexShaderWithBytecode;
 		inputLayout = new InputLayout(device, vertexShaderWithBytecode.Bytecode, InputElements);
 		

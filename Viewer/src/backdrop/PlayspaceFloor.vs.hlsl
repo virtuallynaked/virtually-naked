@@ -1,4 +1,4 @@
-#include <viewer/VertexCommon.hlsl>
+#include <d3d/VertexCommon.hlsl>
 
 cbuffer ConstantBuffer1 : register(b1) {
 	float3 playspaceBounds[4];

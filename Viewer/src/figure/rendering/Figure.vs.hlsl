@@ -1,4 +1,4 @@
-#include <viewer/VertexCommon.hlsl>
+#include <d3d/VertexCommon.hlsl>
 #include "RefinedVertex.hlsl"
 
 cbuffer bar : register(b1) {

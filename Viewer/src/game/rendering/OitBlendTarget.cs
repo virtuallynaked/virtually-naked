@@ -91,9 +91,9 @@ public class OitBlendTarget : IDisposable {
 		compositingStateDesc.rasterizer.CullMode = CullMode.None;
 		compositingStates = new States(device, compositingStateDesc);
 
-		fullScreenVertexShader = shaderCache.GetVertexShader<RenderPassController>("viewer/rendering/FullScreenVertexShader");
-		depthCopyingShader = shaderCache.GetPixelShader<RenderPassController>("viewer/rendering/DepthCopyingShader");
-		compositingShader = shaderCache.GetPixelShader<RenderPassController>("viewer/rendering/UnorderedTransparencyCompositingShader");
+		fullScreenVertexShader = shaderCache.GetVertexShader<RenderPassController>("game/rendering/FullScreenVertexShader");
+		depthCopyingShader = shaderCache.GetPixelShader<RenderPassController>("game/rendering/DepthCopyingShader");
+		compositingShader = shaderCache.GetPixelShader<RenderPassController>("game/rendering/UnorderedTransparencyCompositingShader");
 	}
 
 	public void Dispose() {

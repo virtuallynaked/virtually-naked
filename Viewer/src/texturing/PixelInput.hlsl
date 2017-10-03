@@ -1,4 +1,4 @@
-#include <viewer/VertexOutput.hlsl>
+#include <d3d/VertexOutput.hlsl>
 
 struct OcclusionInfo {
 	float amount;

@@ -9,11 +9,11 @@ class HiddenAreaMasker : IDisposable {
 	private readonly RasterizerState noCullRasterizerState;
 
 	public HiddenAreaMasker(Device device, ShaderCache shaderCache) {
-		var vertexShaderAndBytecode = shaderCache.GetVertexShader<HiddenAreaMasker>("viewer/HiddenAreaVertexShader");
+		var vertexShaderAndBytecode = shaderCache.GetVertexShader<HiddenAreaMasker>("openvr/HiddenAreaVertexShader");
 		vertexShader = vertexShaderAndBytecode;
 		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, HiddenAreaMesh.InputElements);
 
-		pixelShader = shaderCache.GetPixelShader<HiddenAreaMasker>("viewer/BlackPixelShader");
+		pixelShader = shaderCache.GetPixelShader<HiddenAreaMasker>("openvr/BlackPixelShader");
 
 		writeStencilState = MakeWriteStencilState(device);
 		noCullRasterizerState = MakeNoCullRasterizerState(device);
