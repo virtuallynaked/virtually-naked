@@ -144,6 +144,15 @@ static class OpenVRExtensions {
 		return pTiming;
 	}
 
+
+	private static readonly uint CUMULATIVESTATS_SIZE = (uint) Marshal.SizeOf<Compositor_FrameTiming>();
+
+	public static Compositor_CumulativeStats GetCumulativeStats(this CVRCompositor compositor) {
+		Compositor_CumulativeStats pStats = default(Compositor_CumulativeStats);
+		OpenVR.Compositor.GetCumulativeStats(ref pStats, CUMULATIVESTATS_SIZE);
+		return pStats;
+	}
+
 	public static void Init(EVRApplicationType eApplicationType = EVRApplicationType.VRApplication_Scene) {
 		EVRInitError peError = EVRInitError.None;
 		OpenVR.Init(ref peError, eApplicationType);
