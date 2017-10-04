@@ -24,10 +24,22 @@ public class BreastGravityAnimator : IProceduralAnimator {
 		hangForwardChannel = channelSystem.ChannelsByName["pCTRLBreastsHangForward?value"];
 	}
 	
+	/**
+	 *  Quadratic function defined by:
+	 *  f(-1) = -1
+	 *  f(0) = 0
+	 *  f(+1) = 2
+	 */
 	public static float ExpandPositive(float z) {
 		return 0.5f * z * z + 1.5f * z;
 	}
 
+	/**
+	 *  Quadratic function defined by:
+	 *  f(-1) = -2
+	 *  f(0) = 0
+	 *  f(+1) = +1
+	 */
 	public static float ExpandNegative(float z) {
 		return -ExpandPositive(-z);
 	}
