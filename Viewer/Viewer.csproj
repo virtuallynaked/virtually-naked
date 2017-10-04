@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net452</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <Import Project="..\CommonAssemblyAttributes.targets" />
   <Import Project="..\RunSettings.targets" />
