@@ -16,6 +16,7 @@ class DemoApp {
 		//new ColorConversionDemo().Run();
 		//new BumpToNormalDemo().Run();
 		//new FaceTransparencyDemo().Run();
+		//new FramePreparerDemo().Run();
 	}
 }
 

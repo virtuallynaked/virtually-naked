@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Valve.VR;
 
-static class OpenVRExtensions {
+public static class OpenVRExtensions {
 	public static string GetStringTrackedDeviceProperty(this CVRSystem system, uint unDeviceIndex, ETrackedDeviceProperty prop) {
 		ETrackedPropertyError error = ETrackedPropertyError.TrackedProp_Success;
 
