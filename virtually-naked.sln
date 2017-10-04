@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Importer", "Importer\Import
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demos", "Demos\Demos.csproj", "{2F7BFDAF-65F0-4A89-B9B6-38EB9ABA1856}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D9B4BE27-B975-45A6-8E13-C7079136E06A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,14 @@ Global
 		{2F7BFDAF-65F0-4A89-B9B6-38EB9ABA1856}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2F7BFDAF-65F0-4A89-B9B6-38EB9ABA1856}.Release|x64.ActiveCfg = Release|Any CPU
 		{2F7BFDAF-65F0-4A89-B9B6-38EB9ABA1856}.Release|x64.Build.0 = Release|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Debug|x64.Build.0 = Debug|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Release|x64.ActiveCfg = Release|Any CPU
+		{D9B4BE27-B975-45A6-8E13-C7079136E06A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
