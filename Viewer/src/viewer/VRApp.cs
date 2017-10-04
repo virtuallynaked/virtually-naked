@@ -139,6 +139,7 @@ public class VRApp : IDisposable {
 	
 	private void Run() {
 		//setup initial frame
+		timeKeeper.Start();
 		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
 		KickoffFramePreparation();
 		preparedFrame = asyncFramePreparer.FinishPreparingFrame();
@@ -200,7 +201,7 @@ public class VRApp : IDisposable {
 	private void KickoffFramePreparation() {
 		var headPosition = companionWindow.HasIndependentCamera ? companionWindow.CameraPosition : PlayerPositionUtils.GetHeadPosition(gamePoses);
 		var updateParameters = new FrameUpdateParameters(
-			timeKeeper.GetNextFrameTime(1), //need to go one frame ahead because this is for the next frame
+			timeKeeper.NextFrameTime, //need to go one frame ahead because this is for the next frame
 			timeKeeper.TimeDelta,
 			gamePoses,
 			headPosition);

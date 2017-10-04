@@ -1,38 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Valve.VR;
 
 public class OpenVRTimeKeeper {
-	private readonly float secondsFromVSyncToPhotons;
-	private readonly float secondsPerFrame;
+	private const float MaxTimeDelta = 0.1f;
 
+	private float nextFrameTime;
 	private float timeDelta;
-	private float time;
 	
-	public OpenVRTimeKeeper() {
-		this.secondsFromVSyncToPhotons = OpenVR.System.GetFloatTrackedDeviceProperty(
-			OpenVR.k_unTrackedDeviceIndex_Hmd,
-			ETrackedDeviceProperty.Prop_SecondsFromVsyncToPhotons_Float);
-		float framesPerSecond = OpenVR.System.GetFloatTrackedDeviceProperty(
-			OpenVR.k_unTrackedDeviceIndex_Hmd,
-			ETrackedDeviceProperty.Prop_DisplayFrequency_Float);
-		this.secondsPerFrame = 1 / framesPerSecond;
+	private long initialTimestamp;
+	
+	public float NextFrameTime => nextFrameTime;
+	public float TimeDelta => timeDelta;
+
+	public void Start() {
+		initialTimestamp = Stopwatch.GetTimestamp();
 	}
 
 	public void AdvanceFrame() {
-		// Handle asynchronous reprojection: https://steamcommunity.com/app/358720/discussions/0/385429254937377076/
-		var timing = OpenVR.Compositor.GetFrameTiming(0);
-		timeDelta = timing.m_nNumFramePresents * secondsPerFrame;
+		float previousFrameTime = nextFrameTime;
 
-		time += timeDelta;
-	}
+		long currentTimestamp = Stopwatch.GetTimestamp();
+		float timeRemaining = OpenVR.Compositor.GetFrameTimeRemaining();
 
-	public float TimeDelta => timeDelta;
+		double currentTime = (double) (currentTimestamp - initialTimestamp) / Stopwatch.Frequency;
 
-	public float GetNextFrameTime(int framesAhead) {
-		return time + framesAhead * timeDelta + secondsFromVSyncToPhotons;
+		nextFrameTime = (float) (currentTime + timeRemaining);
+		timeDelta = MathExtensions.Clamp(nextFrameTime - previousFrameTime, 0, MaxTimeDelta);
 	}
 }
