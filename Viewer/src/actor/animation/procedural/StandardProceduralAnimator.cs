@@ -8,7 +8,7 @@
 		animators = new IProceduralAnimator[] {
 			//new HeadLookAtAnimator(channelSystem, boneSystem),
 			new EyeLookAtAnimator(channelSystem, boneSystem, behaviorModel),
-			//new BreastPhysicsAnimator(channelSystem, boneSystem),
+			new BreastGravityAnimator(channelSystem, boneSystem),
 			new BlinkAnimator(channelSystem),
 			//new ExpressionAnimator(channelSystem),
 			//new SpeechAnimator(channelSystem, boneSystem)
