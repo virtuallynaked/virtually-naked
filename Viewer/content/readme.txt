@@ -19,6 +19,11 @@ CONTACT:
   reddit.com/u/virtuallynaked
   virtuallynaked.tumblr.com
 
+REQUIREMENTS:
+  Microsoft .NET Framework 4.5.2
+  SteamVR
+  A SteamVR-compatible VR headset with tracked controller (HTC Vive, Oculus Rift + Touch, etc.)
+
 CONTROLS:
 
 Desktop:

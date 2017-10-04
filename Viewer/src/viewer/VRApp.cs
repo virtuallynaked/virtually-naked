@@ -70,8 +70,17 @@ public class VRApp : IDisposable {
 		
 		string title = Application.ProductName + " " + Application.ProductVersion;
 		
-		using (VRApp app = new VRApp(dataDir, title)) {
-			app.Run();
+		try {
+			using (VRApp app = new VRApp(dataDir, title)) {
+				app.Run();
+			}
+		} catch (VRInitException e) {
+			string text =String.Join("\n\n",
+				String.Format("OpenVR initialization failed: {0}", e.Message),
+				"Please make sure SteamVR is installed and running, and VR headset is connected.");
+			string caption = "OpenVR Initialization Error";
+			
+			MessageBox.Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 		
 		if (ObjectTracker.FindActiveObjects().Count > 0) {
@@ -100,6 +109,8 @@ public class VRApp : IDisposable {
 	private IPreparedFrame preparedFrame;
 
 	public VRApp(IArchiveDirectory dataDir, string title) {
+		OpenVRExtensions.Init();
+
 		device = new Device(DriverType.Hardware, debugDevice ? DeviceCreationFlags.Debug : DeviceCreationFlags.None);
 		shaderCache = new ShaderCache(device);
 		standardSamplers = new StandardSamplers(device);
@@ -107,9 +118,7 @@ public class VRApp : IDisposable {
 		companionWindow = new CompanionWindow(device, shaderCache, standardSamplers, title, dataDir);
 				
 		immediateContext = device.ImmediateContext;
-
-		OpenVRExtensions.Init();
-		
+				
 		timeKeeper = new OpenVRTimeKeeper();
 				
 		hiddenAreaMeshes = new HiddenAreaMeshes(device);
