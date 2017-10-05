@@ -17,6 +17,7 @@ class DemoApp {
 		//new BumpToNormalDemo().Run();
 		//new FaceTransparencyDemo().Run();
 		//new FramePreparerDemo().Run();
+		//new BoneSystemPerformanceDemo().Run();
 	}
 }
 
