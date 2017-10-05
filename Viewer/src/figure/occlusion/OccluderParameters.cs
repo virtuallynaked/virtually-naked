@@ -1,11 +1,13 @@
-﻿public class OccluderParameters {
+﻿using System.Collections.Generic;
+
+public class OccluderParameters {
 	public uint[] BaseOcclusion { get; }
-	public int[] ChannelIndices { get; }
+	public List<string> ChannelNames { get; }
 	public PackedLists<OcclusionDelta> Deltas { get; }
 
-	public OccluderParameters(uint[] baseOcclusion, int[] channelIndices, PackedLists<OcclusionDelta> deltas) {
+	public OccluderParameters(uint[] baseOcclusion, List<string> channelNames, PackedLists<OcclusionDelta> deltas) {
 		BaseOcclusion = baseOcclusion;
-		ChannelIndices = channelIndices;
+		ChannelNames = channelNames;
 		Deltas = deltas;
 	}
 }

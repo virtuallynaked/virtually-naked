@@ -16,8 +16,9 @@ public class DeformableOccluder : IOccluder {
 	private uint[] unmorphedWithChildrenOcclusionInfosToUpload;
 
 	private readonly OccluderParametersResources parametersResources;
-		
-	public DeformableOccluder(Device device, ShaderCache shaderCache, OcclusionInfo[] unmorphedOcclusionInfos, OccluderParameters parameters) {
+	private int[] channelIndices;
+	
+	public DeformableOccluder(Device device, ShaderCache shaderCache, ChannelSystem channelSystem, OcclusionInfo[] unmorphedOcclusionInfos, OccluderParameters parameters) {
 		this.unmorphedOcclusionInfos = unmorphedOcclusionInfos;
 				
 		shader = shaderCache.GetComputeShader<DeformableOccluder>("figure/occlusion/shader/Occluder");
@@ -27,6 +28,9 @@ public class DeformableOccluder : IOccluder {
 		RegisterChildOccluders(new List<IOccluder>() { });
 		
 		parametersResources = OccluderParametersResources.Make(device, parameters);
+		channelIndices = parameters.ChannelNames
+			.Select(channelName => channelSystem.ChannelsByName[channelName].Index)
+			.ToArray();
 	}
 	
 	public void Dispose() {
@@ -76,7 +80,7 @@ public class DeformableOccluder : IOccluder {
 			return;
 		}
 
-		float[] weights = parametersResources.Parameters.ChannelIndices.Select(idx => (float) channelOutputs.Values[idx]).ToArray();
+		float[] weights = channelIndices.Select(idx => (float) channelOutputs.Values[idx]).ToArray();
 		parametersResources.channelWeightsBufferManager.Update(context, weights);
 	}
 

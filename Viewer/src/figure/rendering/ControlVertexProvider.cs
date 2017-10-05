@@ -8,7 +8,7 @@ using System.Linq;
 public class ControlVertexProvider : IDisposable {
 	public static readonly int ControlVertex_SizeInBytes = Vector3.SizeInBytes + OcclusionInfo.PackedSizeInBytes;
 
-	private static IOccluder LoadOccluder(Device device, ShaderCache shaderCache, bool isMainFigure, IArchiveDirectory unmorphedOcclusionDirectory, IArchiveDirectory occlusionDirectory) {
+	private static IOccluder LoadOccluder(Device device, ShaderCache shaderCache, ChannelSystem channelSystem, bool isMainFigure, IArchiveDirectory unmorphedOcclusionDirectory, IArchiveDirectory occlusionDirectory) {
 		if (isMainFigure) {
 			IArchiveFile occluderParametersFile = occlusionDirectory.File("occluder-parameters.dat");
 			if (occluderParametersFile == null) {
@@ -17,7 +17,7 @@ public class ControlVertexProvider : IDisposable {
 			
 			var occluderParameters = Persistance.Load<OccluderParameters>(occluderParametersFile);
 			OcclusionInfo[] unmorphedOcclusionInfos = OcclusionInfo.UnpackArray(unmorphedOcclusionDirectory.File("occlusion-infos.array").ReadArray<uint>());
-			var occluder = new DeformableOccluder(device, shaderCache, unmorphedOcclusionInfos, occluderParameters);
+			var occluder = new DeformableOccluder(device, shaderCache, channelSystem, unmorphedOcclusionInfos, occluderParameters);
 			return occluder;
 		} else {
 			OcclusionInfo[] figureOcclusionInfos = OcclusionInfo.UnpackArray(occlusionDirectory.File("occlusion-infos.array").ReadArray<uint>());
@@ -35,7 +35,7 @@ public class ControlVertexProvider : IDisposable {
 		
 		bool isMainFigure = definition.ChannelSystem.Parent == null;
 
-		var occluder = LoadOccluder(device, shaderCache, isMainFigure, unmorphedOcclusionDirectory, occlusionDirectory);
+		var occluder = LoadOccluder(device, shaderCache, definition.ChannelSystem, isMainFigure, unmorphedOcclusionDirectory, occlusionDirectory);
 
 		var provider = new ControlVertexProvider(
 			device, shaderCache,
@@ -45,7 +45,7 @@ public class ControlVertexProvider : IDisposable {
 
 		model.ShapeChanged += (oldShape, newShape) => {
 			var newOcclusionDirectory = model.Shape.Directory ?? unmorphedOcclusionDirectory;
-			var newOccluder = LoadOccluder(device, shaderCache, isMainFigure, unmorphedOcclusionDirectory, newOcclusionDirectory);
+			var newOccluder = LoadOccluder(device, shaderCache, definition.ChannelSystem, isMainFigure, unmorphedOcclusionDirectory, newOcclusionDirectory);
 			provider.SetOccluder(newOccluder);
 		};
 

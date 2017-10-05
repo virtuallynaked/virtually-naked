@@ -5,10 +5,8 @@ public class OccluderParametersResources : IDisposable {
 	public static OccluderParametersResources Make(Device device, OccluderParameters parameters) {
 		return parameters != null ? new OccluderParametersResources(device, parameters) : null;
 	}
-
-	public OccluderParameters Parameters { get; }
+	
 	public readonly int vertexCount;
-
 	
 	public readonly StructuredBufferManager<float> channelWeightsBufferManager;
 	public readonly ShaderResourceView baseOcclusionView;
@@ -17,10 +15,9 @@ public class OccluderParametersResources : IDisposable {
 	public readonly InOutStructuredBufferManager<uint> calculatedInfosBuffersBufferManager;
 
 	private OccluderParametersResources(Device device, OccluderParameters parameters) {
-		Parameters = parameters;
 		vertexCount = parameters.BaseOcclusion.Length;
 					
-		channelWeightsBufferManager = new StructuredBufferManager<float>(device, parameters.ChannelIndices.Length);
+		channelWeightsBufferManager = new StructuredBufferManager<float>(device, parameters.ChannelNames.Count);
 		baseOcclusionView = BufferUtilities.ToStructuredBufferView(device, parameters.BaseOcclusion);
 		occlusionDeltaWeightSegmentsView = BufferUtilities.ToStructuredBufferView(device, parameters.Deltas.Segments);
 		occlusionDeltaWeightElemsView = BufferUtilities.ToStructuredBufferView(device, parameters.Deltas.Elems);

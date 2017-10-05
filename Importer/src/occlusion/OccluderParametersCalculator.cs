@@ -125,7 +125,7 @@ public class OccluderParametersCalculator : IDisposable {
 		var baseOutputs = figure.Evaluate(null, baseInputs);
 		var baseOcclusionInfos = CalculateOcclusion(baseOutputs);
 		
-		List<int> channelIdxs = new List<int>();
+		List<Channel> channels = new List<Channel>();
 		List<List<OcclusionDelta>> perVertexDeltas = new List<List<OcclusionDelta>>();
 		for (int i = 0; i < baseOcclusionInfos.Length; ++i) {
 			perVertexDeltas.Add(new List<OcclusionDelta>());
@@ -134,8 +134,8 @@ public class OccluderParametersCalculator : IDisposable {
 		foreach (var channel in GetChannelsForOcclusionSystem()) {
 			Console.WriteLine($"\t{channel.Name}...");
 			
-			int occlusionChannelIdx = channelIdxs.Count;
-			channelIdxs.Add(channel.Index);
+			int occlusionChannelIdx = channels.Count;
+			channels.Add(channel);
 
 			var inputs = new ChannelInputs(baseInputs);
 			channel.SetValue(inputs, 1);
@@ -152,7 +152,7 @@ public class OccluderParametersCalculator : IDisposable {
 
 		var parameters = new OccluderParameters(
 			OcclusionInfo.PackArray(baseOcclusionInfos),
-			channelIdxs.ToArray(),
+			channels.Select(channel => channel.Name).ToList(),
 			PackedLists<OcclusionDelta>.Pack(perVertexDeltas));
 
 		return parameters;
