@@ -20,5 +20,11 @@
       <HintPath>..\third-party\nvidia-texture-tools\Nvidia.TextureTools.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ContentWithTargetPath Include="..\third-party\nvidia-texture-tools\nvtt.dll" Link="libs\nvtt.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>nvtt.dll</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
   <Import Project="..\EmbedShaders.targets" />
 </Project>
