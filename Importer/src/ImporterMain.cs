@@ -52,7 +52,8 @@ public class ImporterMain : IDisposable {
 
 		Figure parentFigure = genesis3FemaleWithGenitalia;
 		
-		List<Figure> childFigures = settings.ChildFiguresToImport
+		List<Figure> childFigures = settings.FiguresToImport
+			.Where(figureName => figureName != parentFigure.Name)
 			.Select(figureName => loader.LoadFigureRecipe(figureName, genesis3FemaleRecipe).Bake(figureName, parentFigure))
 			.ToList();
 
