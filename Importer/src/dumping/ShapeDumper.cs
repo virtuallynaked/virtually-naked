@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using System;
 using SharpDX.Direct3D11;
+using System.Collections.Generic;
 
 class ShapeDumper {
 	public static void DumpAllForFigure(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure) {
@@ -93,8 +94,17 @@ class ShapeDumper {
 		}
 
 		//persist
+		Dictionary<string, double> shapeInputsByName = new Dictionary<string, double>();
+		foreach (var channel in figure.Channels) {
+			double defaultValue = channel.InitialValue;
+			double value = channel.GetInputValue(shapeInputs);
+			if (value != defaultValue) {
+				shapeInputsByName.Add(channel.Name, value);
+			}
+		}
+		
 		shapeDirectory.CreateWithParents();
-		Persistance.Save(shapeFile, shapeInputs);
+		Persistance.Save(shapeFile, shapeInputsByName);
 	}
 
 	private void DumpOccluderParameters(DirectoryInfo shapeDirectory, ChannelInputs shapeInputs) {

@@ -7,7 +7,7 @@ public class Shape {
 		IArchiveDirectory shapesDirectory = figureDir.Subdirectory("shapes");
 		if (shapesDirectory != null) {
 			foreach (var shapeDirectory in shapesDirectory.Subdirectories) {
-				var shape = Shape.Load(shapeDirectory);
+				var shape = Shape.Load(channelSystem, shapeDirectory);
 				shapes.Add(shape);
 			}
 		} else {
@@ -18,9 +18,16 @@ public class Shape {
 		return shapes;
 	}
 
-	public static Shape Load(IArchiveDirectory shapeDirectory) {
+	public static Shape Load(ChannelSystem channelSystem, IArchiveDirectory shapeDirectory) {
 		var channelInputsFile = shapeDirectory.File("channel-inputs.dat");
-		ChannelInputs channelInputs = Persistance.Load<ChannelInputs>(channelInputsFile);
+		var shapeInputsByName = Persistance.Load<Dictionary<string, double>>(channelInputsFile);
+
+		ChannelInputs channelInputs = channelSystem.MakeDefaultChannelInputs();
+		foreach (var entry in shapeInputsByName) {
+			Channel channel = channelSystem.ChannelsByName[entry.Key];
+			channel.SetValue(channelInputs, entry.Value);
+		}
+		
 		return new Shape(shapeDirectory.Name, shapeDirectory, channelInputs);
 	}
 
