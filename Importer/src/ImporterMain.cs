@@ -38,8 +38,10 @@ public class ImporterMain : IDisposable {
 	}
 			
 	private void Run() {
+		var settings = ImportSettings.MakeFromViewerInitialSettings();
+
 		new UiImporter().Run();
-		new EnvironmentCubeGenerator().Run();
+		new EnvironmentCubeGenerator().Run(settings);
 
 		var loader = new FigureRecipeLoader(objectLocator);
 
@@ -50,13 +52,7 @@ public class ImporterMain : IDisposable {
 
 		Figure parentFigure = genesis3FemaleWithGenitalia;
 		
-		List<string> childFiguresNames = new List<string>();
-		if (InitialSettings.Hair != null) {
-			childFiguresNames.Add(InitialSettings.Hair);
-		}
-		childFiguresNames.AddRange(InitialSettings.Clothing);
-		
-		List<Figure> childFigures = childFiguresNames
+		List<Figure> childFigures = settings.ChildFiguresToImport
 			.Select(figureName => loader.LoadFigureRecipe(figureName, genesis3FemaleRecipe).Bake(figureName, parentFigure))
 			.ToList();
 
@@ -75,9 +71,9 @@ public class ImporterMain : IDisposable {
 			GeometryDumper.DumpFigure(figure);
 			UVSetDumper.DumpFigure(figure);
 			
-			ShapeDumper.DumpAllForFigure(fileLocator, device, shaderCache, parentFigure, figure);
+			ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, parentFigure, figure);
 
-			MaterialSetDumper.DumpAllForFigure(device, shaderCache, fileLocator, objectLocator, figure);
+			MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, figure);
 		}
 
 	}

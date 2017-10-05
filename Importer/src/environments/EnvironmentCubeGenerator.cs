@@ -136,12 +136,12 @@ public class EnvironmentCubeGenerator {
 		glossyLevels.ForEach(file => file.Delete());
 	}
 
-	public void Run() {
+	public void Run(ImportSettings importSettings) {
 		DirectoryInfo sourceEnvironmentsDir = CommonPaths.SourceAssetsDir.Subdirectory("environments");
 
 		foreach (FileInfo sourceFile in sourceEnvironmentsDir.EnumerateFiles()) {
 			string environmentName = Path.GetFileNameWithoutExtension(sourceFile.Name);
-			if (environmentName != InitialSettings.Environment) {
+			if (!importSettings.ShouldImportEnvironment(environmentName)) {
 				continue;
 			}
 

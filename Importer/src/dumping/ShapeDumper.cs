@@ -5,16 +5,14 @@ using SharpDX.Direct3D11;
 using System.Collections.Generic;
 
 class ShapeDumper {
-	public static void DumpAllForFigure(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure) {
+	public static void DumpAllForFigure(ImportSettings settings, ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure) {
 		ShapeImportConfiguration[] configurations = ShapeImportConfiguration.Load(figure.Name);
 		var baseConf = configurations.SingleOrDefault(conf => conf.name == "Base");
 
 		ShapeDumper dumper = new ShapeDumper(fileLocator, device, shaderCache, parentFigure, figure, baseConf);
 		
-		InitialSettings.Shapes.TryGetValue(figure.Name, out string activeConfigurationName);
-
 		foreach (var conf in configurations) {
-			if (conf.name != activeConfigurationName) {
+			if (!settings.ShouldImportShape(figure.Name, conf.name)) {
 				continue;
 			}
 

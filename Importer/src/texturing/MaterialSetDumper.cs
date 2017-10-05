@@ -56,19 +56,17 @@ class MaterialSetDumper {
 		ScatteringDumper.Dump(figure, materialSettings.PerMaterialSettings, configuration.name);
 	}
 
-	public static void DumpAllForFigure(Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure) {
+	public static void DumpAllForFigure(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure) {
 		MaterialSetImportConfiguration[] configurations = MaterialSetImportConfiguration.Load(figure.Name);
 
 		var baseConf = configurations.Single(conf => conf.name == "Base");
-
-		InitialSettings.MaterialSets.TryGetValue(figure.Name, out string activeConfiguration);
-
+		
 		foreach (var conf in configurations) {
 			if (conf == baseConf) {
 				continue;
 			}
 
-			if (conf.name != activeConfiguration) {
+			if (!settings.ShouldImportMaterialSet(figure.Name, conf.name)) {
 				continue;
 			}
 
