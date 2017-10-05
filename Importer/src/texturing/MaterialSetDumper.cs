@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 class MaterialSetDumper {
-	private static MultiMaterialSettings DumpMaterialSet(Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, MaterialSetImportConfiguration baseConfiguration, MaterialSetImportConfiguration configuration) {
+	private static MultiMaterialSettings DumpMaterialSet(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, MaterialSetImportConfiguration baseConfiguration, MaterialSetImportConfiguration configuration) {
 		DirectoryInfo figuresDirectory = CommonPaths.WorkDir.Subdirectory("figures");
 		DirectoryInfo figureDirectory = figuresDirectory.Subdirectory(figure.Name);
 		DirectoryInfo texturesDirectory = figureDirectory.Subdirectory("textures");
@@ -25,10 +25,10 @@ class MaterialSetDumper {
 		TextureProcessor textureProcessor;
 		IMaterialImporter materialImporter;
 		if (figure.Name.EndsWith("-hair")) {
-			textureProcessor = new TextureProcessor(device, shaderCache, texturesDirectory);
+			textureProcessor = new TextureProcessor(device, shaderCache, texturesDirectory, settings.CompressTextures);
 			materialImporter = new HairMaterialImporter(figure, textureProcessor);
 		} else {
-			textureProcessor = new TextureProcessor(device, shaderCache, materialSetDirectory);
+			textureProcessor = new TextureProcessor(device, shaderCache, materialSetDirectory, settings.CompressTextures);
 			materialImporter = new UberMaterialImporter(figure, textureProcessor);
 		}
 		
@@ -50,9 +50,9 @@ class MaterialSetDumper {
 		return multiMaterialSettings;
 	}
 
-	public static void DumpMaterialSetAndScattering(Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure,
+	public static void DumpMaterialSetAndScattering(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure,
 		MaterialSetImportConfiguration baseConfiguration, MaterialSetImportConfiguration configuration) {
-		var materialSettings = DumpMaterialSet(device, shaderCache, fileLocator, objectLocator, figure, baseConfiguration, configuration);
+		var materialSettings = DumpMaterialSet(settings, device, shaderCache, fileLocator, objectLocator, figure, baseConfiguration, configuration);
 		ScatteringDumper.Dump(figure, materialSettings.PerMaterialSettings, configuration.name);
 	}
 
@@ -70,7 +70,7 @@ class MaterialSetDumper {
 				continue;
 			}
 
-			DumpMaterialSetAndScattering(device, shaderCache, fileLocator, objectLocator, figure, baseConf, conf);
+			DumpMaterialSetAndScattering(settings, device, shaderCache, fileLocator, objectLocator, figure, baseConf, conf);
 		}
 	}
 }

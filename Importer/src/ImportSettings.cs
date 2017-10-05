@@ -16,6 +16,8 @@ public class ImportSettings {
 		}
 	}
 
+	public bool CompressTextures => false;
+
 	public bool ShouldImportEnvironment(string name) {
 		return name == InitialSettings.Environment;
 	}

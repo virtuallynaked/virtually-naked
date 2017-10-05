@@ -66,18 +66,18 @@ class TextureProcessingSettings {
 }
 
 public class TextureProcessor {
-	private static readonly bool Compress = false;
-	
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
 	private readonly DirectoryInfo destinationFolder;
+	private readonly bool compress;
 	
 	private readonly Dictionary<string, TextureProcessingSettings> settingsByName = new Dictionary<string, TextureProcessingSettings>();
 
-	public TextureProcessor(Device device, ShaderCache shaderCache, DirectoryInfo destinationFolder) {
+	public TextureProcessor(Device device, ShaderCache shaderCache, DirectoryInfo destinationFolder, bool compress) {
 		this.device = device;
 		this.shaderCache = shaderCache;
 		this.destinationFolder = destinationFolder;
+		this.compress = compress;
 	}
 
 	private static void CompressTexture(FileInfo file, TextureProcessingType type, bool isLinear) {
@@ -162,7 +162,7 @@ public class TextureProcessor {
 			//force the previous output handler to be destructed so that the file is flushed and closed
 			output.SetFileName("nul");
 
-			if (Compress) {
+			if (compress) {
 				CompressTexture(new FileInfo(destinationPath), settings.Type, settings.IsLinear);
 			}
 		}
