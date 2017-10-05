@@ -75,7 +75,6 @@ public class InverseKinematicsUserInterface {
 
 	public InverseKinematicsProblem GetProblem(FrameUpdateParameters updateParameters, ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		var outputs = definition.ChannelSystem.Evaluate(null, inputs);
-		var boneTransforms = definition.BoneSystem.GetBoneTransforms(outputs);
 
 		if (!tracking) {
 			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {
@@ -97,7 +96,7 @@ public class InverseKinematicsUserInterface {
 				var worldSourcePosition = controllerTransform.TranslationVector * 100;
 
 				sourceBone = MapPositionToBone(worldSourcePosition, previousFrameControlVertexInfos);
-				boneRelativeSourcePosition = boneTransforms[sourceBone.Index].InverseTransform(worldSourcePosition);
+				boneRelativeSourcePosition = sourceBone.GetChainedTransform(outputs).InverseTransform(worldSourcePosition);
 			}
 		}
 

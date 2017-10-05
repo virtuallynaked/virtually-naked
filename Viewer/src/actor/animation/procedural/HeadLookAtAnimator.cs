@@ -29,8 +29,7 @@ public class HeadLookAtAnimator : IProceduralAnimator {
 		var forecastHeadPosition = headPositionForecaster.ForecastValue;
 
 		var outputs = channelSystem.Evaluate(null, inputs);
-		var boneTotalTransforms = boneSystem.GetBoneTransforms(outputs);
-		var neckTotalTransform = boneTotalTransforms[headBone.Parent.Index];
+		var neckTotalTransform = headBone.Parent.GetChainedTransform(outputs);
 				
 		var figureEyeCenter = (leftEyeBone.CenterPoint.GetValue(outputs) + rightEyeBone.CenterPoint.GetValue(outputs)) / 2;
 		var figureEyeWorldPosition = neckTotalTransform.Transform(figureEyeCenter);

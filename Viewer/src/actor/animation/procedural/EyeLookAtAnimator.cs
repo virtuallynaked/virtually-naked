@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System;
 using static MathExtensions;
 
 public class EyeLookAtAnimator : IProceduralAnimator {
@@ -10,6 +11,7 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 	
 	private readonly Bone leftEyeBone;
 	private readonly Bone rightEyeBone;
+	private readonly Bone eyeParentBone;
 	
 	private readonly LaggedVector3Forecaster headPositionForecaster = new LaggedVector3Forecaster(0.05f);
 
@@ -20,10 +22,14 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 
 		leftEyeBone = boneSystem.BonesByName["lEye"];
 		rightEyeBone = boneSystem.BonesByName["rEye"];
+
+		eyeParentBone = leftEyeBone.Parent;
+		if (eyeParentBone != rightEyeBone.Parent) {
+			throw new Exception("expected eyes to have same parent");
+		}
 	}
 	
-	private void UpdateEye(ChannelOutputs outputs, StagedSkinningTransform[] boneTotalTransforms, ChannelInputs inputs, Bone eyeBone, Vector3 targetPosition) {
-		var eyeParentTotalTransform = boneTotalTransforms[eyeBone.Parent.Index];
+	private void UpdateEye(ChannelOutputs outputs, StagedSkinningTransform eyeParentTotalTransform, ChannelInputs inputs, Bone eyeBone, Vector3 targetPosition) {
 		Vector3 targetPositionInRotationFreeEyeSpace = eyeParentTotalTransform.InverseTransform(targetPosition * 100) - eyeBone.CenterPoint.GetValue(outputs);
 
 		var targetRotation = QuaternionExtensions.RotateBetween(Vector3.BackwardRH, targetPositionInRotationFreeEyeSpace);
@@ -43,9 +49,9 @@ public class EyeLookAtAnimator : IProceduralAnimator {
 		}
 
 		var outputs = channelSystem.Evaluate(null, inputs);
-		var boneTotalTransforms = boneSystem.GetBoneTransforms(outputs);
+		var eyeParentTotalTransform = eyeParentBone.GetChainedTransform(outputs);
 		
-		UpdateEye(outputs, boneTotalTransforms, inputs, leftEyeBone, forecastHeadPosition);
-		UpdateEye(outputs, boneTotalTransforms, inputs, rightEyeBone, forecastHeadPosition);
+		UpdateEye(outputs, eyeParentTotalTransform, inputs, leftEyeBone, forecastHeadPosition);
+		UpdateEye(outputs, eyeParentTotalTransform, inputs, rightEyeBone, forecastHeadPosition);
 	}
 }

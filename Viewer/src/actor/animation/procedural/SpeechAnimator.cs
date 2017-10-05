@@ -108,8 +108,7 @@ public class SpeechAnimator : IProceduralAnimator {
 		hmdToWorldTransform.Invert();
 		
 		var outputs = channelSystem.Evaluate(null, inputs);
-		var boneTotalTransforms = boneSystem.GetBoneTransforms(outputs);
-		var headTotalTransform = boneTotalTransforms[headBone.Index];
+		var headTotalTransform = headBone.GetChainedTransform(outputs);
 
 		var headBindPoseCenter = headBone.CenterPoint.GetValue(outputs);
 		Vector3 headWorldPosition = headTotalTransform.Transform(headBindPoseCenter) / 100;

@@ -46,8 +46,7 @@ public class BreastGravityAnimator : IProceduralAnimator {
 
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
 		var outputs = channelSystem.Evaluate(null, inputs);
-		var boneTransforms = boneSystem.GetBoneTransforms(outputs);
-		var chestBoneTransform = boneTransforms[chestBone.Index];
+		var chestBoneTransform = chestBone.GetChainedTransform(outputs);
 		var chestBoneRotation = chestBoneTransform.RotationStage.Rotation;
 
 		chestBoneRotation.Invert();

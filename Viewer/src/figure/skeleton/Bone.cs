@@ -131,4 +131,9 @@ public class Bone {
 
 		return new StagedSkinningTransform(chainedScalingTransform, chainedRotationTransform);
 	}
+
+	public StagedSkinningTransform GetChainedTransform(ChannelOutputs outputs) {
+		StagedSkinningTransform parentTransform = Parent != null ? Parent.GetChainedTransform(outputs) : StagedSkinningTransform.Identity;
+		return GetChainedTransform(outputs, parentTransform);
+	}
 }
