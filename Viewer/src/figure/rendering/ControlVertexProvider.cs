@@ -96,6 +96,10 @@ public class ControlVertexProvider : IDisposable {
 		occluder.Dispose();
 		occluder = newOccluder;
 		OccluderChanged?.Invoke();
+
+		if (children != null) {
+			RegisterChildOccluders();
+		}
 	}
 	
 	public int VertexCount => vertexCount;
@@ -105,16 +109,20 @@ public class ControlVertexProvider : IDisposable {
 	private List<ControlVertexProvider> children;
 
 	public void RegisterChildren(List<ControlVertexProvider> children) {
+		if (this.children != null) {
+			throw new NotImplementedException("changing children is not implemented yet");
+		}
+
 		this.children = children;
 
 		foreach (var child in children) {
-			child.OccluderChanged += HandleChildrenChanged;
+			child.OccluderChanged += RegisterChildOccluders;
 		}
 		
-		HandleChildrenChanged();
+		RegisterChildOccluders();
 	}
 
-	private void HandleChildrenChanged() {
+	private void RegisterChildOccluders() {
 		var childOccluders = children
 			.Select(child => child.occluder)
 			.ToList();
