@@ -6,5 +6,21 @@
 	{
 		"name": "Aloha",
 		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Aloha Sarong.duf" ]
+	},
+	{
+		"name": "Ahiahi",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Ahiahi Sarong.duf" ]
+	},
+	{
+		"name": "Mahalo",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Mahalo Sarong .duf" ]
+	},
+	{
+		"name": "Mahina",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Mahina Sarong.duf" ]
+	},
+	{
+		"name": "Ohana",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Ohana Sarong.duf" ]
 	}
 ]

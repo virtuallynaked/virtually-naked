@@ -6,5 +6,21 @@
 	{
 		"name": "Aloha",
 		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Aloha Bikini Top.duf" ]
+	},
+	{
+		"name": "Ahiahi",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Ahiahi Bikini Top.duf" ]
+	},
+	{
+		"name": "Mahalo",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Mahalo Bikini Top .duf" ]
+	},
+	{
+		"name": "Mahina",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Mahina Bikini Top.duf" ]
+	},
+	{
+		"name": "Ohana",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Tropical Style/Materials/Iray/Ohana Bikini Top.duf" ]
 	}
 ]
