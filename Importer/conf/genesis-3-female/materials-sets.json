@@ -200,5 +200,17 @@
 			"/People/Genesis 3 Female/Characters/Uma/Materials/Iray/Uma Base MAT.duf",
 			"/patches/uma-mouth.duf"
 		]
+	},
+	{
+		"name": "Tisha",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Tisha/Materials/Tisha Iray Base MAT.duf"
+		]
+	},
+	{
+		"name": "Senna",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Senna/Materials/Senna All Mat.duf"
+		]
 	}
 ]

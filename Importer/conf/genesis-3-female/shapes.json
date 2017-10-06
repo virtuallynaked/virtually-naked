@@ -253,5 +253,19 @@
 			"CTRL-FWSAUma": 1.0,
 			"Genesis3Female-hd-correction": 1.0
 		}
+	},
+	{
+		"name": "Tisha",
+		"morphs": {
+			"CTRL-FWSATisha": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Senna",
+		"morphs": {
+			"CTRLSenna": 1.0,
+			"Genesis3Female-hd-correction": 1.0
+		}
 	}
 ]
