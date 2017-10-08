@@ -117,7 +117,7 @@ public class OccluderParametersCalculator : IDisposable {
 	
 	private OcclusionInfo[] CalculateOcclusion(ChannelOutputs outputs) {
 		var outputsGroup = new ChannelOutputsGroup(outputs, new ChannelOutputs[0]);
-		return occlusionCalculator.CalculateOcclusionInformation(outputsGroup).FigureOcclusion;
+		return occlusionCalculator.CalculateOcclusionInformation(outputsGroup).ParentOcclusion;
 	}
 
 	public OccluderParameters CalculateOccluderParameters() {

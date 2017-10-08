@@ -119,6 +119,7 @@ public class GpuOcclusionCalculator : IDisposable {
 	}
 	
 	public OcclusionInfo[] Run(DeviceContext context, ShaderResourceView vertexInfos) {
+		context.ClearState();
 		context.ComputeShader.Set(shader);
 		context.ComputeShader.SetConstantBuffer(0, hemispherePointsAndWeightsConstantBuffer);
 		context.ComputeShader.SetShaderResources(0, rasterCacheView, facesView, transparenciesView);

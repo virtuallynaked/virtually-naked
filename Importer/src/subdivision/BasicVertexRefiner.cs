@@ -41,8 +41,6 @@ public class BasicVertexRefiner : IDisposable {
 	}
 	
 	public void Dispose() {
-		refinerShader.Dispose();
-
 		stencilSegmentsView.Dispose();
 		stencilElemsView.Dispose();
 

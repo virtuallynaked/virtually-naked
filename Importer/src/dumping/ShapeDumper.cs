@@ -148,9 +148,11 @@ class ShapeDumper {
 		}
 		
 		shapeDirectory.Create();
-		occlusionInfosFile.WriteArray(OcclusionInfo.PackArray(occlusionResult.FigureOcclusion));
-		if (occlusionResult.BaseFigureOcclusion != null) {
-			parentOcclusionInfosFile.WriteArray(OcclusionInfo.PackArray(occlusionResult.BaseFigureOcclusion));
+		if (figure == parentFigure) {
+			occlusionInfosFile.WriteArray(OcclusionInfo.PackArray(occlusionResult.ParentOcclusion));
+		} else {
+			occlusionInfosFile.WriteArray(OcclusionInfo.PackArray(occlusionResult.ChildOcclusions[0]));
+			parentOcclusionInfosFile.WriteArray(OcclusionInfo.PackArray(occlusionResult.ParentOcclusion));
 		}
 	}
 }

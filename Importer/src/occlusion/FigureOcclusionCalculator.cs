@@ -6,106 +6,109 @@ using System.Linq;
 
 public class FigureOcclusionCalculator : IDisposable {
 	public class Result {
-		public OcclusionInfo[] FigureOcclusion { get; }
-		public OcclusionInfo[] BaseFigureOcclusion { get; }
+		public OcclusionInfo[] ParentOcclusion { get; }
+		public List<OcclusionInfo[]> ChildOcclusions { get; }
 
-		public Result(OcclusionInfo[] figureOcclusion, OcclusionInfo[] baseFigureOcculsion) {
-			FigureOcclusion = figureOcclusion;
-			BaseFigureOcclusion = baseFigureOcculsion;
+		public Result(OcclusionInfo[] parentOcclusion, List<OcclusionInfo[]> childOcclusions) {
+			ParentOcclusion = parentOcclusion;
+			ChildOcclusions = childOcclusions;
 		}
 	}
-
-	private static float[] CalculateFaceTransparencies(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure figure, int[] surfaceMap) {
-		if (figure.Name == "liv-hair") {
-			var calculator = new FromTextureFaceTransparencyCalculator(fileLocator, device, shaderCache, figure);
-			return calculator.CalculateSurfaceTransparencies();
-		}
-
-		var surfaceProperties = SurfacePropertiesJson.Load(figure);
-		
-		return surfaceMap
-			.Select(surfaceIdx => 1 - surfaceProperties.Opacities[surfaceIdx])
-			.ToArray();
-	}
-
+	
 	private readonly Device device;
 
 	private readonly FigureGroup figureGroup;
 
-	private readonly StructuredBufferManager<Vector3> vertexPositionsBufferManager;
+	private readonly StructuredBufferManager<Vector3> controlPositionsBufferManager;
 	private readonly BasicVertexRefiner vertexRefiner;
 	private readonly GpuOcclusionCalculator occlusionCalculator;
 
+	private readonly ArraySegment parentSegment;
+	private readonly List<ArraySegment> childSegments = new List<ArraySegment>();
+	
 	public FigureOcclusionCalculator(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, FigureGroup figureGroup) {
 		this.device = device;
 		
 		this.figureGroup = figureGroup;
-
-		var baseFigure = figureGroup.Parent;
-		var figure = GroupExportUtils.FindExportTarget(figureGroup);
-
-		var level0RefinementResult = figure.Geometry.AsTopology().Refine(0);
-		float[] faceTransparencies = CalculateFaceTransparencies(fileLocator, device, shaderCache, figure, level0RefinementResult.SurfaceMap);
-
-		if (baseFigure != figure) {
-			var baseRefinementResult = baseFigure.Geometry.AsTopology().Refine(0);
-			var baseFaceTransparencies = CalculateFaceTransparencies(fileLocator, device, shaderCache, baseFigure, baseRefinementResult.SurfaceMap);
-
-			level0RefinementResult = RefinementResult.Combine(baseRefinementResult, level0RefinementResult);
-			faceTransparencies = baseFaceTransparencies.Concat(faceTransparencies).ToArray();
-		}
-
-		SubdivisionMesh level0SubdivisionMesh = level0RefinementResult.Mesh;
-		int[] surfaceMap = level0RefinementResult.SurfaceMap;
-
-		this.vertexPositionsBufferManager = new StructuredBufferManager<Vector3>(device, level0SubdivisionMesh.Topology.VertexCount);
-
-		this.vertexRefiner = new BasicVertexRefiner(device, shaderCache, level0SubdivisionMesh.Stencils);
-
 		
-		occlusionCalculator = new GpuOcclusionCalculator(device, shaderCache, level0SubdivisionMesh.Topology, faceTransparencies);
+		var geometryConcatenator = new OcclusionGeometryConcatenator();
+
+		//parent
+		{
+			var figure = figureGroup.Parent;
+
+			var refinementResult = figure.Geometry.AsTopology().Refine(0);
+			var faceTransparencies = FaceTransparencyCalculator.Calculate(fileLocator, device, shaderCache, figure, refinementResult.SurfaceMap);
+
+			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
+			parentSegment = segment;
+		}
+		
+		//children
+		foreach (var figure in figureGroup.Children) {
+			var refinementResult = figure.Geometry.AsTopology().Refine(0);
+			float[] faceTransparencies = FaceTransparencyCalculator.Calculate(fileLocator, device, shaderCache, figure, refinementResult.SurfaceMap);
+
+			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
+			childSegments.Add(segment);
+		}
+		
+		controlPositionsBufferManager = new StructuredBufferManager<Vector3>(device, geometryConcatenator.Mesh.Topology.VertexCount);
+		vertexRefiner = new BasicVertexRefiner(device, shaderCache, geometryConcatenator.Mesh.Stencils);
+		occlusionCalculator = new GpuOcclusionCalculator(device, shaderCache, geometryConcatenator.Mesh.Topology, geometryConcatenator.FaceTransparencies);
 	}
 
 	public void Dispose() {
+		controlPositionsBufferManager.Dispose();
+		vertexRefiner.Dispose();
 		occlusionCalculator.Dispose();
 	}
 	
 	public Result CalculateOcclusionInformation(ChannelOutputsGroup outputsGroup) {
 		List<Vector3> controlPositions = new List<Vector3>();
 
-		var baseFigure = figureGroup.Parent;
-		var figure = GroupExportUtils.FindExportTarget(figureGroup);
+		Vector3[] parentDeltas = figureGroup.Parent.CalculateDeltas(outputsGroup.ParentOutputs);
 
-		var baseOutputs = outputsGroup.ParentOutputs;
-		var outputs = GroupExportUtils.FindExportTarget(outputsGroup);
+		//parent
+		{
+			var figure = figureGroup.Parent;
+			var outputs = outputsGroup.ParentOutputs;
 
-		Vector3[] baseDeltas = baseFigure.CalculateDeltas(baseOutputs);
-		if (baseFigure != figure) {
-			controlPositions.AddRange(baseFigure.CalculateControlPositions(baseOutputs, baseDeltas));
+			controlPositions.AddRange(figure.CalculateControlPositions(outputs, parentDeltas));
 		}
 
 		int figureOffset = controlPositions.Count;
-		
-		controlPositions.AddRange(figure.CalculateControlPositions(outputs, baseDeltas));
+
+		//children
+		for (int childIdx = 0; childIdx < figureGroup.Children.Length; ++childIdx) {
+			var figure = figureGroup.Children[childIdx];
+			var outputs = outputsGroup.ChildOutputs[childIdx];
+
+			controlPositions.AddRange(figure.CalculateControlPositions(outputs, parentDeltas));
+		}
 		
 		DeviceContext context = device.ImmediateContext;
 
-		vertexPositionsBufferManager.Update(context, controlPositions.ToArray());
-		ShaderResourceView vertexInfosView = vertexRefiner.Refine(context, vertexPositionsBufferManager.View);
-		OcclusionInfo[] allOcclusionInfos = occlusionCalculator.Run(device.ImmediateContext, vertexInfosView);
+		controlPositionsBufferManager.Update(context, controlPositions.ToArray());
+		ShaderResourceView vertexInfosView = vertexRefiner.Refine(context, controlPositionsBufferManager.View);
+		OcclusionInfo[] groupOcclusionInfos = occlusionCalculator.Run(device.ImmediateContext, vertexInfosView);
 
-		var figureOcclusionInfos = allOcclusionInfos.Skip(figureOffset).ToArray();
-		if (figureOcclusionInfos.Length != figure.Geometry.VertexCount) {
-			throw new InvalidOperationException();
+		OcclusionInfo[] parentOcclusionInfos;
+		List<OcclusionInfo[]> childOcclusionInfos = new List<OcclusionInfo[]>();
+		
+		//parent
+		{
+			var segment = parentSegment;
+			var figureOcclusionInfos = groupOcclusionInfos.Skip(segment.Offset).Take(segment.Count).ToArray();
+			parentOcclusionInfos = figureOcclusionInfos;
 		}
 
-		OcclusionInfo[] baseFigureOcclusionInfos;
-		if (baseFigure != figure) {
-			baseFigureOcclusionInfos = allOcclusionInfos.Take(figureOffset).ToArray();
-		} else {
-			baseFigureOcclusionInfos = null;
+		//children
+		foreach (var segment in childSegments) {
+			var figureOcclusionInfos = groupOcclusionInfos.Skip(segment.Offset).Take(segment.Count).ToArray();
+			childOcclusionInfos.Add(figureOcclusionInfos);
 		}
-
-		return new Result(figureOcclusionInfos, baseFigureOcclusionInfos);
+		
+		return new Result(parentOcclusionInfos, childOcclusionInfos);
 	}
 }
