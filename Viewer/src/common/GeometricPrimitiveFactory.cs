@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static MathExtensions;
 
 //Ported from https://github.com/Microsoft/DirectXTK/blob/master/Src/Geometry.cpp
@@ -174,5 +172,76 @@ public class GeometricPrimitiveFactory {
 		}
 		
 		return new QuadMesh(faces, vertices, normals);
+	}
+
+	private class SubdividableVertexCollection {
+		private List<Vector3> vertices = new List<Vector3>();
+		private Dictionary<(int, int), int> midwayVertexMap = new Dictionary<(int, int), int>();
+		
+		public int AddControl(Vector3 v) {
+			int idx = vertices.Count;
+			vertices.Add(v);
+			return idx;
+		}
+
+		public int AddMidway(int idxA, int idxB) {
+			var pair = idxA < idxB ? (idxA, idxB) : (idxB, idxA);
+			if (midwayVertexMap.TryGetValue(pair, out int midwayIdx)) {
+				return midwayIdx;
+			} else {
+				midwayIdx = vertices.Count;
+				midwayVertexMap.Add(pair, midwayIdx);
+				vertices.Add((vertices[idxA] + vertices[idxB]) / 2);
+				return midwayIdx;
+			}
+		}
+
+		public List<Vector3> Vertices => vertices;
+	}
+
+	public static TriMesh MakeOctahemisphere(int subdivisionLevel) {
+		var vertices = new SubdividableVertexCollection();
+		List<Tri> faces;
+
+		{
+			//control level
+			int center = vertices.AddControl(new Vector3(0, 0, 1));
+			int right = vertices.AddControl(new Vector3(+1, 0, 0));
+			int up = vertices.AddControl(new Vector3(0, +1, 0));
+			int left = vertices.AddControl(new Vector3(-1, 0, 0));
+			int down = vertices.AddControl(new Vector3(0, -1, 0));
+
+			faces = new List<Tri> {
+				new Tri(center, right, up),
+				new Tri(center, up, left),
+				new Tri(center, left, down),
+				new Tri(center, down, right)
+			};
+		}
+		
+		for (int i = 0; i < subdivisionLevel; ++i) {
+			var coarseFaces = faces;
+			faces = new List<Tri>();
+			foreach (Tri face in coarseFaces) {
+				int indexA = face.Index0;
+				int indexB = face.Index1;
+				int indexC = face.Index2;
+
+				int indexAB = vertices.AddMidway(indexA, indexB);
+				int indexBC = vertices.AddMidway(indexB, indexC);
+				int indexCA = vertices.AddMidway(indexC, indexA);
+				
+				faces.Add(new Tri(indexA, indexAB, indexCA));
+				faces.Add(new Tri(indexAB, indexB, indexBC));
+				faces.Add(new Tri(indexCA, indexBC, indexC));
+				faces.Add(new Tri(indexBC, indexCA, indexAB));
+			}
+		}
+		
+		var normalizedVertices = vertices.Vertices
+			.Select(v => Vector3.Normalize(v))
+			.ToList();
+		
+		return new TriMesh(faces, normalizedVertices, normalizedVertices);
 	}
 }
