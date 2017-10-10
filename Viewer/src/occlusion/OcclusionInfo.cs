@@ -65,4 +65,8 @@ public struct OcclusionInfo {
 		}
 		return packedArray;
 	}
+
+	override public string ToString() {
+		return String.Format("OcclusionInfo[front = {0}, back = {1}]", Front, Back);
+	}
 }
