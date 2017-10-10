@@ -19,11 +19,16 @@ public class FigureOcclusionCalculator : IDisposable {
 
 	private readonly FigureGroup figureGroup;
 
-	private readonly StructuredBufferManager<Vector3> controlPositionsBufferManager;
+	private readonly StructuredBufferManager<Vector3> groupControlPositionsBufferManager;
 	private readonly BasicVertexRefiner vertexRefiner;
+	private readonly InOutStructuredBufferManager<BasicRefinedVertexInfo> refinedVertexInfosBufferManager;
 	private readonly GpuOcclusionCalculator occlusionCalculator;
 
 	private readonly ArraySegment parentSegment;
+
+	private readonly List<HemisphereOcclusionSurrogate> surrogates;
+	private readonly List<ArraySegment> surrogateSegments = new List<ArraySegment>();
+
 	private readonly List<ArraySegment> childSegments = new List<ArraySegment>();
 	
 	public FigureOcclusionCalculator(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, FigureGroup figureGroup) {
@@ -42,6 +47,9 @@ public class FigureOcclusionCalculator : IDisposable {
 
 			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
 			parentSegment = segment;
+
+			surrogates = HemisphereOcclusionSurrogate.MakeForFigure(figure);
+			surrogateSegments = surrogates.Select(geometryConcatenator.Add).ToList();
 		}
 		
 		//children
@@ -53,45 +61,62 @@ public class FigureOcclusionCalculator : IDisposable {
 			childSegments.Add(segment);
 		}
 		
-		controlPositionsBufferManager = new StructuredBufferManager<Vector3>(device, geometryConcatenator.Mesh.Topology.VertexCount);
+		groupControlPositionsBufferManager = new StructuredBufferManager<Vector3>(device, geometryConcatenator.Mesh.ControlVertexCount);
 		vertexRefiner = new BasicVertexRefiner(device, shaderCache, geometryConcatenator.Mesh.Stencils);
+		refinedVertexInfosBufferManager = new InOutStructuredBufferManager<BasicRefinedVertexInfo>(device, vertexRefiner.RefinedVertexCount);
 		occlusionCalculator = new GpuOcclusionCalculator(device, shaderCache, geometryConcatenator.Mesh.Topology, geometryConcatenator.FaceTransparencies);
 	}
 
 	public void Dispose() {
-		controlPositionsBufferManager.Dispose();
+		groupControlPositionsBufferManager.Dispose();
 		vertexRefiner.Dispose();
+		refinedVertexInfosBufferManager.Dispose();
 		occlusionCalculator.Dispose();
 	}
 	
 	public Result CalculateOcclusionInformation(ChannelOutputsGroup outputsGroup) {
-		List<Vector3> controlPositions = new List<Vector3>();
+		List<Vector3> groupControlPositions = new List<Vector3>();
 
 		Vector3[] parentDeltas = figureGroup.Parent.CalculateDeltas(outputsGroup.ParentOutputs);
+
+		List<BasicRefinedVertexInfo[]> surrogateVertexInfos = new List<BasicRefinedVertexInfo[]>();
 
 		//parent
 		{
 			var figure = figureGroup.Parent;
 			var outputs = outputsGroup.ParentOutputs;
 
-			controlPositions.AddRange(figure.CalculateControlPositions(outputs, parentDeltas));
+			var controlPositions = figure.CalculateControlPositions(outputs, parentDeltas);
+			groupControlPositions.AddRange(controlPositions);
+
+			foreach (var surrogate in surrogates) {
+				surrogateVertexInfos.Add(surrogate.GetVertexInfos(outputs, controlPositions));
+			}
 		}
 
-		int figureOffset = controlPositions.Count;
+		int figureOffset = groupControlPositions.Count;
 
 		//children
 		for (int childIdx = 0; childIdx < figureGroup.Children.Length; ++childIdx) {
 			var figure = figureGroup.Children[childIdx];
 			var outputs = outputsGroup.ChildOutputs[childIdx];
 
-			controlPositions.AddRange(figure.CalculateControlPositions(outputs, parentDeltas));
+			var controlPositions = figure.CalculateControlPositions(outputs, parentDeltas);
+			groupControlPositions.AddRange(controlPositions);
 		}
 		
 		DeviceContext context = device.ImmediateContext;
 
-		controlPositionsBufferManager.Update(context, controlPositions.ToArray());
-		ShaderResourceView vertexInfosView = vertexRefiner.Refine(context, controlPositionsBufferManager.View);
-		OcclusionInfo[] groupOcclusionInfos = occlusionCalculator.Run(device.ImmediateContext, vertexInfosView);
+		groupControlPositionsBufferManager.Update(context, groupControlPositions.ToArray());
+		vertexRefiner.Refine(context, groupControlPositionsBufferManager.View, refinedVertexInfosBufferManager.OutView);
+
+		for (int surrogateIdx = 0; surrogateIdx < surrogates.Count; ++surrogateIdx) {
+			var segment = surrogateSegments[surrogateIdx];
+			var vertexInfos = surrogateVertexInfos[surrogateIdx];
+			refinedVertexInfosBufferManager.Update(context, vertexInfos, segment.Offset);
+		}
+		
+		OcclusionInfo[] groupOcclusionInfos = occlusionCalculator.Run(context, refinedVertexInfosBufferManager.InView);
 
 		OcclusionInfo[] parentOcclusionInfos;
 		List<OcclusionInfo[]> childOcclusionInfos = new List<OcclusionInfo[]>();

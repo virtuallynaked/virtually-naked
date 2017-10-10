@@ -22,6 +22,16 @@ public class OcclusionGeometryConcatenator {
 		}
 	}
 
+	public ArraySegment Add(HemisphereOcclusionSurrogate surrogate) {
+		int dummyVertexCount = surrogate.SurrogateVertexCount;
+		var dummyMesh = new SubdivisionMesh(
+			0,
+			new QuadTopology(dummyVertexCount, new Quad[0]),
+			PackedLists<WeightedIndexWithDerivatives>.MakeEmptyLists(dummyVertexCount));
+		var dummyFaceTransparencies = new float[0];
+		return Add(dummyMesh, dummyFaceTransparencies);
+	}
+
 	public float[] FaceTransparencies => combinedFaceTransparencies;
 	public SubdivisionMesh Mesh => combinedMesh;
 }
