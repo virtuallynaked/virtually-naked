@@ -20,7 +20,7 @@ public class FigureFacade : IDisposable {
 		string materialSetName = model.MaterialSet.Label;
 		var renderer = FigureRenderer.Load(definition.Directory, device, shaderCache, materialSetName);
 		
-		var facade = new FigureFacade(definition, model, controlVertexProvider, renderer);
+		var facade = new FigureFacade(device, shaderCache, definition, model, controlVertexProvider, renderer);
 
 		model.MaterialSetChanged += (oldMaterialSet, newMaterialSet) => {
 			string newMaterialSetName = newMaterialSet.Label;
@@ -35,19 +35,22 @@ public class FigureFacade : IDisposable {
 	private readonly FigureModel model;
 	private readonly ControlVertexProvider controlVertexProvider;
 	private FigureRenderer renderer;
+	private readonly OcclusionSurrogateDebugRenderer surrogateDebugRenderer;
 	
 	public IFigureAnimator Animator { get; set; } = null;
 
-	public FigureFacade(FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
+	public FigureFacade(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
 		this.definition = definition;
 		this.model = model;
 		this.controlVertexProvider = controlVertexProvider;
 		this.renderer = renderer;
+		this.surrogateDebugRenderer = new OcclusionSurrogateDebugRenderer(device, shaderCache, 0);
 	}
 	
 	public void Dispose() {
 		controlVertexProvider.Dispose();
 		renderer.Dispose();
+		surrogateDebugRenderer.Dispose();
 	}
 
 	public FigureDefinition Definition => definition;
@@ -74,6 +77,7 @@ public class FigureFacade : IDisposable {
 
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		renderer.RenderPass(context, pass);
+		surrogateDebugRenderer.RenderPass(context, pass, controlVertexProvider.OcclusionInfos);
 	}
 	
 	public ChannelOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {

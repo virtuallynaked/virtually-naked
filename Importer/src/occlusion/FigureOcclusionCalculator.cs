@@ -124,7 +124,12 @@ public class FigureOcclusionCalculator : IDisposable {
 		//parent
 		{
 			var segment = parentSegment;
-			var figureOcclusionInfos = groupOcclusionInfos.Skip(segment.Offset).Take(segment.Count).ToArray();
+			
+			var mainOcclusionInfos = groupOcclusionInfos.Skip(segment.Offset).Take(segment.Count);
+			var surrogateOcclusionInfos = surrogateSegments
+				.SelectMany(surrogateSegment => groupOcclusionInfos.Skip(surrogateSegment.Offset).Take(surrogateSegment.Count));
+			
+			var figureOcclusionInfos = mainOcclusionInfos.Concat(surrogateOcclusionInfos).ToArray();
 			parentOcclusionInfos = figureOcclusionInfos;
 		}
 

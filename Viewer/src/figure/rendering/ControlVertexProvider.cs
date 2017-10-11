@@ -104,6 +104,7 @@ public class ControlVertexProvider : IDisposable {
 	
 	public int VertexCount => vertexCount;
 
+	public ShaderResourceView OcclusionInfos => occluder.OcclusionInfosView;
 	public ShaderResourceView ControlVertexInfosView => controlVertexInfosBufferManager.InView;
 	
 	private List<ControlVertexProvider> children;
