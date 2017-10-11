@@ -51,4 +51,22 @@ public class QuaternionExtensionsTest {
 				Vector3.Normalize(v2)),
 			1e-6);
 	}
+
+	[TestMethod]
+	public void TestHlslRotate() {
+		Vector3 p = new Vector3(2, 3, 4);
+		Quaternion q = Quaternion.RotationYawPitchRoll(0.1f, 0.2f, 0.3f);
+
+		Vector3 expectedResult = Vector3.Transform(p, q);
+
+		Vector3 qXYZ = new Vector3(q.X, q.Y, q.Z);
+		Vector3 actualResult = p + 2 * Vector3.Cross(Vector3.Cross(p, qXYZ) - q.W * p, qXYZ);
+
+		Assert.AreEqual(
+			0,
+			Vector3.Distance(
+				expectedResult,
+				actualResult),
+			1e-6);
+	}
 }

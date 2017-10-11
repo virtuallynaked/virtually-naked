@@ -1,5 +1,6 @@
 #include "ControlVertexInfo.hlsl"
 #include "StagedSkinningTransform.hlsl"
+#include "OcclusionSurrogate.hlsl"
 
 struct ArraySegment {
 	uint offset;
@@ -39,13 +40,16 @@ StructuredBuffer<StagedSkinningTransform> boneTransforms : register(t8);
 
 //occlusion inputs
 StructuredBuffer<uint> packedOcclusions : register(t9);
+StructuredBuffer<uint> surrogateMap : register(t10);
+StructuredBuffer<uint3> surrogateFaces : register(t11);
+StructuredBuffer<SurrogateInfo> surrogateInfos : register(t12);
 
 RWStructuredBuffer<ControlVertexInfo> vertexInfosOut : register(u0);
 
 #if SHAPER_OUTPUT_DELTAS
 RWStructuredBuffer<float3> baseDeltas : register(u1);
 #else
-StructuredBuffer<float3> baseDeltas : register(t10);
+StructuredBuffer<float3> baseDeltas : register(t13);
 #endif
 
 float3 calculateDelta(uint vertexIdx) {
@@ -93,18 +97,34 @@ void skin(int vertexIdx, inout float3 p) {
 	p = StagedSkinningTransform_Apply(transformAccumulator, p);
 }
 
+uint lookupOcclusion(uint vertexIdx, float3 unskinnedPosition) {
+	uint surrogateIdxPlusOne = surrogateMap[vertexIdx];
+	if (surrogateIdxPlusOne == 0) {
+
+		return packedOcclusions[vertexIdx];
+	} else {
+		SurrogateInfo surrogateInfo = surrogateInfos[surrogateIdxPlusOne - 1];
+		float3 normal = Quaternion_Apply(
+			surrogateInfo.rotation,
+			normalize(unskinnedPosition - surrogateInfo.center));
+		float2 occlusion = occlusionFromNormal(surrogateFaces, packedOcclusions, surrogateInfo.offset, normal);
+		return packOcclusion(occlusion);
+	}
+}
+
 [numthreads(64, 1, 1)]
 void main(uint3 dispatchThreadId : SV_DispatchThreadID) {
-	int vertexIdx = dispatchThreadId.x;
+	uint vertexIdx = dispatchThreadId.x;
 
 	float3 position = initialPositions[vertexIdx];
 	morph(vertexIdx, position);
 	automorph(vertexIdx, position);
+	uint packedOcclusion = lookupOcclusion(vertexIdx, position);
 	skin(vertexIdx, position);
 
 	ControlVertexInfo vertexInfo;
 	vertexInfo.position = position;
-	vertexInfo.packedOcclusion = packedOcclusions[vertexIdx];
+	vertexInfo.packedOcclusion = packedOcclusion;
 
 	vertexInfosOut[vertexIdx] = vertexInfo;
 }

@@ -49,6 +49,6 @@ public class ShaperParameters {
 		BoneWeights = boneWeights;
 
 		OcclusionSurrogateMap = occlusionSurrogateMap;
-		OcclusionSurrogateParameters = occlusionSurrogateParameters;
+		OcclusionSurrogateParameters = occlusionSurrogateParameters ?? new OcclusionSurrogateParameters[0];
 	}
 }

@@ -68,7 +68,7 @@ public class ControlVertexProvider : IDisposable {
 		ShaperParameters shaperParameters,
 		IOccluder occluder) {
 		this.definition = definition;
-		this.shaper = new GpuShaper(device, shaderCache, shaperParameters);
+		this.shaper = new GpuShaper(device, shaderCache, definition, shaperParameters);
 		this.occluder = occluder;
 		
 		this.vertexCount = shaperParameters.InitialPositions.Length;

@@ -1,24 +1,10 @@
 #include <d3d/VertexCommon.hlsl>
-#include "OcclusionSurrogate.hlsl"
+#include <figure/shaping/shader/Quaternion.hlsl>
+#include <figure/shaping/shader/ControlVertexInfo.hlsl>
+#include <figure/shaping/shader/OcclusionSurrogate.hlsl>
 
-float2 occlusionFromNormal(int offset, float3 normal) {
-	int faceIdx;
-	float2 coords;
-	normalToControlFaceAndCoords(normal, faceIdx, coords);
-	
-	subdivide(faceIdx, coords);
-	subdivide(faceIdx, coords);
-	subdivide(faceIdx, coords);
-	subdivide(faceIdx, coords);
-
-	uint3 surrogateFace = surrogateFaces[faceIdx];
-	uint3 occlusionIdxs = surrogateFace + offset;
-
-	float2 occlusion = (1 - coords.x - coords.y) * unpackOcclusion(packedOcclusions[occlusionIdxs[0]])
-		+ coords.x * unpackOcclusion(packedOcclusions[occlusionIdxs[1]])
-	    + coords.y * unpackOcclusion(packedOcclusions[occlusionIdxs[2]]);
-	return occlusion;
-}
+StructuredBuffer<uint3> surrogateFaces : register(t0);
+StructuredBuffer<uint> packedOcclusions: register(t1);
 
 struct VertexIn {
 	float3 position : POSITION;
@@ -32,7 +18,7 @@ VertexOutput main(uint vertexIdx : SV_VertexId, VertexIn vIn) {
 	//int occlusionInfoIdx = vertexIdx + offset;
 	//float2 occlusion = unpackOcclusion(packedOcclusions[occlusionInfoIdx]);
 
-	float2 occlusion = occlusionFromNormal(offset, vIn.normal);
+	float2 occlusion = occlusionFromNormal(surrogateFaces, packedOcclusions, offset, vIn.normal);
 
 	VertexOutput vOut = (VertexOutput) 0;
 	vOut.positions = calculatePositions(worldPosition);
