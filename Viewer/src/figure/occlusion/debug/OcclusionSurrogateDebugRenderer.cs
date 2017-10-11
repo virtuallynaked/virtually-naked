@@ -3,7 +3,6 @@ using SharpDX.Direct3D11;
 using System;
 
 public class OcclusionSurrogateDebugRenderer : IDisposable {
-	private static TriMesh SurrogateMesh = GeometricPrimitiveFactory.MakeOctahemisphere(4);
 	private static TriMesh DrawMesh = GeometricPrimitiveFactory.MakeOctahemisphere(4);
 	
 	private readonly ShaderResourceView surrogateFacesView;
@@ -13,7 +12,7 @@ public class OcclusionSurrogateDebugRenderer : IDisposable {
 	private readonly IOpaqueMaterial material;
 	
 	public OcclusionSurrogateDebugRenderer(Device device, ShaderCache shaderCache, int occlusionInfoOffset) {
-		surrogateFacesView = BufferUtilities.ToStructuredBufferView(device, SurrogateMesh.Faces.ToArray());
+		surrogateFacesView = BufferUtilities.ToStructuredBufferView(device, OcclusionSurrogateCommon.Mesh.Faces.ToArray());
 
 		meshBuffers = new MeshBuffers(device, DrawMesh);
 

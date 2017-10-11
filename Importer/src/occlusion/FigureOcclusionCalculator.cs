@@ -25,8 +25,6 @@ public class FigureOcclusionCalculator : IDisposable {
 	private readonly GpuOcclusionCalculator occlusionCalculator;
 
 	private readonly ArraySegment parentSegment;
-
-	private readonly List<HemisphereOcclusionSurrogate> surrogates;
 	private readonly List<ArraySegment> surrogateSegments = new List<ArraySegment>();
 
 	private readonly List<ArraySegment> childSegments = new List<ArraySegment>();
@@ -48,7 +46,7 @@ public class FigureOcclusionCalculator : IDisposable {
 			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
 			parentSegment = segment;
 
-			surrogates = HemisphereOcclusionSurrogate.MakeForFigure(figure);
+			var surrogates = figure.OcclusionBinding.Surrogates;
 			surrogateSegments = surrogates.Select(geometryConcatenator.Add).ToList();
 		}
 		
@@ -59,6 +57,12 @@ public class FigureOcclusionCalculator : IDisposable {
 
 			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
 			childSegments.Add(segment);
+
+			var surrogates = figure.OcclusionBinding.Surrogates;
+			if (surrogates.Count != 0) {
+				// There's no technical reason this couldn't be implemented; I just haven't needed it yet.
+				throw new NotImplementedException("occlusion surrogates aren't supported on child figures");
+			}
 		}
 		
 		groupControlPositionsBufferManager = new StructuredBufferManager<Vector3>(device, geometryConcatenator.Mesh.ControlVertexCount);
@@ -89,7 +93,7 @@ public class FigureOcclusionCalculator : IDisposable {
 			var controlPositions = figure.CalculateControlPositions(outputs, parentDeltas);
 			groupControlPositions.AddRange(controlPositions);
 
-			foreach (var surrogate in surrogates) {
+			foreach (var surrogate in figure.OcclusionBinding.Surrogates) {
 				surrogateVertexInfos.Add(surrogate.GetVertexInfos(outputs, controlPositions));
 			}
 		}
@@ -110,7 +114,7 @@ public class FigureOcclusionCalculator : IDisposable {
 		groupControlPositionsBufferManager.Update(context, groupControlPositions.ToArray());
 		vertexRefiner.Refine(context, groupControlPositionsBufferManager.View, refinedVertexInfosBufferManager.OutView);
 
-		for (int surrogateIdx = 0; surrogateIdx < surrogates.Count; ++surrogateIdx) {
+		for (int surrogateIdx = 0; surrogateIdx < figureGroup.Parent.OcclusionBinding.Surrogates.Count; ++surrogateIdx) {
 			var segment = surrogateSegments[surrogateIdx];
 			var vertexInfos = surrogateVertexInfos[surrogateIdx];
 			refinedVertexInfosBufferManager.Update(context, vertexInfos, segment.Offset);

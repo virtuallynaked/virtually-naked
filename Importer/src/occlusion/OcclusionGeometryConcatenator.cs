@@ -23,7 +23,7 @@ public class OcclusionGeometryConcatenator {
 	}
 
 	public ArraySegment Add(HemisphereOcclusionSurrogate surrogate) {
-		int dummyVertexCount = surrogate.SurrogateVertexCount;
+		int dummyVertexCount = surrogate.SampleCount;
 		var dummyMesh = new SubdivisionMesh(
 			0,
 			new QuadTopology(dummyVertexCount, new Quad[0]),

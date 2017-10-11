@@ -46,7 +46,9 @@ public class FigureRecipe {
 		BoneSystem boneSystem = parentFigure?.BoneSystem ?? selfBoneSystem;
 				
 		SkinBinding skinBinding = SkinBinding.Bake(boneSystem.BonesByName, selfBoneSystem.BonesByName);
+
+		OcclusionBinding occlusionBinding = OcclusionBinding.MakeForFigure(name, geometry, boneSystem, skinBinding);
 		
-		return new Figure(name, parentFigure, this, geometry, channelSystem, boneSystem, morpher, automorpher, skinBinding, uvSets, defaultUvSet);
+		return new Figure(name, parentFigure, this, geometry, channelSystem, boneSystem, morpher, automorpher, skinBinding, uvSets, defaultUvSet, occlusionBinding);
 	}
 }

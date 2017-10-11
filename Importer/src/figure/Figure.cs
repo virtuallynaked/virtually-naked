@@ -1,7 +1,6 @@
 ﻿using SharpDX;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 public class Figure {
 	private readonly string name;
@@ -15,8 +14,9 @@ public class Figure {
 	private readonly SkinBinding skinBinding;
 	private readonly Dictionary<string, UvSet> uvSets;
 	private readonly UvSet defaultUvSet;
+	private readonly OcclusionBinding occlusionBinding;
 	
-	public Figure(string name, Figure parent, FigureRecipe recipe, Geometry geometry, ChannelSystem channelSystem, BoneSystem boneSystem, Morpher morpher, Automorpher automorpher, SkinBinding skinBinding, Dictionary<string, UvSet> uvSets, UvSet defaultUvSet) {
+	public Figure(string name, Figure parent, FigureRecipe recipe, Geometry geometry, ChannelSystem channelSystem, BoneSystem boneSystem, Morpher morpher, Automorpher automorpher, SkinBinding skinBinding, Dictionary<string, UvSet> uvSets, UvSet defaultUvSet, OcclusionBinding occlusionBinding) {
 		this.name = name;
 		this.parent = parent;
 		this.recipe = recipe;
@@ -28,6 +28,7 @@ public class Figure {
 		this.skinBinding = skinBinding;
 		this.uvSets = uvSets;
 		this.defaultUvSet = defaultUvSet;
+		this.occlusionBinding = occlusionBinding;
 	}
 	
 	public string Name => name;
@@ -41,6 +42,7 @@ public class Figure {
 	public SkinBinding SkinBinding => skinBinding;
 	public Dictionary<string, UvSet> UvSets => uvSets;
 	public UvSet DefaultUvSet => defaultUvSet;
+	public OcclusionBinding OcclusionBinding => occlusionBinding;
 
 	/*
 	 * Recipes
@@ -88,18 +90,6 @@ public class Figure {
 	/*
 	 * Shaping System
 	 */
-
-	public ShaperParameters MakeShaperParameters(bool[] channelsToInclude) {
-		return new ShaperParameters(
-			Geometry.VertexPositions,
-			Morpher.Morphs.Count,
-			Morpher.Morphs.Select(morph => morph.Channel.Index).ToArray(),
-			Morpher.ConvertToVertexDeltas(VertexCount, channelsToInclude),
-			Automorpher?.BaseDeltaWeights,
-			SkinBinding.Bones.Count,
-			SkinBinding.Bones.Select(bone => bone.Index).ToArray(),
-			SkinBinding.BoneWeights);
-	}
 		
 	public Vector3[] CalculateControlPositions(ChannelOutputs channelOutputs, Vector3[] baseDeltas) {
 		Vector3[] controlVertices = Geometry.VertexPositions.Select(p => p).ToArray();
@@ -116,6 +106,24 @@ public class Figure {
 		return controlVertices;
 	}
 	
+	/**
+	 *  Export
+	 */
+		
+	public ShaperParameters MakeShaperParameters(bool[] channelsToInclude) {
+		return new ShaperParameters(
+			Geometry.VertexPositions,
+			Morpher.Morphs.Count,
+			Morpher.Morphs.Select(morph => morph.Channel.Index).ToArray(),
+			Morpher.ConvertToVertexDeltas(VertexCount, channelsToInclude),
+			Automorpher?.BaseDeltaWeights,
+			SkinBinding.Bones.Count,
+			SkinBinding.Bones.Select(bone => bone.Index).ToArray(),
+			SkinBinding.BoneWeights,
+			OcclusionBinding.MakeSurrogateMap(),
+			OcclusionBinding.MakeSurrogateParameters());
+	}
+
 	public InverterParameters MakeInverterParameters() {
 		return new InverterParameters(Geometry.Faces, Geometry.FaceGroupMap, Geometry.FaceGroupNames, SkinBinding.FaceGroupToNodeMap);
 	}

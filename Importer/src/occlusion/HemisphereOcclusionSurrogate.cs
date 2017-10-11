@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class HemisphereOcclusionSurrogate {
-	private static TriMesh SurrogateMesh = GeometricPrimitiveFactory.MakeOctahemisphere(4);
-
 	private readonly Bone bone;
 	private readonly List<int> attachedVertices;
 	private readonly List<int> attachedFaces;
@@ -16,9 +14,11 @@ public class HemisphereOcclusionSurrogate {
 		this.attachedFaces = attachedFaces;
 	}
 
-	public int SurrogateVertexCount => SurrogateMesh.VertexCount;
+	public int SampleCount => OcclusionSurrogateCommon.Mesh.VertexCount;
+	public Bone AttachedBone => bone;
+	public List<int> AttachedVertices => attachedVertices;
 	public List<int> AttachedFaces => attachedFaces;
-
+	
 	public BasicRefinedVertexInfo[] GetVertexInfos(ChannelOutputs outputs, Vector3[] controlPositions) {
 		Vector3 center = bone.GetChainedTransform(outputs).Transform(bone.CenterPoint.GetValue(outputs));
 
@@ -32,7 +32,7 @@ public class HemisphereOcclusionSurrogate {
 		
 		var transform = Matrix.AffineTransformation((float) radius * 1.2f, rotation, center);
 
-		var transformedSurrogateMesh = SurrogateMesh.Transform(transform);
+		var transformedSurrogateMesh = OcclusionSurrogateCommon.Mesh.Transform(transform);
 
 		return Enumerable.Range(0, transformedSurrogateMesh.VertexCount)
 			.Select(idx => new BasicRefinedVertexInfo {
@@ -42,13 +42,12 @@ public class HemisphereOcclusionSurrogate {
 			.ToArray();
 	}
 
-	private static List<int> FindVerticesAttachedToBone(Figure figure, Bone bone) {
-		var skinBinding = figure.SkinBinding;
+	private static List<int> FindVerticesAttachedToBone(Geometry geometry, SkinBinding skinBinding, Bone bone) {
 		var boneIndex = skinBinding.Bones.IndexOf(bone);
 
 		List<int> attachedVertices = new List<int>();
 
-		for (int vertexIdx = 0; vertexIdx < figure.VertexCount; ++vertexIdx) {
+		for (int vertexIdx = 0; vertexIdx < geometry.VertexCount; ++vertexIdx) {
 			var boneWeights = skinBinding.BoneWeights.GetElements(vertexIdx);
 			foreach (var boneWeight in boneWeights) {
 				if (boneWeight.Index != boneIndex) {
@@ -66,13 +65,13 @@ public class HemisphereOcclusionSurrogate {
 		return attachedVertices;
 	}
 
-	private static List<int> FindAttachedFaces(Figure figure, List<int> attachedVertices) {
+	private static List<int> FindAttachedFaces(Geometry geometry, List<int> attachedVertices) {
 		List<int> attachedFaces = new List<int>();
 
 		HashSet<int> attachedVerticesSet = new HashSet<int>(attachedVertices);
 
-		for (int faceIdx = 0; faceIdx < figure.Geometry.Faces.Length; ++faceIdx) {
-			Quad face = figure.Geometry.Faces[faceIdx];
+		for (int faceIdx = 0; faceIdx < geometry.Faces.Length; ++faceIdx) {
+			Quad face = geometry.Faces[faceIdx];
 			
 			bool attached0 = attachedVerticesSet.Contains(face.Index0);
 			bool attached1 = attachedVerticesSet.Contains(face.Index1);
@@ -93,18 +92,18 @@ public class HemisphereOcclusionSurrogate {
 		return attachedFaces;
 	}
 
-	public static HemisphereOcclusionSurrogate Make(Figure figure, Bone bone) {
-		List<int> attachedVertices = FindVerticesAttachedToBone(figure, bone);
-		List<int> attachedFaces = FindAttachedFaces(figure, attachedVertices);
+	public static HemisphereOcclusionSurrogate Make(Geometry geometry, SkinBinding skinBinding, Bone bone) {
+		List<int> attachedVertices = FindVerticesAttachedToBone(geometry, skinBinding, bone);
+		List<int> attachedFaces = FindAttachedFaces(geometry, attachedVertices);
 
 		return new HemisphereOcclusionSurrogate(bone, attachedVertices, attachedFaces);
 	}
 
-	public static List<HemisphereOcclusionSurrogate> MakeForFigure(Figure figure) {
-		if (figure.Name == "genesis-3-female") {
+	public static List<HemisphereOcclusionSurrogate> MakeForFigure(string figureName, Geometry geometry, BoneSystem boneSystem, SkinBinding skinBinding) {
+		if (figureName == "genesis-3-female") {
 			return new List<HemisphereOcclusionSurrogate> {
-				Make(figure, figure.BonesByName["lEye"]),
-				Make(figure, figure.BonesByName["rEye"])
+				Make(geometry, skinBinding, boneSystem.BonesByName["lEye"]),
+				Make(geometry, skinBinding, boneSystem.BonesByName["rEye"])
 			};
 		} else {
 			return new List<HemisphereOcclusionSurrogate>();
