@@ -15,26 +15,32 @@ public class StructuredBufferManager<T> : IDisposable where T : struct {
 
 		int elementSizeInBytes = Marshal.SizeOf<T>();
 
-		BufferDescription description = new BufferDescription {
-			SizeInBytes = count * elementSizeInBytes,
-			Usage = ResourceUsage.Default,
-			BindFlags = BindFlags.ShaderResource,
-			CpuAccessFlags = CpuAccessFlags.None,
-			OptionFlags = ResourceOptionFlags.BufferStructured,
-			StructureByteStride = elementSizeInBytes
-		};
-		this.buffer = new Buffer(device, description);
-		this.view = new ShaderResourceView(device, buffer);
+		if (count > 0) {
+			//buffers cannot have size 0, but I want to hide this detail from StructuredBufferManager consumers
+
+			BufferDescription description = new BufferDescription {
+				SizeInBytes = count * elementSizeInBytes,
+				Usage = ResourceUsage.Default,
+				BindFlags = BindFlags.ShaderResource,
+				CpuAccessFlags = CpuAccessFlags.None,
+				OptionFlags = ResourceOptionFlags.BufferStructured,
+				StructureByteStride = elementSizeInBytes
+			};
+			this.buffer = new Buffer(device, description);
+			this.view = new ShaderResourceView(device, buffer);
+		}
 	}
 
 	public void Dispose() {
-		buffer.Dispose();
-		view.Dispose();
+		buffer?.Dispose();
+		view?.Dispose();
 	}
 
 	public ShaderResourceView View => view;
 
 	public void Update(DeviceContext context, T[] data) {
-		context.UpdateSubresource(data, buffer);
+		if (buffer != null) {
+			context.UpdateSubresource(data, buffer);
+		}
 	}
 }
