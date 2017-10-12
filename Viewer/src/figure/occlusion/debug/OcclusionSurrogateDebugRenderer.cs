@@ -18,7 +18,7 @@ public class OcclusionSurrogateDebugRenderer : IDisposable {
 
 		var vertexShaderAndBytecode = shaderCache.GetVertexShader<OcclusionSurrogateDebugRenderer>("figure/occlusion/debug/DebugVertex");
 		vertexShader = vertexShaderAndBytecode;
-		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, QuadMeshBuffers.InputElements);
+		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 
 		using (var texture = MonochromaticTextures.Make(device, Color.LightGray)) {
 			var textureView = new ShaderResourceView(device, texture);

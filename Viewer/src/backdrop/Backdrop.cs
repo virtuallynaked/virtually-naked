@@ -3,7 +3,7 @@ using SharpDX.Direct3D11;
 using Device = SharpDX.Direct3D11.Device;
 
 class Backdrop {
-	private readonly QuadMeshBuffers meshBuffers;
+	private readonly MeshBuffers meshBuffers;
 	private readonly CoordinateNormalMatrixPairConstantBufferManager modelToWorldTransform;
 	private readonly VertexShader vertexShader;
 	private readonly InputLayout inputLayout;
@@ -16,13 +16,13 @@ class Backdrop {
 		Matrix transform = Matrix.Translation(0, size / 2, 0);
 		QuadMesh mesh = GeometricPrimitiveFactory.MakeCube(size).Flip();
 
-		this.meshBuffers = new QuadMeshBuffers(device, mesh);
+		this.meshBuffers = new MeshBuffers(device, mesh.AsTriMesh());
 
 		this.modelToWorldTransform = new CoordinateNormalMatrixPairConstantBufferManager(device);
 
 		var vertexShaderAndBytecode = shaderCache.GetVertexShader<Backdrop>("backdrop/Backdrop");
 		this.vertexShader = vertexShaderAndBytecode;
-		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, QuadMeshBuffers.InputElements);
+		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 
 		this.pixelShader = shaderCache.GetPixelShader<Backdrop>("backdrop/Backdrop");
 		

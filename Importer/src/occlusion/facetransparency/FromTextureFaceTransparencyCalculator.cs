@@ -37,7 +37,7 @@ private static InputElement[] InputElements = new[] {
 		this.figure = figure;
 
 		var vertexShaderAndBytecode = shaderCache.GetVertexShader<TextureMaskRenderer>("occlusion/facetransparency/OpacityCounting");
-		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, QuadMeshBuffers.InputElements);
+		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 		vertexShader = vertexShaderAndBytecode;
 		
 		pixelShader = shaderCache.GetPixelShader<TextureMaskRenderer>("occlusion/facetransparency/OpacityCounting");

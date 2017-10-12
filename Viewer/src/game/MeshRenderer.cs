@@ -2,8 +2,8 @@
 using SharpDX.Direct3D11;
 using Device = SharpDX.Direct3D11.Device;
 
-class QuadMeshRenderer {
-	private readonly QuadMeshBuffers meshBuffers;
+class MeshRenderer {
+	private readonly MeshBuffers meshBuffers;
 	private readonly CoordinateNormalMatrixPairConstantBufferManager modelToWorldTransform;
 	private readonly VertexShader vertexShader;
 	private readonly InputLayout inputLayout;
@@ -11,14 +11,14 @@ class QuadMeshRenderer {
 
 	private readonly Matrix transform;
 
-	public QuadMeshRenderer(Device device, ShaderCache shaderCache, Matrix transform, QuadMesh mesh) {
-		this.meshBuffers = new QuadMeshBuffers(device, mesh);
+	public MeshRenderer(Device device, ShaderCache shaderCache, Matrix transform, TriMesh mesh) {
+		this.meshBuffers = new MeshBuffers(device, mesh);
 
 		this.modelToWorldTransform = new CoordinateNormalMatrixPairConstantBufferManager(device);
 
-		var vertexShaderAndBytecode = shaderCache.GetVertexShader<QuadMeshRenderer>("game/QuadMeshVertex");
+		var vertexShaderAndBytecode = shaderCache.GetVertexShader<MeshRenderer>("game/MeshVertex");
 		this.vertexShader = vertexShaderAndBytecode;
-		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, QuadMeshBuffers.InputElements);
+		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 
 		using (var texture = MonochromaticTextures.Make(device, Color.LightGray)) {
 			var textureView = new ShaderResourceView(device, texture);

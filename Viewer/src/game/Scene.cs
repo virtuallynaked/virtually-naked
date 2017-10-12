@@ -11,7 +11,7 @@ class Scene : IDisposable {
 	private readonly Backdrop backdrop;
 	private readonly PlayspaceFloor floor;
 	private readonly RenderModelRenderer renderModelRenderer;
-	private readonly QuadMeshRenderer primitiveRenderer;
+	private readonly MeshRenderer primitiveRenderer;
 	private readonly Actor actor;
 	private readonly Menu menu;
 
@@ -21,7 +21,7 @@ class Scene : IDisposable {
 		backdrop = new Backdrop(device, shaderCache);
 		floor = new PlayspaceFloor(device, shaderCache);
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, trackedDeviceBufferManager);
-		primitiveRenderer = new QuadMeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100));
+		primitiveRenderer = new MeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100).AsTriMesh());
 		actor = Actor.Load(dataDir, device, shaderCache, controllerManager);
 		
 		var iblMenu = LightingEnvironmentMenu.MakeMenuLevel(dataDir, iblEnvironment);

@@ -49,7 +49,7 @@ public class MeshBuffers : IDisposable {
 		this.indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, indices);
 		this.indexCount = indices.Length;
 	}
-
+	
 	public void Dispose() {
 		vertexBuffer.Dispose();
 		indexBuffer.Dispose();

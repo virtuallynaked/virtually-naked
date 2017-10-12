@@ -25,7 +25,7 @@ public class TextureMaskRenderer : IDisposable {
 		var features = this.device.CheckD3D113Features2();
 
 		var vertexShaderAndBytecode = shaderCache.GetVertexShader<TextureMaskRenderer>("texturing/processing/TextureMask");
-		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, QuadMeshBuffers.InputElements);
+		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 		vertexShader = vertexShaderAndBytecode;
 
 		var rasterizerStateDesc = new RasterizerStateDescription2() {
