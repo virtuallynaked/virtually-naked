@@ -20,7 +20,7 @@ public class OcclusionGeometryConcatenator {
 		return new ArraySegment(startingOffset, count);
 	}
 
-	public ArraySegment Add(HemisphereOcclusionSurrogate surrogate) {
+	public ArraySegment Add(ImporterOcclusionSurrogate surrogate) {
 		int dummyVertexCount = surrogate.SampleCount;
 		var dummyMesh = new SubdivisionMesh(
 			0,

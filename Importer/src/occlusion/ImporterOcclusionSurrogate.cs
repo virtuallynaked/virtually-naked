@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class HemisphereOcclusionSurrogate {
+public class ImporterOcclusionSurrogate {
 	private readonly Bone bone;
 	private readonly List<int> attachedVertices;
 	private readonly List<int> attachedFaces;
 
-	public HemisphereOcclusionSurrogate(Bone bone, List<int> attachedVertices, List<int> attachedFaces) {
+	public ImporterOcclusionSurrogate(Bone bone, List<int> attachedVertices, List<int> attachedFaces) {
 		this.bone = bone;
 		this.attachedVertices = attachedVertices;
 		this.attachedFaces = attachedFaces;
@@ -92,21 +92,21 @@ public class HemisphereOcclusionSurrogate {
 		return attachedFaces;
 	}
 
-	public static HemisphereOcclusionSurrogate Make(Geometry geometry, SkinBinding skinBinding, Bone bone) {
+	public static ImporterOcclusionSurrogate Make(Geometry geometry, SkinBinding skinBinding, Bone bone) {
 		List<int> attachedVertices = FindVerticesAttachedToBone(geometry, skinBinding, bone);
 		List<int> attachedFaces = FindAttachedFaces(geometry, attachedVertices);
 
-		return new HemisphereOcclusionSurrogate(bone, attachedVertices, attachedFaces);
+		return new ImporterOcclusionSurrogate(bone, attachedVertices, attachedFaces);
 	}
 
-	public static List<HemisphereOcclusionSurrogate> MakeForFigure(string figureName, Geometry geometry, BoneSystem boneSystem, SkinBinding skinBinding) {
+	public static List<ImporterOcclusionSurrogate> MakeForFigure(string figureName, Geometry geometry, BoneSystem boneSystem, SkinBinding skinBinding) {
 		if (figureName == "genesis-3-female") {
-			return new List<HemisphereOcclusionSurrogate> {
+			return new List<ImporterOcclusionSurrogate> {
 				Make(geometry, skinBinding, boneSystem.BonesByName["lEye"]),
 				Make(geometry, skinBinding, boneSystem.BonesByName["rEye"])
 			};
 		} else {
-			return new List<HemisphereOcclusionSurrogate>();
+			return new List<ImporterOcclusionSurrogate>();
 		}
 	}
 }

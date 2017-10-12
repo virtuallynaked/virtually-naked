@@ -3,24 +3,24 @@ using System.Collections.Generic;
 
 public class OcclusionBinding {
 	public static OcclusionBinding MakeForFigure(string figureName, Geometry geometry, BoneSystem boneSystem, SkinBinding skinBinding) {
-		var surrogates = HemisphereOcclusionSurrogate.MakeForFigure(figureName, geometry, boneSystem, skinBinding);
+		var surrogates = ImporterOcclusionSurrogate.MakeForFigure(figureName, geometry, boneSystem, skinBinding);
 		return new OcclusionBinding(geometry.VertexCount, surrogates);
 	}
 	
 	private int vertexCount;
-	private List<HemisphereOcclusionSurrogate> surrogates;
+	private List<ImporterOcclusionSurrogate> surrogates;
 	
-	public OcclusionBinding(int vertexCount, List<HemisphereOcclusionSurrogate> surrogates) {
+	public OcclusionBinding(int vertexCount, List<ImporterOcclusionSurrogate> surrogates) {
 		this.vertexCount = vertexCount;
 		this.surrogates = surrogates;
 	}
 	
-	public List<HemisphereOcclusionSurrogate> Surrogates => surrogates;
+	public List<ImporterOcclusionSurrogate> Surrogates => surrogates;
 	
 	public int[] MakeSurrogateMap() {
 		int[] map = new int[vertexCount];
 		for (int surrogateIdx = 0; surrogateIdx < surrogates.Count; ++surrogateIdx) {
-			HemisphereOcclusionSurrogate surrogate = surrogates[surrogateIdx];
+			ImporterOcclusionSurrogate surrogate = surrogates[surrogateIdx];
 			foreach (var vertexIdx in surrogate.AttachedVertices) {
 				if (map[vertexIdx] != 0) {
 					throw new Exception("surrogate map conflict");
@@ -38,7 +38,7 @@ public class OcclusionBinding {
 
 		int offset = vertexCount;
 		for (int surrogateIdx = 0; surrogateIdx < surrogates.Count; ++surrogateIdx) {
-			HemisphereOcclusionSurrogate surrogate = surrogates[surrogateIdx];
+			ImporterOcclusionSurrogate surrogate = surrogates[surrogateIdx];
 			parameters[surrogateIdx] = new OcclusionSurrogateParameters(
 				surrogate.AttachedBone.Index,
 				offset);
