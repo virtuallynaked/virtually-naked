@@ -11,7 +11,9 @@ StructuredBuffer<RasterFull> rasterCube : register(t0);
 //Mesh data
 StructuredBuffer<Quad> faces : register(t1);
 StructuredBuffer<float> transparencies : register(t2);
-StructuredBuffer<BasicRefinedVertexInfo> vertexInfos : register(t3);
+StructuredBuffer<uint> vertexMasks : register(t3);
+StructuredBuffer<uint> faceMasks : register(t4);
+StructuredBuffer<BasicRefinedVertexInfo> vertexInfos : register(t5);
 
 struct ArraySegment {
 	uint offset;
@@ -53,17 +55,21 @@ bool Quad_Contains(Quad face, uint vertexIdx) {
 	return face[0] == vertexIdx || face[1] == vertexIdx || face[2] == vertexIdx || face[3] == vertexIdx;
 }
 
-RasterFull rasterizeFace(float4x4 viewTransform, Quad face, int skipVertexIdx) {
+RasterFull rasterizeFace(float4x4 viewTransform, int faceIdx, int skipVertexIdx) {
+	Quad face = faces[faceIdx];
+
 	float3 vert0 = (float3) mul(float4(vertexInfos[face[0]].position, 1), viewTransform);
 	float3 vert1 = (float3) mul(float4(vertexInfos[face[1]].position, 1), viewTransform);
 	float3 vert2 = (float3) mul(float4(vertexInfos[face[2]].position, 1), viewTransform);
 	float3 vert3 = (float3) mul(float4(vertexInfos[face[3]].position, 1), viewTransform);
 
 	float3 faceNormal = cross(vert1 - vert0, vert2 - vert1);
-	if (Quad_Contains(face, skipVertexIdx)) {
+
+	if ((vertexMasks[skipVertexIdx] & faceMasks[faceIdx]) != 0) {
 		return (RasterFull) 0;
-	}
-	else if (vert0.z >= 0 && vert1.z >= 0 && vert2.z >= 0 && vert3.z >= 0) {
+	} else if (Quad_Contains(face, skipVertexIdx)) {
+		return (RasterFull) 0;
+	} else if (vert0.z >= 0 && vert1.z >= 0 && vert2.z >= 0 && vert3.z >= 0) {
 		//behind camera
 		return (RasterFull) 0;
 	}
@@ -106,9 +112,7 @@ void rasterizeMesh(out FloatRasterRow meshRaster, uint groupIdx, uint rowIdx, fl
 
 			if (faceIdx < faceCount) {
 				transparency = transparencies[faceIdx];
-
-				Quad face = faces[faceIdx];
-				raster = rasterizeFace(viewTransform, face, skipVertexIdx);
+				raster = rasterizeFace(viewTransform, faceIdx, skipVertexIdx);
 			}
 			else {
 				transparency = 1;

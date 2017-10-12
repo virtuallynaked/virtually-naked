@@ -30,7 +30,7 @@ public class HemisphereOcclusionSurrogate {
 
 		Quaternion rotation = bone.Parent.GetChainedTransform(outputs).RotationStage.Rotation;
 		
-		var transform = Matrix.AffineTransformation((float) radius * 1.2f, rotation, center);
+		var transform = Matrix.AffineTransformation((float) radius, rotation, center);
 
 		var transformedSurrogateMesh = OcclusionSurrogateCommon.Mesh.Transform(transform);
 

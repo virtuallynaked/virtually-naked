@@ -68,7 +68,11 @@ public class FigureOcclusionCalculator : IDisposable {
 		groupControlPositionsBufferManager = new StructuredBufferManager<Vector3>(device, geometryConcatenator.Mesh.ControlVertexCount);
 		vertexRefiner = new BasicVertexRefiner(device, shaderCache, geometryConcatenator.Mesh.Stencils);
 		refinedVertexInfosBufferManager = new InOutStructuredBufferManager<BasicRefinedVertexInfo>(device, vertexRefiner.RefinedVertexCount);
-		occlusionCalculator = new GpuOcclusionCalculator(device, shaderCache, geometryConcatenator.Mesh.Topology, geometryConcatenator.FaceTransparencies);
+		occlusionCalculator = new GpuOcclusionCalculator(device, shaderCache,
+			geometryConcatenator.Mesh.Topology,
+			geometryConcatenator.FaceTransparencies,
+			geometryConcatenator.FaceMasks,
+			geometryConcatenator.VertexMasks);
 	}
 
 	public void Dispose() {

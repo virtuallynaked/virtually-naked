@@ -28,14 +28,24 @@ public class GpuOcclusionCalculator : IDisposable {
 
 	private ShaderResourceView facesView;
 	private ShaderResourceView transparenciesView;
+	private ShaderResourceView faceMasksView;
+	private ShaderResourceView vertexMasksView;
 
 	private StageableStructuredBufferManager<OcclusionInfo> outputBufferManager;
 
 	private int vertexCount;
 	
-	public GpuOcclusionCalculator(Device device, ShaderCache shaderCache, QuadTopology topology, float[] faceTransparencies) {
+	public GpuOcclusionCalculator(Device device, ShaderCache shaderCache, QuadTopology topology, float[] faceTransparencies,
+		uint[] faceMasks, uint[] vertexMasks) {
 		if (topology.Faces.Length != faceTransparencies.Length) {
 			throw new ArgumentException("face count mismatch");
+		}
+		if (topology.Faces.Length != faceMasks.Length) {
+			throw new ArgumentException("face count mismatch");
+		}
+
+		if (topology.VertexCount != vertexMasks.Length) {
+			throw new ArgumentException("vertex count mismatch");
 		}
 
 		shader = shaderCache.GetComputeShader<GpuOcclusionCalculator>("occlusion/HemisphericalRasterizingComputeShader");
@@ -43,6 +53,9 @@ public class GpuOcclusionCalculator : IDisposable {
 		SetupHemispherePointsAndWeights(device);
 		SetupRasterTable(device, shaderCache);
 		SetupTopologyBuffers(device, topology, faceTransparencies);
+
+		faceMasksView = BufferUtilities.ToStructuredBufferView(device, faceMasks);
+		vertexMasksView = BufferUtilities.ToStructuredBufferView(device, vertexMasks);
 	}
 
 	private static Vector4[] CalculateHemispherePointsAndWeights() {
@@ -116,14 +129,22 @@ public class GpuOcclusionCalculator : IDisposable {
 		transparenciesView.Dispose();
 
 		outputBufferManager.Dispose();
+
+		vertexMasksView.Dispose();
+		faceMasksView.Dispose();
 	}
 	
 	public OcclusionInfo[] Run(DeviceContext context, ShaderResourceView vertexInfos) {
 		context.ClearState();
 		context.ComputeShader.Set(shader);
 		context.ComputeShader.SetConstantBuffer(0, hemispherePointsAndWeightsConstantBuffer);
-		context.ComputeShader.SetShaderResources(0, rasterCacheView, facesView, transparenciesView);
-		context.ComputeShader.SetShaderResource(3, vertexInfos);
+		context.ComputeShader.SetShaderResources(0,
+			rasterCacheView,
+			facesView,
+			transparenciesView,
+			vertexMasksView,
+			faceMasksView,
+			vertexInfos);
 		context.ComputeShader.SetUnorderedAccessView(0, outputBufferManager.View);
 
 		for (int baseVertexIdx = 0; baseVertexIdx < vertexCount; baseVertexIdx += BatchSize) {
