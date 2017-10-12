@@ -1,25 +1,17 @@
 ﻿using System.Linq;
 
 public class OcclusionGeometryConcatenator {
-	private SubdivisionMesh combinedMesh;
-	private float[] combinedFaceTransparencies;
+	private SubdivisionMesh combinedMesh = SubdivisionMesh.Empty;
+	private float[] combinedFaceTransparencies = new float[0];
 
 	public ArraySegment Add(SubdivisionMesh mesh, float[] faceTransparencies) {
-		if (combinedMesh == null) {
-			combinedMesh = mesh;
-			combinedFaceTransparencies = faceTransparencies;
+		int startingOffset = combinedMesh.Topology.VertexCount;
 
-			int count = mesh.Topology.VertexCount;
-			return new ArraySegment(0, count);
-		} else {
-			int startingOffset = combinedMesh.Topology.VertexCount;
+		combinedMesh = SubdivisionMesh.Combine(this.combinedMesh, mesh);
+		combinedFaceTransparencies = this.combinedFaceTransparencies.Concat(faceTransparencies).ToArray();
 
-			combinedMesh = SubdivisionMesh.Combine(this.combinedMesh, mesh);
-			combinedFaceTransparencies = this.combinedFaceTransparencies.Concat(faceTransparencies).ToArray();
-
-			int count = mesh.Topology.VertexCount;
-			return new ArraySegment(startingOffset, count);
-		}
+		int count = mesh.Topology.VertexCount;
+		return new ArraySegment(startingOffset, count);
 	}
 
 	public ArraySegment Add(HemisphereOcclusionSurrogate surrogate) {
