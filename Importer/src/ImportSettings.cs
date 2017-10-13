@@ -3,7 +3,7 @@ using System.Linq;
 
 public class ImportSettings {
 	public static ImportSettings MakeReleaseSettings() {
-		var ReleaseCharacters = new HashSet<string> { "Mei Lin", "Rune", "Eva", "Monique", "Victoria" };
+		var ReleaseCharacters = new HashSet<string> { "Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea" };
 		
 		return new ImportSettings {
 			CompressTextures = true,

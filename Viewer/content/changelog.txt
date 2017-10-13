@@ -1,6 +1,7 @@
 [0.5]
 	Major: Figure's eyes follow player
 	Major: Add Save/Load Scene menu items
+	Major: Added Kalea character
 	Minor: Breast shape is now affected by gravity
 	Fixed: Changing character causes hair to stop casting shadows on body
 	Fixed: Texture mismatch betwen legs and torso on Victoria and Monique (Thanks to Grether for reporting this)
