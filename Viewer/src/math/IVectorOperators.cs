@@ -6,6 +6,20 @@ public interface IVectorOperators<T> {
 	T Mul(float f, T t);
 }
 
+public struct FloatVectorOperators : IVectorOperators<float> {
+	public float Add(float t1, float t2) {
+		return t1 + t2;
+	}
+
+	public float Mul(float f, float t) {
+		return f * t;
+	}
+
+	public float Zero() {
+		return 0;
+	}
+}
+
 public struct Vector2Operators : IVectorOperators<Vector2> {
 	public Vector2 Add(Vector2 t1, Vector2 t2) {
 		return t1 + t2;

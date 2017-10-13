@@ -9,7 +9,7 @@ public class HeadLookAtAnimator : IProceduralAnimator {
 	private readonly Bone leftEyeBone;
 	private readonly Bone rightEyeBone;
 
-	private readonly LaggedVector3Forecaster headPositionForecaster = new LaggedVector3Forecaster(0.06f);
+	private readonly DelayedForecaster<Vector3, Vector3Operators> headPositionForecaster = new DelayedForecaster<Vector3, Vector3Operators>(0.3f, 1f, Vector3.Zero);
 	
 	public HeadLookAtAnimator(ChannelSystem channelSystem, BoneSystem boneSystem) {
 		this.channelSystem = channelSystem;
@@ -25,8 +25,8 @@ public class HeadLookAtAnimator : IProceduralAnimator {
 	}
 		
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs) {
-		headPositionForecaster.Update(updateParameters.HeadPosition);
-		var forecastHeadPosition = headPositionForecaster.ForecastValue;
+		headPositionForecaster.Update(updateParameters.Time, updateParameters.HeadPosition);
+		var forecastHeadPosition = headPositionForecaster.Forecast;
 
 		var outputs = channelSystem.Evaluate(null, inputs);
 		var neckTotalTransform = headBone.Parent.GetChainedTransform(outputs);
