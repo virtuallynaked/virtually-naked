@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Viewer": {
+      "commandName": "Project",
+      "commandLineArgs": "--data=$(SolutionDir)work"
+    }
+  }
+}

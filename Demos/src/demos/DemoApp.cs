@@ -5,7 +5,7 @@ class DemoApp {
 	public static void Main(string[] args) {
 		//new PackArchiveDemo().Run();
 		ImporterMain.Main(args);
-		VRApp.Main(args);
+		VRApp.Main(new string[] { "--data=work" });
 		//new AnalyzeDazOutputApp().Run();
 		//new AnalyzeDazColorSwatchesApp().Run();
 		//new Mixamo.AnimationImporterDemo().Run();

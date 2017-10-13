@@ -2,6 +2,5 @@
   <PropertyGroup>
     <RunWorkingDirectory>$(SolutionDir)</RunWorkingDirectory>
     <RunCommand>$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)\$(AssemblyName)$(_NativeExecutableExtension)</RunCommand>
-    <RunArguments>--data=$(SolutionDir)work</RunArguments>
   </PropertyGroup>
 </Project>
