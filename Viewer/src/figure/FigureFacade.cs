@@ -35,7 +35,6 @@ public class FigureFacade : IDisposable {
 	private readonly FigureModel model;
 	private readonly ControlVertexProvider controlVertexProvider;
 	private FigureRenderer renderer;
-	private readonly OcclusionSurrogateDebugRenderer surrogateDebugRenderer;
 	
 	public IFigureAnimator Animator { get; set; } = null;
 
@@ -44,19 +43,16 @@ public class FigureFacade : IDisposable {
 		this.model = model;
 		this.controlVertexProvider = controlVertexProvider;
 		this.renderer = renderer;
-		this.surrogateDebugRenderer = new OcclusionSurrogateDebugRenderer(device, shaderCache, 0);
 	}
 	
 	public void Dispose() {
 		controlVertexProvider.Dispose();
 		renderer.Dispose();
-		surrogateDebugRenderer.Dispose();
 	}
 
 	public FigureDefinition Definition => definition;
 	public FigureModel Model => model;
 	public int VertexCount => controlVertexProvider.VertexCount;
-	
 	
 	private void SetRenderer(FigureRenderer newRenderer) {
 		renderer.Dispose();
@@ -77,7 +73,6 @@ public class FigureFacade : IDisposable {
 
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		renderer.RenderPass(context, pass);
-		surrogateDebugRenderer.RenderPass(context, pass, controlVertexProvider.OcclusionInfos);
 	}
 	
 	public ChannelOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
