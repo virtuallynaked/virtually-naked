@@ -32,7 +32,7 @@ class Scene : IDisposable {
 		);
 		var scenePersistenceMenuLevel = ScenePersistenceMenuLevel.Make(this);
 		var appMenuLevel = new StaticMenuLevel(
-			new SubLevelMenuItem("Scenes", scenePersistenceMenuLevel),
+			new SubLevelMenuItem("Save/Load", scenePersistenceMenuLevel),
 			new SubLevelMenuItem("Render Settings", renderSettingsMenuLevel)
 		);
 
