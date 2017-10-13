@@ -1,6 +1,5 @@
 [0.5]
 	Major: Figure's eyes follow player
-		Known Bug: When not looking straight forward, the exposed edges of the eyes aren't lit correctly (too dark) (to be fixed before final release)
 	Major: Add Save/Load Scene menu items
 	Minor: Breast shape is now affected by gravity
 	Fixed: Changing character causes hair to stop casting shadows on body
