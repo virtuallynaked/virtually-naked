@@ -4,6 +4,7 @@
 	Major: Add Save/Load Scene menu items
 	Minor: Breast shape is now affected by gravity
 	Fixed: Changing character causes hair to stop casting shadows on body
+	Fixed: Texture mismatch betwen legs and torso on Victoria and Monique (Thanks to Grether for reporting this)
 
 [0.4]
 	Major: Added hair
@@ -11,7 +12,7 @@
 		Press "Space" to re-activate the independent companion window view at cost to performance.
 	Fixed: Animations juddered between key-frames
 	Fixed: Eva arms had slightly different color than rest of body
-	Fixed: Menu-related crash on startup on some systems (Thanks for Nath for reporting this) 
+	Fixed: Menu-related crash on startup on some systems (Thanks to Nath for reporting this) 
 
 [0.3]
 	Major: Added new characters Mei Lin, Monique, Rune and Victoria

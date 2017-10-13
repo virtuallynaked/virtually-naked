@@ -5,7 +5,10 @@
 	},
 	{
 		"name": "Victoria",
-		"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 All MAT.duf" ]
+		"paths": [
+			"/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 All MAT.duf",
+			"/patches/victoria-legs-scattering.duf"
+		]
 	},
 	{
 		"name": "Summer",
@@ -165,7 +168,10 @@
 	},
 	{
 		"name": "Monique",
-		"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 All Maps.duf" ]
+		"paths": [
+			"/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 All Maps.duf",
+			"/patches/monique-legs-scattering.duf"
+		]
 	},
 	{
 		"name": "Gia",
