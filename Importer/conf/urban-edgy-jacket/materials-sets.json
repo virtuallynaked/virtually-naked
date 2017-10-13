@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Urban Edgy Outfit/Urban Edgy Jacket.duf" ]
+	},
+	{
+		"name": "Black Suede",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Urban Edgy Outfit/Iray/UE Jacket Black Suede.duf" ]
+	},
+	{
+		"name": "Chocolate Suede",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Urban Edgy Outfit/Iray/UE Jacket Chocolate Suede.duf" ]
+	},
+	{
+		"name": "Leather",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Urban Edgy Outfit/Iray/UE Jacket Leather.duf" ]
+	},
+	{
+		"name": "Pink Camo",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Urban Edgy Outfit/Iray/UE Jacket Pink Camo.duf" ]
+	},
+	{
+		"name": "Green Camo",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Urban Edgy Outfit/Iray/UE Jacket Green Camo.duf" ]
+	}
+]

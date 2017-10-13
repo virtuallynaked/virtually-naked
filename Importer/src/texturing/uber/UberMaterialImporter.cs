@@ -129,9 +129,11 @@ public class UberMaterialImporter : IMaterialImporter {
 
 		//Top Coat / Bump
 		if (rawSettings.topCoatBumpMode != 0) {
-			throw new InvalidOperationException("not expecting top coat bump mode to be 'normal'");
+			Console.WriteLine("warning: skipping top coat bump map with mode 'normal'");
+			settings.topCoatBump = new FloatTexture { image= null, value = 1 };
+		} else {
+			settings.topCoatBump = textureImporter.ImportBumpTexture(rawSettings.topCoatBump);
 		}
-		settings.topCoatBump = textureImporter.ImportBumpTexture(rawSettings.topCoatBump);
 
 		//Volume
 		settings.thinWalled = rawSettings.thinWalled;

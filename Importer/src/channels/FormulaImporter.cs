@@ -79,7 +79,7 @@ class FormulaImporter {
 		string scope;
 		int colonIdx = uri.IndexOf(':');
 		if (colonIdx >= 0) {
-			scope = uri.Substring(0, colonIdx);
+			scope = Uri.UnescapeDataString(uri.Substring(0, colonIdx));
 			uri = uri.Substring(colonIdx + 1);
 		} else {
 			scope = null;
