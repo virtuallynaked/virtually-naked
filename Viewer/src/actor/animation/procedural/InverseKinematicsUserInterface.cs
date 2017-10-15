@@ -45,21 +45,23 @@ public class InverseKinematicsUserInterface {
 	};
 
 	private readonly ControllerManager controllerManager;
-	private readonly FigureDefinition definition;
+	private readonly ChannelSystem channelSystem;
+	private readonly RigidBoneSystem boneSystem;
 	private readonly InverterParameters inverterParameters;
 
 	private bool tracking = false;
 	private uint trackedDeviceIdx;
-	private Bone sourceBone;
+	private RigidBone sourceBone;
 	private Vector3 boneRelativeSourcePosition;
 
-	public InverseKinematicsUserInterface(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
+	public InverseKinematicsUserInterface(ControllerManager controllerManager, ChannelSystem channelSystem, RigidBoneSystem boneSystem, InverterParameters inverterParameters) {
 		this.controllerManager = controllerManager;
-		this.definition = definition;
+		this.channelSystem = channelSystem;
+		this.boneSystem = boneSystem;
 		this.inverterParameters = inverterParameters;
 	}
 	
-	private Bone MapPositionToBone(Vector3 position, ControlVertexInfo[] previousFrameControlVertexInfos) {
+	private RigidBone MapPositionToBone(Vector3 position, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		Vector3[] previousFrameControlVertexPositions = previousFrameControlVertexInfos.Select(vertexInfo => vertexInfo.position).ToArray();
 		int faceIdx = ClosestPoint.FindClosestFaceOnMesh(inverterParameters.ControlFaces, previousFrameControlVertexPositions, position);
 		int faceGroupIdx = inverterParameters.FaceGroupMap[faceIdx];
@@ -70,12 +72,10 @@ public class InverseKinematicsUserInterface {
 		}
 
 		string boneName = inverterParameters.FaceGroupToNodeMap[grabFaceGroupName];
-		return definition.BoneSystem.BonesByName[boneName];
+		return boneSystem.BonesByName[boneName];
 	}
 
-	public InverseKinematicsProblem GetProblem(FrameUpdateParameters updateParameters, ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
-		var outputs = definition.ChannelSystem.Evaluate(null, inputs);
-
+	public InverseKinematicsProblem GetProblem(FrameUpdateParameters updateParameters, ChannelOutputs outputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		if (!tracking) {
 			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {
 				ControllerStateTracker stateTracker = controllerManager.StateTrackers[deviceIdx];

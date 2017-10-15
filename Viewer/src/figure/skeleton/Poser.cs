@@ -2,10 +2,12 @@
 	private readonly BoneSystem boneSystem;
 	private readonly ChannelOutputs orientationOutputs;
 
-	public Poser(FigureDefinition definition) {
-		this.boneSystem = definition.BoneSystem;
+	public Poser(FigureDefinition definition) : this(definition.ChannelSystem, definition.BoneSystem) {
+	}
 
-		this.orientationOutputs = definition.ChannelSystem.DefaultOutputs; //orientation doesn't seem to change between actors so we can use default inputs
+	public Poser(ChannelSystem channelSystem, BoneSystem boneSystem) {
+		this.boneSystem = boneSystem;
+		this.orientationOutputs = channelSystem.DefaultOutputs; //orientation doesn't seem to change between actors so we can use default inputs
 	}
 
 	public void Apply(ChannelInputs inputs, Pose pose, DualQuaternion rootTransform) {

@@ -109,7 +109,7 @@ public class Bone {
 		return DualQuaternion.FromRotationTranslation(worldSpaceRotation, translation);
 	}
 		
-	private ScalingTransform GetObjectCenteredScalingTransform(ChannelOutputs outputs) {
+	public ScalingTransform GetObjectCenteredScalingTransform(ChannelOutputs outputs) {
 		ScalingTransform localSpaceTransform = GetJointCenteredScalingTransform(outputs);
 		Vector3 centerPoint  = CenterPoint.GetValue(outputs);
 		return ScalingTransform.FromTranslation(-centerPoint).Chain(localSpaceTransform).Chain(ScalingTransform.FromTranslation(+centerPoint));
