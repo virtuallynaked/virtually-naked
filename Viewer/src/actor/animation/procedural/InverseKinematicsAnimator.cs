@@ -4,7 +4,9 @@ public class InverseKinematicsAnimator {
 	private readonly ChannelSystem channelSystem;
 	private readonly RigidBoneSystem boneSystem;
 	private readonly InverseKinematicsUserInterface ui;
-	private readonly ChannelInputs inputDeltas;
+
+	private ChannelInputs inputDeltas;
+	private ChannelInputs transientDeltas;
 
 	public InverseKinematicsAnimator(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
 		channelSystem = definition.ChannelSystem;
@@ -46,14 +48,25 @@ public class InverseKinematicsAnimator {
 		ChannelInputs baseInputs = new ChannelInputs(inputs);
 
 		for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
-			inputs.RawValues[i] += inputDeltas.RawValues[i];
+			inputs.RawValues[i] = baseInputs.RawValues[i] + inputDeltas.RawValues[i];
 		}
-
+		
 		var outputs = channelSystem.Evaluate(null, inputs);
 		boneSystem.Synchronize(outputs);
 
 		InverseKinematicsProblem problem = ui.GetProblem(updateParameters, outputs, previousFrameControlVertexInfos);
+
 		if (problem == null) {
+			if (transientDeltas != null) {
+				inputDeltas = transientDeltas;
+				transientDeltas = null;
+
+				//reapply deltas
+				for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
+					inputs.RawValues[i] = baseInputs.RawValues[i] + inputDeltas.RawValues[i];
+				}
+			}
+
 			return;
 		}
 		
@@ -71,8 +84,11 @@ public class InverseKinematicsAnimator {
 			outputs = channelSystem.Evaluate(null, inputs);
 		}
 
+		if (transientDeltas == null) {
+			transientDeltas = channelSystem.MakeZeroChannelInputs();
+		}
 		for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
-			inputDeltas.RawValues[i] = inputs.RawValues[i] - baseInputs.RawValues[i];
+			transientDeltas.RawValues[i] = inputs.RawValues[i] - baseInputs.RawValues[i];
 		}
 	}
 }
