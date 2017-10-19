@@ -25,7 +25,7 @@ public class InverseKinematicsAnimator {
 		return boneTransforms[bone.Index].Transform(bone.CenterPoint);
 	}
 	
-	private void ApplyCorrection(RigidBoneSystemInputs inputs, StagedSkinningTransform[] boneTransforms, RigidBone bone, Vector3 sourcePosition, Vector3 targetPosition, float weight) {
+	private void ApplyCorrection(RigidBoneSystemInputs inputs, StagedSkinningTransform[] boneTransforms, RigidBone bone, ref Vector3 sourcePosition, Vector3 targetPosition, float weight) {
 		var centerPosition = GetCenterPosition(boneTransforms, bone);
 
 		var rotationCorrection = QuaternionExtensions.RotateBetween(
@@ -42,6 +42,11 @@ public class InverseKinematicsAnimator {
 			weight);
 		
 		bone.SetRotation(inputs, lerpedRotation, true);
+
+		var newBoneTransform = bone.GetChainedTransform(inputs, bone.Parent != null ? boneTransforms[bone.Parent.Index] : StagedSkinningTransform.Identity);
+		var newSourcePosition = newBoneTransform.Transform(boneTransform.InverseTransform(sourcePosition));
+
+		sourcePosition = newSourcePosition;
 	}
 	
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs channelInputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
@@ -69,8 +74,7 @@ public class InverseKinematicsAnimator {
 
 				float weight = 0.5f;
 				for (var bone = problem.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
-					ApplyCorrection(resultInputs, boneTransforms, bone, sourcePosition, problem.TargetPosition, weight);
-					weight *= 0.5f;
+					ApplyCorrection(resultInputs, boneTransforms, bone, ref sourcePosition, problem.TargetPosition, weight);
 				}
 			}
 
