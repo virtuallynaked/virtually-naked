@@ -82,8 +82,8 @@ public class ActorBehavior {
 				rootTranslation);
 			behaviour.dragHandle.Transform = rootTransform.ToMatrix();
 
-			var inputs = behaviour.ikAnimator.InputDeltas;
-			inputs.ClearToZero();
+			var poseDeltas = behaviour.ikAnimator.PoseDeltas;
+			poseDeltas.ClearToZero();
 			foreach (var bone in behaviour.model.MainDefinition.BoneSystem.Bones) {
 				Vector3 angles;
 				if (boneRotations.TryGetValue(bone.Name, out var values)) {
@@ -91,7 +91,7 @@ public class ActorBehavior {
 				} else {
 					angles = Vector3.Zero;
 				}
-				bone.Rotation.SetValue(inputs, angles);
+				poseDeltas.BoneInputs[bone.Index].Rotation = angles;
 			}
 		}
 	}
@@ -102,9 +102,9 @@ public class ActorBehavior {
 		Vector3 rootTranslation = rootTransform.Translation;
 		
 		Dictionary<string, float[]> boneRotations = new Dictionary<string, float[]>();
-		var inputs = ikAnimator.InputDeltas;
+		var poseDeltas = ikAnimator.PoseDeltas;
 		foreach (var bone in model.MainDefinition.BoneSystem.Bones) {
-			var angles = bone.Rotation.GetInputValue(inputs);
+			var angles = poseDeltas.BoneInputs[bone.Index].Rotation;
 			if (!angles.IsZero) {
 				boneRotations.Add(bone.Name, angles.ToArray());
 			}

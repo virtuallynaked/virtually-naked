@@ -7,7 +7,7 @@ public class RigidBoneSystemPerformanceDemo {
 	private ChannelSystem channelSystem;
 	private BoneSystem boneSystem;
 	private RigidBoneSystem rigidBoneSystem;
-	private ChannelInputs inputs;
+	private ChannelInputs channelInputs;
 
 	public RigidBoneSystemPerformanceDemo() {
 		var figureDir = UnpackedArchiveDirectory.Make(new System.IO.DirectoryInfo("work/figures/genesis-3-female"));
@@ -19,15 +19,17 @@ public class RigidBoneSystemPerformanceDemo {
 		boneSystem = boneSystemRecipe.Bake(channelSystem.ChannelsByName);
 
 		var pose = Persistance.Load<List<Pose>>(figureDir.File("animations/idle.dat"))[0];
-		inputs = channelSystem.MakeDefaultChannelInputs();
-		new Poser(channelSystem, boneSystem).Apply(inputs, pose, DualQuaternion.Identity);
+		channelInputs = channelSystem.MakeDefaultChannelInputs();
+		new Poser(channelSystem, boneSystem).Apply(channelInputs, pose, DualQuaternion.Identity);
 
 		rigidBoneSystem = new RigidBoneSystem(boneSystem);
 	}
 
-	private void CheckConsistency(ChannelOutputs outputs) {
-		var boneTransformsA = boneSystem.GetBoneTransforms(outputs);
-		var boneTransformsB = rigidBoneSystem.GetBoneTransforms(outputs);
+	private void CheckConsistency(ChannelOutputs channelOutputs) {
+		var inputs = rigidBoneSystem.ReadInputs(channelOutputs);
+
+		var boneTransformsA = boneSystem.GetBoneTransforms(channelOutputs);
+		var boneTransformsB = rigidBoneSystem.GetBoneTransforms(inputs);
 
 		for (int i = 0; i < boneSystem.Bones.Count; ++i) {
 			var boneTransformA = boneTransformsA[i];
@@ -46,16 +48,17 @@ public class RigidBoneSystemPerformanceDemo {
 	}
 
 	public void Run() {
-		var outputs = channelSystem.Evaluate(null, inputs);
-		rigidBoneSystem.Synchronize(outputs);
+		var channelOutputs = channelSystem.Evaluate(null, channelInputs);
+		rigidBoneSystem.Synchronize(channelOutputs);
+		var inputs = rigidBoneSystem.ReadInputs(channelOutputs); 
 
-		CheckConsistency(outputs);
+		CheckConsistency(channelOutputs);
 
 		var stopwatch = Stopwatch.StartNew();
 		int trialCount = 0;
 
 		while (true) {
-			rigidBoneSystem.GetBoneTransforms(outputs);
+			rigidBoneSystem.GetBoneTransforms(inputs);
 
 			trialCount += 1;
 			if (trialCount == 1000) {

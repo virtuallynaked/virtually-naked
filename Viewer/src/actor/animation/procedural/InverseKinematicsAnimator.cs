@@ -5,27 +5,27 @@ public class InverseKinematicsAnimator {
 	private readonly RigidBoneSystem boneSystem;
 	private readonly InverseKinematicsUserInterface ui;
 
-	private ChannelInputs inputDeltas;
-	private ChannelInputs transientDeltas;
+	private RigidBoneSystemInputs poseDeltas;
+	private RigidBoneSystemInputs lastIkDeltas;
 
 	public InverseKinematicsAnimator(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
 		channelSystem = definition.ChannelSystem;
 		boneSystem = new RigidBoneSystem(definition.BoneSystem);
 		ui = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
-		inputDeltas = definition.ChannelSystem.MakeZeroChannelInputs();
+		poseDeltas = boneSystem.MakeZeroInputs();
 	}
 	
-	public ChannelInputs InputDeltas => inputDeltas;
+	public RigidBoneSystemInputs PoseDeltas => poseDeltas;
 
 	public void Reset() {
-		inputDeltas.ClearToZero();
+		poseDeltas.ClearToZero();
 	}
 
 	private Vector3 GetCenterPosition(StagedSkinningTransform[] boneTransforms, RigidBone bone) {
 		return boneTransforms[bone.Index].Transform(bone.CenterPoint);
 	}
 	
-	private void ApplyCorrection(ChannelInputs inputs, ChannelOutputs outputs, StagedSkinningTransform[] boneTransforms, RigidBone bone, Vector3 sourcePosition, Vector3 targetPosition, float weight) {
+	private void ApplyCorrection(RigidBoneSystemInputs inputs, StagedSkinningTransform[] boneTransforms, RigidBone bone, Vector3 sourcePosition, Vector3 targetPosition, float weight) {
 		var centerPosition = GetCenterPosition(boneTransforms, bone);
 
 		var rotationCorrection = QuaternionExtensions.RotateBetween(
@@ -33,7 +33,7 @@ public class InverseKinematicsAnimator {
 			targetPosition - centerPosition);
 
 		var boneTransform = boneTransforms[bone.Index];
-		var baseLocalRotation = bone.GetRotation(outputs);
+		var baseLocalRotation = bone.GetRotation(inputs);
 		var localRotationCorrection = Quaternion.Invert(boneTransform.RotationStage.Rotation) * rotationCorrection * boneTransform.RotationStage.Rotation;
 
 		var lerpedRotation = Quaternion.Lerp(
@@ -41,54 +41,42 @@ public class InverseKinematicsAnimator {
 			baseLocalRotation * localRotationCorrection,
 			weight);
 		
-		bone.SetEffectiveRotation(inputs, outputs, lerpedRotation, SetMask.ApplyClampAndVisibleOnly);
+		bone.SetRotation(inputs, lerpedRotation, true);
 	}
 	
-	public void Update(FrameUpdateParameters updateParameters, ChannelInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
-		ChannelInputs baseInputs = new ChannelInputs(inputs);
+	public void Update(FrameUpdateParameters updateParameters, ChannelInputs channelInputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+		var channelOutputs = channelSystem.Evaluate(null, channelInputs);
 
-		for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
-			inputs.RawValues[i] = baseInputs.RawValues[i] + inputDeltas.RawValues[i];
-		}
+		boneSystem.Synchronize(channelOutputs);
+		var baseInputs = boneSystem.ReadInputs(channelOutputs);
+		var resultInputs = boneSystem.SumAndClampInputs(baseInputs, poseDeltas);
 		
-		var outputs = channelSystem.Evaluate(null, inputs);
-		boneSystem.Synchronize(outputs);
-
-		InverseKinematicsProblem problem = ui.GetProblem(updateParameters, outputs, previousFrameControlVertexInfos);
+		InverseKinematicsProblem problem = ui.GetProblem(updateParameters, resultInputs, previousFrameControlVertexInfos);
 
 		if (problem == null) {
-			if (transientDeltas != null) {
-				inputDeltas = transientDeltas;
-				transientDeltas = null;
+			if (lastIkDeltas != null) {
+				poseDeltas = lastIkDeltas;
+				lastIkDeltas = null;
 
 				//reapply deltas
-				for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
-					inputs.RawValues[i] = baseInputs.RawValues[i] + inputDeltas.RawValues[i];
+				resultInputs = boneSystem.SumAndClampInputs(baseInputs, poseDeltas);
+			}
+		} else {
+			for (int i = 0; i < 1; ++i) {
+				var boneTransforms = boneSystem.GetBoneTransforms(resultInputs);
+			
+				var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.BoneRelativeSourcePosition);
+
+				float weight = 0.5f;
+				for (var bone = problem.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
+					ApplyCorrection(resultInputs, boneTransforms, bone, sourcePosition, problem.TargetPosition, weight);
+					weight *= 0.5f;
 				}
 			}
 
-			return;
+			lastIkDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
 		}
 		
-		for (int i = 0; i < 1; ++i) {
-			var boneTransforms = boneSystem.GetBoneTransforms(outputs);
-			
-			var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.BoneRelativeSourcePosition);
-
-			float weight = 0.5f;
-			for (var bone = problem.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
-				ApplyCorrection(inputs, outputs, boneTransforms, bone, sourcePosition, problem.TargetPosition, weight);
-				weight *= 0.5f;
-			}
-
-			outputs = channelSystem.Evaluate(null, inputs);
-		}
-
-		if (transientDeltas == null) {
-			transientDeltas = channelSystem.MakeZeroChannelInputs();
-		}
-		for (int i = 0; i < inputDeltas.RawValues.Length; ++i) {
-			transientDeltas.RawValues[i] = inputs.RawValues[i] - baseInputs.RawValues[i];
-		}
+		boneSystem.WriteInputs(channelInputs, channelOutputs, resultInputs);
 	}
 }
