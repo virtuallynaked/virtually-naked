@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using SharpDX;
 using System.IO;
 
-class AnalyzeDazColorSwatchesApp {
+class AnalyzeDazColorSwatchesApp : IDemoApp {
 	private void FillRectangle(Bitmap bitmap, int left, int top, int width, int height, System.Drawing.Color color) { 
 		for (int y = top; y < top + height; ++y) {
 			for (int x = left; x < left + width; ++x) {

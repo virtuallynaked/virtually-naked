@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public class RigidBoneSystemPerformanceDemo {
+public class RigidBoneSystemPerformanceDemo : IDemoApp {
 	private ChannelSystem channelSystem;
 	private BoneSystem boneSystem;
 	private RigidBoneSystem rigidBoneSystem;

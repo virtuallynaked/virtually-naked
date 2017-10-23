@@ -1,7 +1,7 @@
 ﻿using SharpDX;
 using System;
 
-public class ColorConversionDemo {
+public class ColorConversionDemo : IDemoApp {
 	public void Run() {
 		foreach (double temperature in new[] {2500, 5500, 6500, 10000}) {
 			Vector2 xy = ColorConversion.FromTemperatureToCIExy(temperature);

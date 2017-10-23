@@ -3,7 +3,7 @@ using SharpDX.Direct3D11;
 using System;
 using System.Linq;
 
-public class FaceTransparencyDemo {
+public class FaceTransparencyDemo : IDemoApp {
 	private readonly ContentFileLocator fileLocator;
 	private readonly DsonObjectLocator objectLocator;
 	private readonly Device device;

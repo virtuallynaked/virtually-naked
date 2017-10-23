@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-public class WpfRenderingDemo {
+public class WpfRenderingDemo : IDemoApp {
 	public void Run() {
 		RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
 

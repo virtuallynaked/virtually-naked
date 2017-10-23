@@ -1,0 +1,68 @@
+{
+	"profiles": {
+		"PackArchiveDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "PackArchiveDemo"
+		},
+		"RunImporterThenViewerApp": {
+			"commandName": "Project",
+			"commandLineArgs": "RunImporterThenViewerApp"
+		},
+		"RunViewerApp": {
+			"commandName": "Project",
+			"commandLineArgs": "RunViewerApp"
+		},
+		"AnalyzeDazOutputApp": {
+			"commandName": "Project",
+			"commandLineArgs": "AnalyzeDazOutputApp"
+		},
+		"AnalyzeDazColorSwatchesApp": {
+			"commandName": "Project",
+			"commandLineArgs": "AnalyzeDazColorSwatchesApp"
+		},
+		"Mixamo.AnimationImporterDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "Mixamo.AnimationImporterDemo"
+		},
+		"OpenSubdivFacadeDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "OpenSubdivFacadeDemo"
+		},
+		"SampleCubeMapApp": {
+			"commandName": "Project",
+			"commandLineArgs": "SampleCubeMapApp"
+		},
+		"SpeechDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "SpeechDemo"
+		},
+		"WpfRenderingDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "WpfRenderingDemo"
+		},
+		"ColorConversionDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "ColorConversionDemo"
+		},
+		"BumpToNormalDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "BumpToNormalDemo"
+		},
+		"FaceTransparencyDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "FaceTransparencyDemo"
+		},
+		"FramePreparerDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "FramePreparerDemo"
+		},
+		"BoneSystemPerformanceDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "BoneSystemPerformanceDemo"
+		},
+		"RigidBoneSystemPerformanceDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "RigidBoneSystemPerformanceDemo"
+		}
+	}
+}

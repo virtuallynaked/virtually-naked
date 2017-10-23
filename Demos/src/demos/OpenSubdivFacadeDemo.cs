@@ -1,7 +1,7 @@
 ﻿using OpenSubdivFacade;
 using System;
 
-public class OpenSubdivFacadeDemo {
+public class OpenSubdivFacadeDemo :IDemoApp {
 	public void Run() {
 		int controlVertexCount = 6;
 		Quad[] controlFaces = new [] {

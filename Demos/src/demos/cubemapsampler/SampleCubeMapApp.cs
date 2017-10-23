@@ -4,7 +4,7 @@ using System;
 using System.Reflection;
 using Device = SharpDX.Direct3D11.Device;
 
-public class SampleCubeMapApp {
+public class SampleCubeMapApp : IDemoApp {
 	public void Run() {
 		Device device = new Device(SharpDX.Direct3D.DriverType.Hardware, DeviceCreationFlags.Debug);
 		ShaderCache shaderCache = new ShaderCache(device);

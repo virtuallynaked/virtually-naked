@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using SharpDX;
 
-class AnalyzeDazOutputApp {
+class AnalyzeDazOutputApp : IDemoApp {
 	public void Run() {
 		string filename = @"C:\Users\Ted\Documents\DAZ 3D\Studio\Render Library\out.png";
 		Bitmap image = (Bitmap) System.Drawing.Image.FromFile(filename, false);

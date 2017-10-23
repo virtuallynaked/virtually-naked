@@ -1,8 +1,7 @@
 ﻿using SharpDX;
-using SharpDX.WIC;
 using System.IO;
 
-public class BumpToNormalDemo {
+public class BumpToNormalDemo : IDemoApp {
 	private int ToIndex(Size2 size, int x, int y) {
 		return y * size.Width + x;
 	}

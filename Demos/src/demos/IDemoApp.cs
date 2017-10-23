@@ -1,0 +1,3 @@
+﻿interface IDemoApp {
+	void Run();
+}

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public class BoneSystemPerformanceDemo {
+public class BoneSystemPerformanceDemo : IDemoApp {
 	private ChannelSystem channelSystem;
 	private BoneSystem boneSystem;
 	private ChannelInputs inputs;

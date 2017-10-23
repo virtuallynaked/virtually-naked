@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using Valve.VR;
 
-public class FramePreparerDemo {
+public class FramePreparerDemo : IDemoApp {
 	private void Run(FramePreparer framePreparer) {
 		float time = 0;
 		float deltaTime = 1 / 90f;
