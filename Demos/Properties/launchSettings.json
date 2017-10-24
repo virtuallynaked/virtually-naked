@@ -63,6 +63,10 @@
 		"RigidBoneSystemPerformanceDemo": {
 			"commandName": "Project",
 			"commandLineArgs": "RigidBoneSystemPerformanceDemo"
+		},
+		"FlatIk.FlatIkApp": {
+			"commandName": "Project",
+			"commandLineArgs": "FlatIk.FlatIkApp"
 		}
 	}
 }

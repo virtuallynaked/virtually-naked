@@ -17,11 +17,16 @@ class DemoAppLauncher {
 		}
 
 		var obj = Activator.CreateInstance(type);
-
-		if (obj is IDemoApp app) {
-			app.Run();
-		} else {
-			Console.Error.WriteLine("demo app type {0} doesn't implement a recognized interface", typeName);
+		try {
+			if (obj is IDemoApp app) {
+				app.Run();
+			} else {
+				Console.Error.WriteLine("demo app type {0} doesn't implement a recognized interface", typeName);
+			}
+		} finally {
+			if (obj is IDisposable disposable) {
+				disposable.Dispose();
+			}
 		}
 	}
 }
