@@ -1,18 +1,36 @@
 ﻿using SharpDX;
 using SharpDX.Direct2D1;
 using System;
+using System.Collections.Generic;
 
 namespace FlatIk {
 	public class FlatIkApp : IDemoApp, IDisposable {
 		private readonly WindowedDirect2dRenderEnvironment renderEnvironment;
 		private readonly DeviceContext context;
+		private readonly Brush whiteBrush;
+
+		private readonly List<Bone> bones;
+		
+		private static List<Bone> MakeStandardBones() {
+			var bone0 = Bone.MakeWithOffset(null, Vector2.UnitX, +MathUtil.PiOverFour);
+			var bone1 = Bone.MakeWithOffset(bone0, Vector2.UnitX, +MathUtil.PiOverTwo);
+			var bone2 = Bone.MakeWithOffset(bone1, Vector2.UnitX, -MathUtil.PiOverTwo);
+			var bone3 = Bone.MakeWithOffset(bone2, Vector2.UnitX, -MathUtil.PiOverTwo);
+			var bone4 = Bone.MakeWithOffset(bone3, Vector2.UnitX, +MathUtil.PiOverTwo);
+
+			return new List<Bone> { bone0, bone1, bone2, bone3, bone4 };
+		}
 
 		public FlatIkApp() {
 			renderEnvironment = new WindowedDirect2dRenderEnvironment("FlatIkApp", false);
 			context = renderEnvironment.D2dContext;
+			whiteBrush = new SolidColorBrush(context, Color.White);
+
+			bones = MakeStandardBones();
 		}
 
 		public void Dispose() {
+			whiteBrush.Dispose();
 			renderEnvironment.Dispose();
 		}
 
@@ -20,11 +38,25 @@ namespace FlatIk {
 			renderEnvironment.Run(Render);
 		}
 
+		private Matrix3x2 GetWorldToFormTransform() {
+			float worldExtent = 10;
+			var size = renderEnvironment.Size;
+			float scaling = Math.Min(size.Width, size.Height) / worldExtent;
+			return new Matrix3x2(1, 0, 0, -1, 0, 0) * Matrix3x2.Scaling(scaling) * Matrix3x2.Translation(size.Width / 2, size.Height / 2);
+		}
+
 		private void Render() {
 			context.Clear(null);
-			
-			using (var brush = new SolidColorBrush(context, Color.White)) {
-				context.DrawEllipse(new Ellipse(new Vector2(50, 50), 10, 10), brush, 5);
+
+			Matrix3x2 worldToFormTransform = GetWorldToFormTransform();
+
+			foreach (var bone in bones) {
+				var transform = bone.GetChainedTransform() * worldToFormTransform;
+				var formCenter = Matrix3x2.TransformPoint(transform, bone.Center);
+				var formEnd = Matrix3x2.TransformPoint(transform, bone.End);
+
+				context.DrawEllipse(new Ellipse(formCenter, 5, 5), whiteBrush, 2);
+				context.DrawLine(formCenter, formEnd, whiteBrush, 2);
 			}
 		}
 	}

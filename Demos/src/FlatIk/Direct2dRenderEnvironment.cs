@@ -1,4 +1,5 @@
-﻿using SharpDX.Direct2D1;
+﻿using SharpDX;
+using SharpDX.Direct2D1;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -47,6 +48,8 @@ namespace FlatIk {
 		}
 
 		public SharpDX.Direct2D1.DeviceContext D2dContext => d2dContext;
+
+		public Size2F Size => bitmap.Size;
 
 		public void Dispose() {
 			d2dContext.Target = null;
