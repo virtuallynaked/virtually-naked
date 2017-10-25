@@ -8,8 +8,10 @@ namespace FlatIk {
 		private readonly WindowedDirect2dRenderEnvironment renderEnvironment;
 		private readonly DeviceContext context;
 		private readonly Brush whiteBrush;
+		private readonly Brush redBrush;
 
 		private readonly List<Bone> bones;
+		private Vector2 target = new Vector2(2, 1);
 		
 		private static List<Bone> MakeStandardBones() {
 			var bone0 = Bone.MakeWithOffset(null, Vector2.UnitX, +MathUtil.PiOverFour);
@@ -25,6 +27,7 @@ namespace FlatIk {
 			renderEnvironment = new WindowedDirect2dRenderEnvironment("FlatIkApp", false);
 			context = renderEnvironment.D2dContext;
 			whiteBrush = new SolidColorBrush(context, Color.White);
+			redBrush = new SolidColorBrush(context, Color.Red);
 
 			bones = MakeStandardBones();
 		}
@@ -35,6 +38,14 @@ namespace FlatIk {
 		}
 
 		public void Run() {
+			renderEnvironment.Form.MouseClick += (sender, e) => {
+				Vector2 formPosition = new Vector2(e.X, e.Y);
+				var transform = GetWorldToFormTransform();
+				transform.Invert();
+				Vector2 worldPosition = Matrix3x2.TransformPoint(transform, formPosition);
+				target = worldPosition;
+			};
+			
 			renderEnvironment.Run(Render);
 		}
 
@@ -58,6 +69,18 @@ namespace FlatIk {
 				context.DrawEllipse(new Ellipse(formCenter, 5, 5), whiteBrush, 2);
 				context.DrawLine(formCenter, formEnd, whiteBrush, 2);
 			}
+
+			var formTarget = Matrix3x2.TransformPoint(worldToFormTransform, target);
+
+			float crossSize = 5;
+			context.DrawLine(
+				formTarget + crossSize * new Vector2(-1, -1),
+				formTarget + crossSize * new Vector2(+1, +1),
+				redBrush, 2);
+			context.DrawLine(
+				formTarget + crossSize * new Vector2(-1, +1),
+				formTarget + crossSize * new Vector2(+1, -1),
+				redBrush, 2);
 		}
 	}
 }

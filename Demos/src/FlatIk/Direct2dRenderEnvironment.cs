@@ -48,6 +48,7 @@ namespace FlatIk {
 		}
 
 		public SharpDX.Direct2D1.DeviceContext D2dContext => d2dContext;
+		public RenderForm Form => form;
 
 		public Size2F Size => bitmap.Size;
 
