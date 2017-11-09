@@ -8,6 +8,9 @@
   <Import Project="..\CommonAssemblyAttributes.targets" />
   <Import Project="..\RunSettings.targets" />
   <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Viewer\Viewer.csproj" />
     <ProjectReference Include="..\Importer\Importer.csproj" />
   </ItemGroup>
