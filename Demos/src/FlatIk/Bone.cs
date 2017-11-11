@@ -30,5 +30,28 @@ namespace FlatIk {
 			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform() : Matrix3x2.Identity;
 			return GetLocalTransform() * parentTransform;
 		}
+
+		/**
+		 *  Given a point that has already had bone total-transform applied to it, retransform it as the rotation of this bone was adjusted by a delta.
+		 */
+		public Vector2 RetransformPoint(float rotationDelta, Vector2 point) {
+			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform() : Matrix3x2.Identity;
+			Vector2 transformedCenter = Matrix3x2.TransformPoint(parentTransform, Center);
+
+			var retransform = Matrix3x2.Rotation(rotationDelta, transformedCenter);
+			return Matrix3x2.TransformPoint(retransform, point);
+		}
+
+		/**
+		 * Returns the gradient of a transformed point with respect to the rotation parameter.
+		 */
+		public Vector2 GetGradientOfTransformedPointWithRespectToRotation(Vector2 point) {
+			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform() : Matrix3x2.Identity;
+			Vector2 transformedCenter = Matrix3x2.TransformPoint(parentTransform, Center);
+
+			Vector2 centeredPoint = point - transformedCenter;
+			return new Vector2(-centeredPoint.Y, centeredPoint.X);
+
+		}
 	}
 }
