@@ -56,5 +56,29 @@ namespace FlatIk {
 			Assert.AreEqual(finiteDifferenceApproximationToGradient.X, gradient.X, 1e-3);
 			Assert.AreEqual(finiteDifferenceApproximationToGradient.Y, gradient.Y, 1e-3);
 		}
+
+		[TestMethod]
+		public void TestSetRotation() {
+			bone0.Rotation = +0.01f;
+			Assert.AreEqual(+0.01f, bone0.Rotation, 1e-6);
+
+			bone0.Rotation = -0.01f;
+			Assert.AreEqual(-0.01f, bone0.Rotation, 1e-6);
+
+			bone0.Rotation = MathUtil.TwoPi;
+			Assert.AreEqual(0, bone0.Rotation, 1e-6);
+
+			bone0.Rotation = MathUtil.Pi - 0.01f;
+			Assert.AreEqual(MathUtil.Pi - 0.01f, bone0.Rotation, 1e-6);
+			
+			bone0.Rotation = MathUtil.Pi + 0.01f;
+			Assert.AreEqual(-MathUtil.Pi + 0.01f, bone0.Rotation, 1e-6);
+
+			bone0.Rotation = -MathUtil.Pi + 0.01f;
+			Assert.AreEqual(-MathUtil.Pi + 0.01f, bone0.Rotation, 1e-6);
+			
+			bone0.Rotation = -MathUtil.Pi - 0.01f;
+			Assert.AreEqual(MathUtil.Pi - 0.01f, bone0.Rotation, 1e-6);
+		}
     }
 }

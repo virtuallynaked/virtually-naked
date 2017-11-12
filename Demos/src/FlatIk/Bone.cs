@@ -7,7 +7,16 @@ namespace FlatIk {
 		public Bone Parent { get; }
 		public Vector2 Center { get; }
 		public Vector2 End { get; }
-		public float Rotation { get; set; }
+
+		private float rotation;
+		public float Rotation {
+			get {
+				return rotation;
+			}
+			set {
+				rotation = (float) Math.IEEERemainder(value, Math.PI * 2);
+			}
+		}
 
 		public Bone(Bone parent, Vector2 center, Vector2 end, float rotation) {
 			Parent = parent;
