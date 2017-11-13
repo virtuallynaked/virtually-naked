@@ -31,7 +31,7 @@ namespace FlatIk {
 			redBrush = new SolidColorBrush(context, Color.Red);
 
 			bones = MakeStandardBones();
-			solver = new GaussNewtonIkSolver(bones);
+			solver = new FabrIkSolver(bones);
 		}
 
 		public void Dispose() {
