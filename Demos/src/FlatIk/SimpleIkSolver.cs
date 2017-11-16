@@ -1,14 +1,7 @@
-﻿using System.Collections.Generic;
-using SharpDX;
+﻿using SharpDX;
 
 namespace FlatIk {
 	public class SimpleIkSolver : IIkSolver {
-		private readonly List<Bone> bones;
-
-		public SimpleIkSolver(List<Bone> bones) {
-			this.bones = bones;
-		}
-		
 		private void AdjustBone(Bone bone, Vector2 source, Vector2 target, float weight) {
 			var transform = bone.GetChainedTransform();
 			var center = Matrix3x2.TransformPoint(transform, bone.Center);
@@ -18,8 +11,8 @@ namespace FlatIk {
 			bone.Rotation += rotationDelta * weight;
 		}
 
-		public void DoIteration(Vector2 source, Vector2 target) {
-			var sourceBone = bones[bones.Count - 1];
+		public void DoIteration(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			Vector2 source = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(), sourceBone.End);
 
 			float decay = 0.9f;
 			float weight = 1 - decay;

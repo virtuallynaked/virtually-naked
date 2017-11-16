@@ -2,6 +2,6 @@
 
 namespace FlatIk {
 	public interface IIkSolver {
-		void DoIteration(Vector2 source, Vector2 target);
+		void DoIteration(Bone sourceBone, Vector2 unposedSource, Vector2 target);
 	}
 }

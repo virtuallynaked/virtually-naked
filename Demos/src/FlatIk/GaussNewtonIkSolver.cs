@@ -1,20 +1,24 @@
 ﻿using System.Collections.Generic;
 using SharpDX;
 using MathNet.Numerics.LinearAlgebra;
+using System.Linq;
 
 namespace FlatIk {
 	public class GaussNewtonIkSolver : IIkSolver {
-		private readonly List<Bone> bones;
-
-		public GaussNewtonIkSolver(List<Bone> bones) {
-			this.bones = bones;
+		private static IEnumerable<Bone> GetBoneChain(Bone sourceBone) {
+			for (var bone = sourceBone; bone != null; bone = bone.Parent) {
+				yield return bone;
+			}
 		}
-		
-		public void DoIteration(Vector2 source, Vector2 target) {
+
+		public void DoIteration(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			Vector2 source = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(), sourceBone.End);
 			Vector<float> residuals = Vector<float>.Build.Dense(2);
 			residuals[0] = target.X - source.X;
 			residuals[1] = target.Y - source.Y;
 
+			List<Bone> bones = GetBoneChain(sourceBone).ToList();
+			
 			Matrix<float> jacobian = Matrix<float>.Build.Dense(2, bones.Count);
 			
 			for (int boneIdx = 0; boneIdx < bones.Count; ++boneIdx) {

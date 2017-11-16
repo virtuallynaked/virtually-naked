@@ -31,7 +31,7 @@ namespace FlatIk {
 			redBrush = new SolidColorBrush(context, Color.Red);
 
 			bones = MakeStandardBones();
-			solver = new FabrIkSolver(bones);
+			solver = new FabrIkSolver();
 		}
 
 		public void Dispose() {
@@ -59,9 +59,9 @@ namespace FlatIk {
 
 		private void DoIkIteration() {
 			var sourceBone = bones[bones.Count - 1];
-			var source = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(), sourceBone.End);
+			var unposedSource = sourceBone.End;
 
-			solver.DoIteration(source, target);
+			solver.DoIteration(sourceBone, unposedSource, target);
 		}
 
 		private Matrix3x2 GetWorldToFormTransform() {

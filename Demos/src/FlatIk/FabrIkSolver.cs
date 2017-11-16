@@ -1,80 +1,111 @@
-﻿using System.Collections.Generic;
-using SharpDX;
+﻿using SharpDX;
+using System.Collections.Generic;
 
 namespace FlatIk {
-	public class FabrIkSolver : IIkSolver {
-		private readonly List<Bone> bones;
+	public class FabrIkChain {
+		
+		public static FabrIkChain Make(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			Vector2 posedSource = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(), sourceBone.End);
 
-		public FabrIkSolver(List<Bone> bones) {
-			this.bones = bones;
+			List<Bone> bones = new List<Bone> { };
+			List<Vector2> unposedPositions = new List<Vector2> { };
+			List<Vector2> positions = new List<Vector2> { };
+
+			unposedPositions.Add(unposedSource);
+			positions.Add(posedSource);
+
+			for (var bone = sourceBone; bone != null; bone = bone.Parent) {
+				bones.Add(bone);
+				
+				var unposedCenter = bone.Center;
+				unposedPositions.Add(unposedCenter);
+
+				var posedCenter = Matrix3x2.TransformPoint(bone.GetChainedTransform(), unposedCenter);
+				positions.Add(posedCenter);
+			}
+
+			var startTarget = target;
+			var endTarget = positions[bones.Count];
+			return new FabrIkChain(bones, unposedPositions, positions, target, endTarget);
 		}
 		
-		private Vector2[] ExtractJointPositionsFromBones(Vector2 source) {
-			Vector2[] jointPositions = new Vector2[bones.Count + 1];
-			for (int i = 0; i < bones.Count; ++i) {
-				var bone = bones[i];
-				var transform = bone.GetChainedTransform();
-				var center = Matrix3x2.TransformPoint(transform, bone.Center);
-				jointPositions[i] = center;
-			}
-			jointPositions[bones.Count] = source;
-			return jointPositions;
+		private readonly List<Bone> bones;
+		private readonly List<Vector2> unposedPositions;
+		private readonly List<Vector2> positions;
+		private readonly Vector2 startTarget; //target for end-effector
+		private readonly Vector2 endTarget; //target for root
+
+		private FabrIkChain(List<Bone> bones, List<Vector2> unposedPositions, List<Vector2> positions, Vector2 startTarget, Vector2 endTarget) {
+			this.bones = bones;
+			this.unposedPositions = unposedPositions;
+			this.positions = positions;
+			this.startTarget = startTarget;
+			this.endTarget = endTarget;
 		}
 
-		private void ApplyJointPositionsToBones(Vector2[] jointPositions) {
-			float parentRotation = 0;
+		//From end-effector to root
+		public void DoForwardPass() {
+			Vector2 target = startTarget;
 
 			for (int i = 0; i < bones.Count; ++i) {
+				Vector2 end = positions[i];
+				Vector2 center = positions[i + 1];
+				float length = Vector2.Distance(center, end);
+
+				Vector2 newEnd = target;
+				Vector2 newCenter = newEnd + length * Vector2.Normalize(center - newEnd);
+
+				positions[i] = newEnd;
+				target = newCenter;
+			}
+
+			positions[bones.Count] = target;
+		}
+		
+		// From root to end-effector
+		public void DoBackwardPass() {
+			Vector2 target = endTarget;
+
+			for (int i = bones.Count - 1; i >= 0; --i) {
+				Vector2 end = positions[i];
+				Vector2 center = positions[i + 1];
+				float length = Vector2.Distance(center, end);
+				
+				Vector2 newCenter = target;
+				Vector2 newEnd = newCenter + length * Vector2.Normalize(end - newCenter);
+				
+				positions[i + 1] = newCenter;
+				target = newEnd;
+			}
+
+			positions[0] = target;
+		}
+
+		public void ApplyToBones() {
+			float parentRotation = 0;
+
+			for (int i = bones.Count - 1; i >= 0; --i) {
 				var bone = bones[i];
 				
 				float worldRotation = Vector2Utils.AngleBetween(
-					bone.End - bone.Center,
-					jointPositions[i + 1] - jointPositions[i]);
+					unposedPositions[i] - unposedPositions[i + 1],
+					positions[i] - positions[i + 1]);
 				float localRotation = worldRotation - parentRotation;
 
 				bone.Rotation = localRotation;
 				parentRotation = worldRotation;
 			}
 		}
+	}
 
-		private void DoBackwardPass(Vector2[] jointPositions, Vector2 target) {
-			for (int i = bones.Count - 1; i >= 0; --i) {
-				Vector2 center = jointPositions[i];
-				Vector2 end = jointPositions[i + 1];
-				float length = Vector2.Distance(center, end);
+	public class FabrIkSolver : IIkSolver {
+		public void DoIteration(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			var chain = FabrIkChain.Make(sourceBone, unposedSource, target);
 
-				Vector2 newEnd = target;
-				Vector2 newCenter = newEnd + length * Vector2.Normalize(center - newEnd);
-				
-				jointPositions[i + 1] = newEnd;
-				target = newCenter;
-			}
-			jointPositions[0] = target;
-		}
+			chain.DoForwardPass();
+			chain.DoBackwardPass();
 
-		private void DoForwardPass(Vector2[] jointPositions, Vector2 target) {
-			for (int i = 0; i < bones.Count; ++i) {
-				Vector2 center = jointPositions[i];
-				Vector2 end = jointPositions[i + 1];
-				float length = Vector2.Distance(center, end);
-
-				Vector2 newCenter = target;
-				Vector2 newEnd = newCenter + length * Vector2.Normalize(end - newCenter);
-				
-				jointPositions[i] = newCenter;
-				target = newEnd;
-			}
-			jointPositions[bones.Count] = target;
-		}
-
-		public void DoIteration(Vector2 source, Vector2 target) {
-			var jointPositions = ExtractJointPositionsFromBones(source);
-			var root = jointPositions[0];
-
-			DoBackwardPass(jointPositions, target);
-			DoForwardPass(jointPositions, root);
-			
-			ApplyJointPositionsToBones(jointPositions);
+			chain.ApplyToBones();
 		}
 	}
 }
