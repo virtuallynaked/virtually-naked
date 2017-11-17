@@ -95,6 +95,8 @@ namespace FlatIk {
 				bone.SetRotation(inputs, localRotation);
 				parentRotation = worldRotation;
 			}
+
+			inputs.Translation = positions[bones.Count] - unposedPositions[bones.Count];
 		}
 	}
 

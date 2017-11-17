@@ -1,7 +1,9 @@
-﻿using System;
+﻿using SharpDX;
+using System;
 
 namespace FlatIk {
 	public class SkeletonInputs {
+		public Vector2 Translation { get; set; }
 		private float[] rotations;
 
 		public SkeletonInputs(int boneCount) {

@@ -37,8 +37,16 @@ namespace FlatIk {
 			return Matrix3x2.Rotation(rotation, Center);
 		}
 
+		private static Matrix3x2 GetChainedTransform(Bone bone, SkeletonInputs inputs) {
+			if (bone == null) {
+				return Matrix3x2.Translation(inputs.Translation);
+			} else {
+				return bone.GetChainedTransform(inputs);
+			}
+		}
+
 		public Matrix3x2 GetChainedTransform(SkeletonInputs inputs) {
-			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : Matrix3x2.Identity;
+			Matrix3x2 parentTransform = GetChainedTransform(Parent, inputs);
 			return GetLocalTransform(inputs) * parentTransform;
 		}
 
@@ -46,7 +54,7 @@ namespace FlatIk {
 		 *  Given a point that has already had bone total-transform applied to it, retransform it as the rotation of this bone was adjusted by a delta.
 		 */
 		public Vector2 RetransformPoint(SkeletonInputs inputs, float rotationDelta, Vector2 point) {
-			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : Matrix3x2.Identity;
+			Matrix3x2 parentTransform = GetChainedTransform(Parent, inputs);
 			Vector2 transformedCenter = Matrix3x2.TransformPoint(parentTransform, Center);
 
 			var retransform = Matrix3x2.Rotation(rotationDelta, transformedCenter);
@@ -57,7 +65,7 @@ namespace FlatIk {
 		 * Returns the gradient of a transformed point with respect to the rotation parameter.
 		 */
 		public Vector2 GetGradientOfTransformedPointWithRespectToRotation(SkeletonInputs inputs, Vector2 point) {
-			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : Matrix3x2.Identity;
+			Matrix3x2 parentTransform = GetChainedTransform(Parent, inputs);
 			Vector2 transformedCenter = Matrix3x2.TransformPoint(parentTransform, Center);
 
 			Vector2 centeredPoint = point - transformedCenter;
