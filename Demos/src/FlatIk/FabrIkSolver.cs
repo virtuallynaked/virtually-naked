@@ -13,7 +13,7 @@ namespace FlatIk {
 
 			unposedPositions.Add(unposedSource);
 			positions.Add(posedSource);
-
+			
 			for (var bone = sourceBone; bone != null; bone = bone.Parent) {
 				bones.Add(bone);
 				
@@ -24,21 +24,36 @@ namespace FlatIk {
 				positions.Add(posedCenter);
 			}
 
+			List<float> rotations = new List<float>();
+			for (int i = 0; i < bones.Count; ++i) {
+				float rotation = Vector2Utils.AngleBetween(
+					unposedPositions[i] - unposedPositions[i + 1],
+					positions[i] - positions[i + 1]);
+				rotations.Add(rotation);
+			}
+
 			var startTarget = target;
 			var endTarget = positions[bones.Count];
-			return new FabrIkChain(bones, unposedPositions, positions, target, endTarget);
+			return new FabrIkChain(bones, unposedPositions, rotations, positions, target, endTarget);
 		}
 		
 		private readonly List<Bone> bones;
+
 		private readonly List<Vector2> unposedPositions;
+
+		private readonly List<float> rotations;
 		private readonly List<Vector2> positions;
+
 		private readonly Vector2 startTarget; //target for end-effector
 		private readonly Vector2 endTarget; //target for root
 
-		private FabrIkChain(List<Bone> bones, List<Vector2> unposedPositions, List<Vector2> positions, Vector2 startTarget, Vector2 endTarget) {
+		private FabrIkChain(List<Bone> bones, List<Vector2> unposedPositions, List<float> rotations, List<Vector2> positions, Vector2 startTarget, Vector2 endTarget) {
 			this.bones = bones;
 			this.unposedPositions = unposedPositions;
+
+			this.rotations = rotations;
 			this.positions = positions;
+
 			this.startTarget = startTarget;
 			this.endTarget = endTarget;
 		}
@@ -54,7 +69,11 @@ namespace FlatIk {
 
 				Vector2 newEnd = target;
 				Vector2 newCenter = newEnd + length * Vector2.Normalize(center - newEnd);
+				float newRotation = Vector2Utils.AngleBetween(
+					unposedPositions[i] - unposedPositions[i + 1],
+					newEnd - newCenter);
 
+				rotations[i] = newRotation;
 				positions[i] = newEnd;
 				target = newCenter;
 			}
@@ -73,30 +92,27 @@ namespace FlatIk {
 				
 				Vector2 newCenter = target;
 				Vector2 newEnd = newCenter + length * Vector2.Normalize(end - newCenter);
+				float newRotation = Vector2Utils.AngleBetween(
+					unposedPositions[i] - unposedPositions[i + 1],
+					newEnd - newCenter);
 				
-				positions[i + 1] = newCenter;
+				rotations[i] = newRotation;
 				target = newEnd;
+				positions[i + 1] = newCenter;
 			}
 
 			positions[0] = target;
 		}
 
 		public void ApplyToInputs(SkeletonInputs inputs) {
-			float parentRotation = 0;
-
-			for (int i = bones.Count - 1; i >= 0; --i) {
-				var bone = bones[i];
-				
-				float worldRotation = Vector2Utils.AngleBetween(
-					unposedPositions[i] - unposedPositions[i + 1],
-					positions[i] - positions[i + 1]);
-				float localRotation = worldRotation - parentRotation;
-
-				bone.SetRotation(inputs, localRotation);
-				parentRotation = worldRotation;
-			}
-
 			inputs.Translation = positions[bones.Count] - unposedPositions[bones.Count];
+
+			for (int i = 0; i < bones.Count; ++i) {
+				float parentRotation = (i + 1 < bones.Count) ? rotations[i + 1] : 0;
+				float localRotation = rotations[i] - parentRotation;
+
+				bones[i].SetRotation(inputs, localRotation);
+			}
 		}
 	}
 
