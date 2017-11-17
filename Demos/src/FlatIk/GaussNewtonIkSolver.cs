@@ -11,8 +11,8 @@ namespace FlatIk {
 			}
 		}
 
-		public void DoIteration(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
-			Vector2 source = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(), sourceBone.End);
+		public void DoIteration(SkeletonInputs inputs, Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			Vector2 source = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(inputs), sourceBone.End);
 			Vector<float> residuals = Vector<float>.Build.Dense(2);
 			residuals[0] = target.X - source.X;
 			residuals[1] = target.Y - source.Y;
@@ -22,7 +22,7 @@ namespace FlatIk {
 			Matrix<float> jacobian = Matrix<float>.Build.Dense(2, bones.Count);
 			
 			for (int boneIdx = 0; boneIdx < bones.Count; ++boneIdx) {
-				Vector2 boneGradient = bones[boneIdx].GetGradientOfTransformedPointWithRespectToRotation(source);
+				Vector2 boneGradient = bones[boneIdx].GetGradientOfTransformedPointWithRespectToRotation(inputs, source);
 				jacobian[0, boneIdx] = boneGradient.X;
 				jacobian[1, boneIdx] = boneGradient.Y;
 			}
@@ -30,7 +30,8 @@ namespace FlatIk {
 			Vector<float> step = jacobian.PseudoInverse().Multiply(residuals);
 			
 			for (int boneIdx = 0; boneIdx < bones.Count; ++boneIdx) {
-				bones[boneIdx].Rotation += step[boneIdx];
+				var bone = bones[boneIdx];
+				bone.IncrementRotation(inputs, step[boneIdx]);
 			}
 		}
 	}

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace FlatIk {
 	public class FabrIkChain {
 		
-		public static FabrIkChain Make(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
-			Vector2 posedSource = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(), sourceBone.End);
+		public static FabrIkChain Make(SkeletonInputs inputs, Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			Vector2 posedSource = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(inputs), sourceBone.End);
 
 			List<Bone> bones = new List<Bone> { };
 			List<Vector2> unposedPositions = new List<Vector2> { };
@@ -20,7 +20,7 @@ namespace FlatIk {
 				var unposedCenter = bone.Center;
 				unposedPositions.Add(unposedCenter);
 
-				var posedCenter = Matrix3x2.TransformPoint(bone.GetChainedTransform(), unposedCenter);
+				var posedCenter = Matrix3x2.TransformPoint(bone.GetChainedTransform(inputs), unposedCenter);
 				positions.Add(posedCenter);
 			}
 
@@ -81,7 +81,7 @@ namespace FlatIk {
 			positions[0] = target;
 		}
 
-		public void ApplyToBones() {
+		public void ApplyToInputs(SkeletonInputs inputs) {
 			float parentRotation = 0;
 
 			for (int i = bones.Count - 1; i >= 0; --i) {
@@ -92,20 +92,20 @@ namespace FlatIk {
 					positions[i] - positions[i + 1]);
 				float localRotation = worldRotation - parentRotation;
 
-				bone.Rotation = localRotation;
+				bone.SetRotation(inputs, localRotation);
 				parentRotation = worldRotation;
 			}
 		}
 	}
 
 	public class FabrIkSolver : IIkSolver {
-		public void DoIteration(Bone sourceBone, Vector2 unposedSource, Vector2 target) {
-			var chain = FabrIkChain.Make(sourceBone, unposedSource, target);
+		public void DoIteration(SkeletonInputs inputs, Bone sourceBone, Vector2 unposedSource, Vector2 target) {
+			var chain = FabrIkChain.Make(inputs, sourceBone, unposedSource, target);
 
 			chain.DoForwardPass();
 			chain.DoBackwardPass();
 
-			chain.ApplyToBones();
+			chain.ApplyToInputs(inputs);
 		}
 	}
 }

@@ -1,50 +1,52 @@
 ﻿using SharpDX;
-using System;
-using System.Collections.Generic;
 
 namespace FlatIk {
 	public class Bone {
+		public int Index { get; }
 		public Bone Parent { get; }
 		public Vector2 Center { get; }
 		public Vector2 End { get; }
 
-		private float rotation;
-		public float Rotation {
-			get {
-				return rotation;
-			}
-			set {
-				rotation = (float) Math.IEEERemainder(value, Math.PI * 2);
-			}
-		}
-
-		public Bone(Bone parent, Vector2 center, Vector2 end, float rotation) {
+		public Bone(int index, Bone parent, Vector2 center, Vector2 end) {
+			Index = index;
 			Parent = parent;
 			Center = center;
 			End = end;
-			Rotation = rotation;
 		}
 		
-		public static Bone MakeWithOffset(Bone parent, Vector2 endOffset, float rotation) {
+		public static Bone MakeWithOffset(int index, Bone parent, Vector2 endOffset) {
 			Vector2 center = parent != null ? parent.End : Vector2.Zero;
 			Vector2 end = center + endOffset;
-			return new Bone(parent, center, end, rotation);
+			return new Bone(index, parent, center, end);
 		}
 		
-		public Matrix3x2 GetLocalTransform() {
-			return Matrix3x2.Rotation(Rotation, Center);
+		public float GetRotation(SkeletonInputs inputs) {
+			return inputs.GetRotation(Index);
+		}
+		
+		public void SetRotation(SkeletonInputs inputs, float rotation) {
+			inputs.SetRotation(Index, rotation);
 		}
 
-		public Matrix3x2 GetChainedTransform() {
-			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform() : Matrix3x2.Identity;
-			return GetLocalTransform() * parentTransform;
+		public void IncrementRotation(SkeletonInputs inputs, float rotationDelta) {
+			inputs.IncrementRotation(Index, rotationDelta);
+		}
+
+		public Matrix3x2 GetLocalTransform(SkeletonInputs inputs) {
+			float rotation = GetRotation(inputs);
+			return Matrix3x2.Rotation(rotation, Center);
+		}
+
+		public Matrix3x2 GetChainedTransform(SkeletonInputs inputs) {
+			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : Matrix3x2.Identity;
+			return GetLocalTransform(inputs) * parentTransform;
 		}
 
 		/**
 		 *  Given a point that has already had bone total-transform applied to it, retransform it as the rotation of this bone was adjusted by a delta.
 		 */
-		public Vector2 RetransformPoint(float rotationDelta, Vector2 point) {
-			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform() : Matrix3x2.Identity;
+		public Vector2 RetransformPoint(SkeletonInputs inputs, float rotationDelta, Vector2 point) {
+			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : Matrix3x2.Identity;
 			Vector2 transformedCenter = Matrix3x2.TransformPoint(parentTransform, Center);
 
 			var retransform = Matrix3x2.Rotation(rotationDelta, transformedCenter);
@@ -54,13 +56,12 @@ namespace FlatIk {
 		/**
 		 * Returns the gradient of a transformed point with respect to the rotation parameter.
 		 */
-		public Vector2 GetGradientOfTransformedPointWithRespectToRotation(Vector2 point) {
-			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform() : Matrix3x2.Identity;
+		public Vector2 GetGradientOfTransformedPointWithRespectToRotation(SkeletonInputs inputs, Vector2 point) {
+			Matrix3x2 parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : Matrix3x2.Identity;
 			Vector2 transformedCenter = Matrix3x2.TransformPoint(parentTransform, Center);
 
 			Vector2 centeredPoint = point - transformedCenter;
 			return new Vector2(-centeredPoint.Y, centeredPoint.X);
-
 		}
 	}
 }

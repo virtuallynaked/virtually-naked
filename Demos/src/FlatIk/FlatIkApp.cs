@@ -11,19 +11,22 @@ namespace FlatIk {
 		private readonly Brush redBrush;
 
 		private readonly List<Bone> bones;
+		private readonly SkeletonInputs inputs;
 		private readonly IIkSolver solver;
 		private Vector2 target = new Vector2(2, 1);
 		
 		private static List<Bone> MakeStandardBones() {
-			var bone0 = Bone.MakeWithOffset(null, Vector2.UnitX, +MathUtil.PiOverFour);
-			var bone1 = Bone.MakeWithOffset(bone0, Vector2.UnitX, +MathUtil.PiOverTwo);
-			var bone2 = Bone.MakeWithOffset(bone1, Vector2.UnitX, -MathUtil.PiOverTwo);
-			var bone3 = Bone.MakeWithOffset(bone2, Vector2.UnitX, -MathUtil.PiOverTwo);
-			var bone4 = Bone.MakeWithOffset(bone3, Vector2.UnitX, +MathUtil.PiOverTwo);
+			float l = (float) Math.Sqrt(0.5);
 
+			var bone0 = Bone.MakeWithOffset(0, null, new Vector2(+l, +l));
+			var bone1 = Bone.MakeWithOffset(1, bone0, new Vector2(-l, +l));
+			var bone2 = Bone.MakeWithOffset(2, bone1, new Vector2(+l, +l));
+			var bone3 = Bone.MakeWithOffset(3, bone2, new Vector2(+l, -l));
+			var bone4 = Bone.MakeWithOffset(4, bone3, new Vector2(+l, +l));
+			
 			return new List<Bone> { bone0, bone1, bone2, bone3, bone4 };
 		}
-
+		
 		public FlatIkApp() {
 			renderEnvironment = new WindowedDirect2dRenderEnvironment("FlatIkApp", false);
 			context = renderEnvironment.D2dContext;
@@ -31,6 +34,8 @@ namespace FlatIk {
 			redBrush = new SolidColorBrush(context, Color.Red);
 
 			bones = MakeStandardBones();
+			inputs = new SkeletonInputs(bones.Count);
+
 			solver = new FabrIkSolver();
 		}
 
@@ -61,7 +66,7 @@ namespace FlatIk {
 			var sourceBone = bones[bones.Count - 1];
 			var unposedSource = sourceBone.End;
 
-			solver.DoIteration(sourceBone, unposedSource, target);
+			solver.DoIteration(inputs, sourceBone, unposedSource, target);
 		}
 
 		private Matrix3x2 GetWorldToFormTransform() {
@@ -77,7 +82,7 @@ namespace FlatIk {
 			Matrix3x2 worldToFormTransform = GetWorldToFormTransform();
 
 			foreach (var bone in bones) {
-				var transform = bone.GetChainedTransform() * worldToFormTransform;
+				var transform = bone.GetChainedTransform(inputs) * worldToFormTransform;
 				var formCenter = Matrix3x2.TransformPoint(transform, bone.Center);
 				var formEnd = Matrix3x2.TransformPoint(transform, bone.End);
 
