@@ -18,11 +18,13 @@ namespace FlatIk {
 		private static List<Bone> MakeStandardBones() {
 			float l = (float) Math.Sqrt(0.5);
 
-			var bone0 = Bone.MakeWithOffset(0, null, new Vector2(+l, +l));
-			var bone1 = Bone.MakeWithOffset(1, bone0, new Vector2(-l, +l));
-			var bone2 = Bone.MakeWithOffset(2, bone1, new Vector2(+l, +l));
-			var bone3 = Bone.MakeWithOffset(3, bone2, new Vector2(+l, -l));
-			var bone4 = Bone.MakeWithOffset(4, bone3, new Vector2(+l, +l));
+			float rotationLimit = MathUtil.Pi / 3;
+
+			var bone0 = Bone.MakeWithOffset(0, null, Vector2.UnitX, MathUtil.Pi);
+			var bone1 = Bone.MakeWithOffset(1, bone0, Vector2.UnitX, rotationLimit);
+			var bone2 = Bone.MakeWithOffset(2, bone1, Vector2.UnitX, rotationLimit);
+			var bone3 = Bone.MakeWithOffset(3, bone2, Vector2.UnitX, rotationLimit);
+			var bone4 = Bone.MakeWithOffset(4, bone3, Vector2.UnitX, rotationLimit);
 			
 			return new List<Bone> { bone0, bone1, bone2, bone3, bone4 };
 		}

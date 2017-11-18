@@ -10,9 +10,9 @@ namespace FlatIk {
 		private readonly SkeletonInputs inputs;
 
 		public BoneTest() {
-			bone0 = Bone.MakeWithOffset(0, null, Vector2.UnitX);
-			bone1 = Bone.MakeWithOffset(1, bone0, Vector2.UnitX);
-			bone2 = Bone.MakeWithOffset(2, bone1, Vector2.UnitX);
+			bone0 = Bone.MakeWithOffset(0, null, Vector2.UnitX, MathUtil.Pi);
+			bone1 = Bone.MakeWithOffset(1, bone0, Vector2.UnitX, MathUtil.Pi);
+			bone2 = Bone.MakeWithOffset(2, bone1, Vector2.UnitX, MathUtil.Pi);
 
 			inputs = new SkeletonInputs(3);
 			bone0.SetRotation(inputs, +0.1f);

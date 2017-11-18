@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System;
 using System.Collections.Generic;
 
 namespace FlatIk {
@@ -57,6 +58,26 @@ namespace FlatIk {
 			this.startTarget = startTarget;
 			this.endTarget = endTarget;
 		}
+		
+		public float ConstrainForwardRotation(int boneIdx, float desiredRotation) {
+			if (boneIdx == 0) {
+				return desiredRotation;
+			} else {
+				float childRotation = rotations[boneIdx - 1];
+				float desiredChildLocalRotation = (float) Math.IEEERemainder(childRotation - desiredRotation, Math.PI * 2);
+				float limit = bones[boneIdx - 1].RotationLimit;
+				float childLocalRotation = MathUtil.Clamp(desiredChildLocalRotation, -limit, +limit);
+				return childRotation - childLocalRotation;
+			}
+		}
+
+		public float ConstrainBackwardRotation(int boneIdx, float desiredRotation) {
+			float parentRotation = (boneIdx + 1 < bones.Count) ? rotations[boneIdx + 1] : 0;
+			float desiredLocalRotation = (float) Math.IEEERemainder(desiredRotation - parentRotation, Math.PI * 2);
+			float limit = bones[boneIdx].RotationLimit;
+			float localRotation = MathUtil.Clamp(desiredLocalRotation, -limit, +limit);
+			return parentRotation + localRotation;
+		}
 
 		//From end-effector to root
 		public void DoForwardPass() {
@@ -68,11 +89,14 @@ namespace FlatIk {
 				float length = Vector2.Distance(center, end);
 
 				Vector2 newEnd = target;
-				Vector2 newCenter = newEnd + length * Vector2.Normalize(center - newEnd);
-				float newRotation = Vector2Utils.AngleBetween(
-					unposedPositions[i] - unposedPositions[i + 1],
-					newEnd - newCenter);
 
+				Vector2 desiredCenter = newEnd + length * Vector2.Normalize(center - newEnd);
+				float desiredRotation = Vector2Utils.AngleBetween(
+					unposedPositions[i] - unposedPositions[i + 1],
+					newEnd - desiredCenter);
+				float newRotation = ConstrainForwardRotation(i, desiredRotation);
+				Vector2 newCenter = newEnd - Vector2Utils.RotateBy(newRotation, unposedPositions[i] - unposedPositions[i + 1]);
+				
 				rotations[i] = newRotation;
 				positions[i] = newEnd;
 				target = newCenter;
@@ -91,10 +115,13 @@ namespace FlatIk {
 				float length = Vector2.Distance(center, end);
 				
 				Vector2 newCenter = target;
-				Vector2 newEnd = newCenter + length * Vector2.Normalize(end - newCenter);
-				float newRotation = Vector2Utils.AngleBetween(
+
+				Vector2 desiredEnd = newCenter + length * Vector2.Normalize(end - newCenter);
+				float desiredRotation = Vector2Utils.AngleBetween(
 					unposedPositions[i] - unposedPositions[i + 1],
-					newEnd - newCenter);
+					desiredEnd - newCenter);
+				float newRotation = ConstrainBackwardRotation(i, desiredRotation);
+				Vector2 newEnd = newCenter + Vector2Utils.RotateBy(newRotation, unposedPositions[i] - unposedPositions[i + 1]);
 				
 				rotations[i] = newRotation;
 				target = newEnd;

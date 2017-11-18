@@ -10,4 +10,8 @@ public class Vector2Utils {
 		float angleDelta = Atan(to) - Atan(from);
 		return (float) Math.IEEERemainder(angleDelta, Math.PI * 2);
 	}
+
+	public static Vector2 RotateBy(float rotation, Vector2 v) {
+		return Matrix3x2.TransformPoint(Matrix3x2.Rotation(rotation), v);
+	}
 }

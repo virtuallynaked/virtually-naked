@@ -6,18 +6,20 @@ namespace FlatIk {
 		public Bone Parent { get; }
 		public Vector2 Center { get; }
 		public Vector2 End { get; }
+		public float RotationLimit { get; }
 
-		public Bone(int index, Bone parent, Vector2 center, Vector2 end) {
+		public Bone(int index, Bone parent, Vector2 center, Vector2 end, float rotationLimit) {
 			Index = index;
 			Parent = parent;
 			Center = center;
 			End = end;
+			RotationLimit = rotationLimit;
 		}
 		
-		public static Bone MakeWithOffset(int index, Bone parent, Vector2 endOffset) {
+		public static Bone MakeWithOffset(int index, Bone parent, Vector2 endOffset, float rotationLimit) {
 			Vector2 center = parent != null ? parent.End : Vector2.Zero;
 			Vector2 end = center + endOffset;
-			return new Bone(index, parent, center, end);
+			return new Bone(index, parent, center, end, rotationLimit);
 		}
 		
 		public float GetRotation(SkeletonInputs inputs) {
