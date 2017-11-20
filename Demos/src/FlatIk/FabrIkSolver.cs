@@ -9,57 +9,61 @@ namespace FlatIk {
 			Vector2 posedSource = Matrix3x2.TransformPoint(sourceBone.GetChainedTransform(inputs), sourceBone.End);
 
 			List<Bone> bones = new List<Bone> { };
-			List<Vector2> unposedPositions = new List<Vector2> { };
-			List<Vector2> positions = new List<Vector2> { };
-
-			unposedPositions.Add(unposedSource);
-			positions.Add(posedSource);
+			List<Vector2> unposedBoneVectors = new List<Vector2> { };
 			
-			for (var bone = sourceBone; bone != null; bone = bone.Parent) {
-				bones.Add(bone);
-				
-				var unposedCenter = bone.Center;
-				unposedPositions.Add(unposedCenter);
-
-				var posedCenter = Matrix3x2.TransformPoint(bone.GetChainedTransform(inputs), unposedCenter);
-				positions.Add(posedCenter);
-			}
-
 			List<float> rotations = new List<float>();
-			for (int i = 0; i < bones.Count; ++i) {
-				float rotation = Vector2Utils.AngleBetween(
-					unposedPositions[i] - unposedPositions[i + 1],
-					positions[i] - positions[i + 1]);
-				rotations.Add(rotation);
-			}
 
+			List<Vector2> positions = new List<Vector2> { };
+			positions.Add(posedSource);
+
+			Vector2 previousUnposedPosition = unposedSource;
+			Vector2 previousPosedPosition = posedSource;
+			for (var bone = sourceBone; bone != null; bone = bone.Parent) {
+				var unposedCenter = bone.Center;
+				var posedCenter = Matrix3x2.TransformPoint(bone.GetChainedTransform(inputs), unposedCenter);
+				
+				Vector2 unposedBoneVector = previousUnposedPosition - unposedCenter;
+				Vector2 posedBoneVector = previousPosedPosition - posedCenter;
+				float rotation = Vector2Utils.AngleBetween(
+					unposedBoneVector,
+					posedBoneVector);
+				
+				bones.Add(bone);
+				unposedBoneVectors.Add(unposedBoneVector);
+				rotations.Add(rotation);
+				positions.Add(posedCenter);
+				
+				previousUnposedPosition = unposedCenter;
+				previousPosedPosition = posedCenter;
+			}
+			
 			var startTarget = target;
 			var endTarget = positions[bones.Count];
-			return new FabrIkChain(bones, unposedPositions, rotations, positions, target, endTarget);
+			return new FabrIkChain(bones, unposedBoneVectors, rotations, positions, target, endTarget);
 		}
 		
 		private readonly List<Bone> bones;
 
-		private readonly List<Vector2> unposedPositions;
+		private readonly List<Vector2> unposedBoneVectors;
 
 		private readonly List<float> rotations;
 		private readonly List<Vector2> positions;
 
-		private readonly Vector2 startTarget; //target for end-effector
-		private readonly Vector2 endTarget; //target for root
+		private readonly Vector2 firstTargetEnd; //target for end-effector
+		private readonly Vector2 lastTargetCenter; //target for root
 
-		private FabrIkChain(List<Bone> bones, List<Vector2> unposedPositions, List<float> rotations, List<Vector2> positions, Vector2 startTarget, Vector2 endTarget) {
+		private FabrIkChain(List<Bone> bones, List<Vector2> unposedBoneVectors, List<float> rotations, List<Vector2> positions, Vector2 startTarget, Vector2 endTarget) {
 			this.bones = bones;
-			this.unposedPositions = unposedPositions;
+			this.unposedBoneVectors = unposedBoneVectors;
 
 			this.rotations = rotations;
 			this.positions = positions;
 
-			this.startTarget = startTarget;
-			this.endTarget = endTarget;
+			this.firstTargetEnd = startTarget;
+			this.lastTargetCenter = endTarget;
 		}
 		
-		public float ConstrainForwardRotation(int boneIdx, float desiredRotation) {
+		public float ConstrainRotationAgainstChild(int boneIdx, float desiredRotation) {
 			if (boneIdx == 0) {
 				return desiredRotation;
 			} else {
@@ -71,7 +75,7 @@ namespace FlatIk {
 			}
 		}
 
-		public float ConstrainBackwardRotation(int boneIdx, float desiredRotation) {
+		public float ConstraintRotationAgainstParent(int boneIdx, float desiredRotation) {
 			float parentRotation = (boneIdx + 1 < bones.Count) ? rotations[boneIdx + 1] : 0;
 			float desiredLocalRotation = (float) Math.IEEERemainder(desiredRotation - parentRotation, Math.PI * 2);
 			float limit = bones[boneIdx].RotationLimit;
@@ -81,58 +85,52 @@ namespace FlatIk {
 
 		//From end-effector to root
 		public void DoForwardPass() {
-			Vector2 target = startTarget;
+			Vector2 targetEnd = firstTargetEnd;
 
-			for (int i = 0; i < bones.Count; ++i) {
-				Vector2 end = positions[i];
-				Vector2 center = positions[i + 1];
-				float length = Vector2.Distance(center, end);
-
-				Vector2 newEnd = target;
-
-				Vector2 desiredCenter = newEnd + length * Vector2.Normalize(center - newEnd);
-				float desiredRotation = Vector2Utils.AngleBetween(
-					unposedPositions[i] - unposedPositions[i + 1],
-					newEnd - desiredCenter);
-				float newRotation = ConstrainForwardRotation(i, desiredRotation);
-				Vector2 newCenter = newEnd - Vector2Utils.RotateBy(newRotation, unposedPositions[i] - unposedPositions[i + 1]);
+			for (int boneIdx = 0; boneIdx < bones.Count; ++boneIdx) {
+				Vector2 currentEnd = positions[boneIdx];
+				Vector2 currentCenter = positions[boneIdx + 1];
 				
-				rotations[i] = newRotation;
-				positions[i] = newEnd;
-				target = newCenter;
+				float targetRotationDelta = Vector2Utils.AngleBetween(
+					currentEnd - currentCenter,
+					targetEnd - currentCenter);
+				float unconstrainedTargetRotation = rotations[boneIdx] + targetRotationDelta;
+				float targetRotation = ConstrainRotationAgainstChild(boneIdx, unconstrainedTargetRotation);
+				Vector2 targetCenter = targetEnd - Vector2Utils.RotateBy(targetRotation, unposedBoneVectors[boneIdx]);
+				
+				positions[boneIdx] = targetEnd;
+				rotations[boneIdx] = targetRotation;
+				targetEnd = targetCenter;
 			}
 
-			positions[bones.Count] = target;
+			positions[bones.Count] = targetEnd;
 		}
 		
 		// From root to end-effector
 		public void DoBackwardPass() {
-			Vector2 target = endTarget;
+			Vector2 targetCenter = lastTargetCenter;
 
-			for (int i = bones.Count - 1; i >= 0; --i) {
-				Vector2 end = positions[i];
-				Vector2 center = positions[i + 1];
-				float length = Vector2.Distance(center, end);
+			for (int boneIdx = bones.Count - 1; boneIdx >= 0; --boneIdx) {
+				Vector2 currentEnd = positions[boneIdx];
+				Vector2 currentCenter = positions[boneIdx + 1];
+								
+				float targetRotationDelta = Vector2Utils.AngleBetween(
+					currentEnd - currentCenter,
+					currentEnd - targetCenter);
+				float unconstrainedTargetRotation = rotations[boneIdx] + targetRotationDelta;
+				float targetRotation = ConstraintRotationAgainstParent(boneIdx, unconstrainedTargetRotation);
+				Vector2 targetEnd = targetCenter + Vector2Utils.RotateBy(targetRotation, unposedBoneVectors[boneIdx]);
 				
-				Vector2 newCenter = target;
-
-				Vector2 desiredEnd = newCenter + length * Vector2.Normalize(end - newCenter);
-				float desiredRotation = Vector2Utils.AngleBetween(
-					unposedPositions[i] - unposedPositions[i + 1],
-					desiredEnd - newCenter);
-				float newRotation = ConstrainBackwardRotation(i, desiredRotation);
-				Vector2 newEnd = newCenter + Vector2Utils.RotateBy(newRotation, unposedPositions[i] - unposedPositions[i + 1]);
-				
-				rotations[i] = newRotation;
-				target = newEnd;
-				positions[i + 1] = newCenter;
+				positions[boneIdx + 1] = targetCenter;
+				rotations[boneIdx] = targetRotation;
+				targetCenter = targetEnd;
 			}
 
-			positions[0] = target;
+			positions[0] = targetCenter;
 		}
 
 		public void ApplyToInputs(SkeletonInputs inputs) {
-			inputs.Translation = positions[bones.Count] - unposedPositions[bones.Count];
+			inputs.Translation = positions[bones.Count] - bones[bones.Count - 1].Center;
 
 			for (int i = 0; i < bones.Count; ++i) {
 				float parentRotation = (i + 1 < bones.Count) ? rotations[i + 1] : 0;
