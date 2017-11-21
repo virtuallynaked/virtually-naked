@@ -45,7 +45,7 @@ public class VRApp : IDisposable {
 			AppDomain.CurrentDomain.UnhandledException += ReportUnhandledException;
 		}
 
-		var commandLineParser = new CommandLineApplication();
+		var commandLineParser = new CommandLineApplication(false);
 		var archiveOption = commandLineParser.Option("--data", "path to archive file or directory", CommandOptionType.SingleValue);
 		commandLineParser.Execute(args);
 
