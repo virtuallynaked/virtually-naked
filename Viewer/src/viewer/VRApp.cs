@@ -108,10 +108,41 @@ public class VRApp : IDisposable {
 
 	private IPreparedFrame preparedFrame;
 
+	private static Device CreateDevice() {
+		SharpDX.DXGI.Adapter chosenAdapter = null;
+
+		using (var dxgiFactory = new SharpDX.DXGI.Factory1()) {
+			var adapters = dxgiFactory.Adapters;
+			try {
+				ulong adapterLuid = OpenVR.System.GetOutputDevice(ETextureType.DirectX, IntPtr.Zero);
+				if (adapterLuid != 0) {
+					foreach (var adapter in adapters) {
+						if ((ulong) adapter.Description.Luid == adapterLuid) {
+							chosenAdapter = adapter;
+						}
+					}
+				}
+
+				if (chosenAdapter == null) {
+					//fallback to the default adapter
+					chosenAdapter = adapters[0];
+				}
+
+				var device = new Device(chosenAdapter, debugDevice ? DeviceCreationFlags.Debug : DeviceCreationFlags.None);
+				return device;
+			}
+			finally {
+				foreach (var adapter in adapters) {
+					adapter.Dispose();
+				}
+			}
+		}
+	}
+
 	public VRApp(IArchiveDirectory dataDir, string title) {
 		OpenVRExtensions.Init();
 
-		device = new Device(DriverType.Hardware, debugDevice ? DeviceCreationFlags.Debug : DeviceCreationFlags.None);
+		device = CreateDevice();
 		shaderCache = new ShaderCache(device);
 		standardSamplers = new StandardSamplers(device);
 		

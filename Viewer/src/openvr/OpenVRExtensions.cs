@@ -167,4 +167,10 @@ public static class OpenVRExtensions {
 		overlay.GetKeyboardText(builder, length);
 		return builder.ToString();
 	}
+
+	public static ulong GetOutputDevice(this CVRSystem system, ETextureType textureType,IntPtr pInstance) {
+		ulong pnDevice = 0;
+		system.GetOutputDevice(ref pnDevice, textureType, pInstance);
+		return pnDevice;
+	}
 }
