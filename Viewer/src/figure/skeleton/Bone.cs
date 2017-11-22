@@ -90,7 +90,7 @@ public class Bone {
 	private ScalingTransform GetJointCenteredScalingTransform(ChannelOutputs outputs) {
 		Matrix3x3 scale = GetCombinedScale(outputs);
 		
-		if (!InheritsScale) {
+		if (!InheritsScale && Parent != null) {
 			scale = Matrix3x3.Invert(Parent.GetCombinedScale(outputs)) * scale;
 		}
 

@@ -13,6 +13,10 @@ public class RigidBoneSystemInputs {
 		BoneInputs = new RigidBoneInput[boneCount];
 	}
 
+	public RigidBoneSystemInputs(RigidBoneSystemInputs inputs) {
+		BoneInputs = (RigidBoneInput[]) inputs.BoneInputs.Clone();
+	}
+
 	public void ClearToZero() {
 		for (int i = 0; i < BoneInputs.Length; ++i) {
 			BoneInputs[i].Rotation = Vector3.Zero;
