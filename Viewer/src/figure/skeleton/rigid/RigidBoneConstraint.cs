@@ -3,8 +3,6 @@
 public class RigidBoneConstraint {
 	private Vector3 minRotation;
 	private Vector3 maxRotation;
-	private Vector3 minTranslation;
-	private Vector3 maxTranslation;
 	
 	private static void ExtractMinMax(Channel channel, int idx, ref Vector3 min, ref Vector3 max) {
 		if (!channel.Visible) {
@@ -29,21 +27,14 @@ public class RigidBoneConstraint {
 	
 	public static RigidBoneConstraint InitializeFrom(Bone source) {
 		ExtractMinMax(source.Rotation, out Vector3 minRotation, out Vector3 maxRotation);
-		ExtractMinMax(source.Translation, out Vector3 minTranslation, out Vector3 maxTranslation);
 
 		return new RigidBoneConstraint {
 			minRotation = minRotation,
 			maxRotation = maxRotation,
-			minTranslation = minTranslation,
-			maxTranslation = maxTranslation
 		};
 	}
 
 	public Vector3 ClampRotation(Vector3 value) {
 		return Vector3.Clamp(value, minRotation, maxRotation);
-	}
-
-	public Vector3 ClampTranslation(Vector3 value) {
-		return Vector3.Clamp(value, minTranslation, maxTranslation);
 	}
 }

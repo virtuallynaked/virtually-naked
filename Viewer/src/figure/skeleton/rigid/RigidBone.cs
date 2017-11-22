@@ -10,8 +10,11 @@ public class RigidBone {
 
 	private Vector3 centerPoint;
 	private OrientationSpace orientationSpace;
+
+	//only used during synchronization
 	private ScalingTransform chainedScalingTransform;
-	
+	private Vector3 chainedTranslation;
+
 	public RigidBone(Bone source, RigidBone parent) {
 		Source = source;
 		Index = source.Index;
@@ -24,13 +27,20 @@ public class RigidBone {
 	public Vector3 CenterPoint => centerPoint;
 
 	public void Synchronize(ChannelOutputs outputs) {
-		centerPoint = Source.CenterPoint.GetValue(outputs);
+		ScalingTransform parentScalingTransform = Parent != null ? Parent.chainedScalingTransform : ScalingTransform.Identity;
+		Vector3 parentTranslation = Parent != null ? Parent.chainedTranslation : Vector3.Zero;
+
+		chainedScalingTransform = Source.GetObjectCenteredScalingTransform(outputs).Chain(parentScalingTransform);
+		chainedTranslation = Source.Translation.GetValue(outputs) + parentTranslation;
+
+		Vector3 sourceCenter = Source.CenterPoint.GetValue(outputs);
+		centerPoint = chainedScalingTransform.Transform(sourceCenter) + chainedTranslation;
+
 		orientationSpace = Source.GetOrientationSpace(outputs);
-		chainedScalingTransform = Source.GetObjectCenteredScalingTransform(outputs).Chain(Parent != null ? Parent.chainedScalingTransform : ScalingTransform.Identity);
 	}
 	
 	public Quaternion GetRotation(RigidBoneSystemInputs inputs) {
-		Vector3 rotationAngles = Constraint.ClampRotation(inputs.BoneInputs[Index].Rotation);
+		Vector3 rotationAngles = Constraint.ClampRotation(inputs.Rotations[Index]);
 		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
@@ -52,42 +62,28 @@ public class RigidBone {
 			rotationAnglesDegrees = Constraint.ClampRotation(rotationAnglesDegrees);
 		}
 
-		inputs.BoneInputs[Index].Rotation = rotationAnglesDegrees;
+		inputs.Rotations[Index] = rotationAnglesDegrees;
 	}
-	
-	public Vector3 GetTranslation(RigidBoneSystemInputs inputs) {
-		return Constraint.ClampTranslation(inputs.BoneInputs[Index].Translation);
-	}
-
-	public void SetTranslation(RigidBoneSystemInputs inputs, Vector3 translation, bool applyClamp = false) {
-		if (applyClamp) {
-			translation = Constraint.ClampRotation(translation);
-		}
-
-		inputs.BoneInputs[Index].Translation = translation;
-	}
-		
-	private DualQuaternion GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs, Matrix3x3 parentScale) {
+			
+	private DualQuaternion GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs) {
 		Quaternion worldSpaceRotation = GetRotation(inputs);
-		Vector3 scaledTranslation = Vector3.Transform(GetTranslation(inputs), parentScale);
-		return DualQuaternion.FromRotationTranslation(worldSpaceRotation, scaledTranslation);
+		return DualQuaternion.FromRotationTranslation(worldSpaceRotation, Vector3.Zero);
 	}
 
-	private DualQuaternion GetObjectCenteredRotationTransform(RigidBoneSystemInputs inputs, ScalingTransform parentScale) {
-		DualQuaternion localSpaceTransform = GetJointCenteredRotationTransform(inputs, parentScale.Scale);
-		Vector3 centerPoint = parentScale.Transform(this.centerPoint);
+	private DualQuaternion GetObjectCenteredRotationTransform(RigidBoneSystemInputs inputs) {
+		DualQuaternion localSpaceTransform = GetJointCenteredRotationTransform(inputs);
 		return DualQuaternion.FromTranslation(-centerPoint).Chain(localSpaceTransform).Chain(DualQuaternion.FromTranslation(+centerPoint));
 	}
 	
-	public StagedSkinningTransform GetChainedTransform(RigidBoneSystemInputs inputs, StagedSkinningTransform parentTransform) {
-		DualQuaternion rotationTransform = GetObjectCenteredRotationTransform(inputs, parentTransform.ScalingStage);
-		DualQuaternion chainedRotationTransform = rotationTransform.Chain(parentTransform.RotationStage);
+	public DualQuaternion GetChainedTransform(RigidBoneSystemInputs inputs, DualQuaternion parentTransform) {
+		DualQuaternion rotationTransform = GetObjectCenteredRotationTransform(inputs);
+		DualQuaternion chainedRotationTransform = rotationTransform.Chain(parentTransform);
 
-		return new StagedSkinningTransform(chainedScalingTransform, chainedRotationTransform);
+		return chainedRotationTransform;
 	}
 
-	public StagedSkinningTransform GetChainedTransform(RigidBoneSystemInputs inputs) {
-		StagedSkinningTransform parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : StagedSkinningTransform.Identity;
+	public DualQuaternion GetChainedTransform(RigidBoneSystemInputs inputs) {
+		DualQuaternion parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : DualQuaternion.Identity;
 		return GetChainedTransform(inputs, parentTransform);
 	}
 }

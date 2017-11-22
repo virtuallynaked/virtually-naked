@@ -91,7 +91,7 @@ public class ActorBehavior {
 				} else {
 					angles = Vector3.Zero;
 				}
-				poseDeltas.BoneInputs[bone.Index].Rotation = angles;
+				poseDeltas.Rotations[bone.Index] = angles;
 			}
 		}
 	}
@@ -104,7 +104,7 @@ public class ActorBehavior {
 		Dictionary<string, float[]> boneRotations = new Dictionary<string, float[]>();
 		var poseDeltas = ikAnimator.PoseDeltas;
 		foreach (var bone in model.MainDefinition.BoneSystem.Bones) {
-			var angles = poseDeltas.BoneInputs[bone.Index].Rotation;
+			var angles = poseDeltas.Rotations[bone.Index];
 			if (!angles.IsZero) {
 				boneRotations.Add(bone.Name, angles.ToArray());
 			}
