@@ -57,6 +57,7 @@ public class RigidBoneSystemTest {
 		var baseInputs = channelSystem.MakeDefaultChannelInputs();
 		bone1.Scale.SetValue(baseInputs, new Vector3(2, 3, 4));
 		bone1.Translation.SetValue(baseInputs, new Vector3(4, 5, 6));
+		bone2.Translation.SetValue(baseInputs, new Vector3(5, 6, 7));
 		
 		var baseOutputs = channelSystem.Evaluate(null, baseInputs);
 		rigidBoneSystem.Synchronize(baseOutputs);

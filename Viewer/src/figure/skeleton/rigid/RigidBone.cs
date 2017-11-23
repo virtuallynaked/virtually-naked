@@ -31,10 +31,10 @@ public class RigidBone {
 		Vector3 parentTranslation = Parent != null ? Parent.chainedTranslation : Vector3.Zero;
 
 		chainedScalingTransform = Source.GetObjectCenteredScalingTransform(outputs).Chain(parentScalingTransform);
-		chainedTranslation = Source.Translation.GetValue(outputs) + parentTranslation;
+		chainedTranslation = Vector3.Transform(Source.Translation.GetValue(outputs), parentScalingTransform.Scale) + parentTranslation;
 
 		Vector3 sourceCenter = Source.CenterPoint.GetValue(outputs);
-		centerPoint = chainedScalingTransform.Transform(sourceCenter) + chainedTranslation;
+		centerPoint = parentScalingTransform.Transform(sourceCenter) + chainedTranslation;
 
 		orientationSpace = Source.GetOrientationSpace(outputs);
 	}
