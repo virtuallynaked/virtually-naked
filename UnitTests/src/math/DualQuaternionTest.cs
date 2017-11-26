@@ -66,4 +66,20 @@ public class DualQuaternionTest {
 			v,
 			inverseTransformed);
 	}
+
+	[TestMethod]
+	public void TestInvert() {
+		Vector3 translation = new Vector3(2,3,4);
+		Quaternion rotation = Quaternion.RotationYawPitchRoll(1,2,3);
+		DualQuaternion dq = DualQuaternion.FromRotationTranslation(rotation, translation);
+
+		Vector3 v = new Vector3(3,4,5);
+
+		Vector3 transformed = dq.Transform(v);
+		Vector3 inverseTransformed = dq.Invert().Transform(transformed);
+
+		Assert.AreEqual(
+			v,
+			inverseTransformed);
+	}
 }

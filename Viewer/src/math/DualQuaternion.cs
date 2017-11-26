@@ -80,4 +80,10 @@ public struct DualQuaternion {
 	public Matrix ToMatrix() {
 		return Matrix.RotationQuaternion(Rotation) * Matrix.Translation(Translation);
 	}
+
+	public DualQuaternion Invert() {
+		var inverseRotation = Quaternion.Invert(Rotation);
+		var inverseTranslation = Vector3.Transform(-Translation, inverseRotation);
+		return DualQuaternion.FromRotationTranslation(inverseRotation, inverseTranslation);
+	}
 }
