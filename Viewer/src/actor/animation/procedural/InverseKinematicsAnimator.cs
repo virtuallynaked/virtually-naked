@@ -54,7 +54,7 @@ public class InverseKinematicsAnimator {
 
 		boneSystem.Synchronize(channelOutputs);
 		var baseInputs = boneSystem.ReadInputs(channelOutputs);
-		var resultInputs = boneSystem.SumAndClampInputs(baseInputs, poseDeltas);
+		var resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 		
 		InverseKinematicsProblem problem = ui.GetProblem(updateParameters, resultInputs, previousFrameControlVertexInfos);
 
@@ -64,7 +64,7 @@ public class InverseKinematicsAnimator {
 				lastIkDeltas = null;
 
 				//reapply deltas
-				resultInputs = boneSystem.SumAndClampInputs(baseInputs, poseDeltas);
+				resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 			}
 		} else {
 			for (int i = 0; i < 1; ++i) {

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using SharpDX;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,10 +37,12 @@ public class RigidBoneSystem {
 	public DualQuaternion[] GetBoneTransforms(RigidBoneSystemInputs inputs) {
 		DualQuaternion[] boneTransforms = new DualQuaternion[bones.Length];
 
+		DualQuaternion rootTransform = DualQuaternion.FromTranslation(inputs.RootTranslation);
+
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			RigidBone bone = bones[boneIdx];
 			RigidBone parent = bone.Parent;
-			DualQuaternion parentTransform = parent != null ? boneTransforms[parent.Source.Index] : DualQuaternion.Identity;
+			DualQuaternion parentTransform = parent != null ? boneTransforms[parent.Source.Index] : rootTransform;
 			boneTransforms[boneIdx] = bone.GetChainedTransform(inputs, parentTransform);
 		}
 
@@ -52,8 +54,9 @@ public class RigidBoneSystem {
 	}
 
 	public RigidBoneSystemInputs ReadInputs(ChannelOutputs channelOutputs) {
-		var inputs = new RigidBoneSystemInputs(bones.Length);
+		var inputs = new RigidBoneSystemInputs(bones.Length) {};
 
+		inputs.RootTranslation = source.RootBone.Translation.GetValue(channelOutputs);
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
 			inputs.Rotations[boneIdx] = bone.Source.Rotation.GetValue(channelOutputs);
@@ -63,31 +66,38 @@ public class RigidBoneSystem {
 	}
 	
 	public void WriteInputs(ChannelInputs channelInputs, ChannelOutputs channelOutputs, RigidBoneSystemInputs inputs) {
+		source.RootBone.Translation.SetEffectiveValue(channelInputs, channelOutputs, inputs.RootTranslation, SetMask.ApplyClampAndVisibleOnly);
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
 			bone.Source.Rotation.SetEffectiveValue(channelInputs, channelOutputs, inputs.Rotations[boneIdx], SetMask.ApplyClampAndVisibleOnly);
 		}
 	}
 
-	public RigidBoneSystemInputs SumAndClampInputs(RigidBoneSystemInputs inputsA, RigidBoneSystemInputs inputsB) {
-		var sumInputs = new RigidBoneSystemInputs(bones.Length);
+	public RigidBoneSystemInputs ApplyDeltas(RigidBoneSystemInputs baseInputs, RigidBoneSystemInputs deltaInputs) {
+		var sumInputs = new RigidBoneSystemInputs(bones.Length) {};
 
+		Quaternion baseRotation = RootBone.GetRotation(baseInputs);
+		sumInputs.RootTranslation = baseInputs.RootTranslation + Vector3.Transform(deltaInputs.RootTranslation, baseRotation);
+		
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			sumInputs.Rotations[boneIdx] = bone.Constraint.ClampRotation(inputsA.Rotations[boneIdx] + inputsB.Rotations[boneIdx]);
+			sumInputs.Rotations[boneIdx] = bone.Constraint.ClampRotation(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
 		}
 
 		return sumInputs;
 	}
 
-	public RigidBoneSystemInputs CalculateDeltas(RigidBoneSystemInputs sourceInputs, RigidBoneSystemInputs targetInputs) {
-		var deltas = new RigidBoneSystemInputs(bones.Length);
+	public RigidBoneSystemInputs CalculateDeltas(RigidBoneSystemInputs baseInputs, RigidBoneSystemInputs sumInputs) {
+		var deltaInputs = new RigidBoneSystemInputs(bones.Length) {};
 
+		Quaternion baseRotation = RootBone.GetRotation(baseInputs);
+		deltaInputs.RootTranslation = Vector3.Transform(sumInputs.RootTranslation - baseInputs.RootTranslation, Quaternion.Invert(baseRotation));
+		
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			deltas.Rotations[boneIdx] = targetInputs.Rotations[boneIdx] - sourceInputs.Rotations[boneIdx];
+			deltaInputs.Rotations[boneIdx] = sumInputs.Rotations[boneIdx] - baseInputs.Rotations[boneIdx];
 		}
 
-		return deltas;
+		return deltaInputs;
 	}
 }

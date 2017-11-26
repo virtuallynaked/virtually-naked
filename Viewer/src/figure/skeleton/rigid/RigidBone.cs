@@ -29,9 +29,10 @@ public class RigidBone {
 	public void Synchronize(ChannelOutputs outputs) {
 		ScalingTransform parentScalingTransform = Parent != null ? Parent.chainedScalingTransform : ScalingTransform.Identity;
 		Vector3 parentTranslation = Parent != null ? Parent.chainedTranslation : Vector3.Zero;
+		var sourceTranslation = Parent != null ? Source.Translation.GetValue(outputs) : Vector3.Zero; //don't bake in translation for root bone
 
 		chainedScalingTransform = Source.GetObjectCenteredScalingTransform(outputs).Chain(parentScalingTransform);
-		chainedTranslation = Vector3.Transform(Source.Translation.GetValue(outputs), parentScalingTransform.Scale) + parentTranslation;
+		chainedTranslation = Vector3.Transform(sourceTranslation, parentScalingTransform.Scale) + parentTranslation;
 
 		Vector3 sourceCenter = Source.CenterPoint.GetValue(outputs);
 		centerPoint = parentScalingTransform.Transform(sourceCenter) + chainedTranslation;
@@ -39,14 +40,6 @@ public class RigidBone {
 		orientationSpace = Source.GetOrientationSpace(outputs);
 	}
 	
-	public Quaternion GetRotation(RigidBoneSystemInputs inputs) {
-		Vector3 rotationAngles = Constraint.ClampRotation(inputs.Rotations[Index]);
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
-		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
-
-		return worldSpaceRotation;
-	}
-
 	public Vector3 ConvertRotationToAngles(Quaternion objectSpaceRotation) {
 		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
 
@@ -56,6 +49,18 @@ public class RigidBone {
 		return rotationAnglesDegrees;
 	}
 
+	public Quaternion ConvertAnglesToRotation(Vector3 rotationAngles) {
+		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		Quaternion objectSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
+
+		return objectSpaceRotation;
+	}
+
+	public Quaternion GetRotation(RigidBoneSystemInputs inputs) {
+		Vector3 rotationAngles = Constraint.ClampRotation(inputs.Rotations[Index]);
+		return ConvertAnglesToRotation(rotationAngles);
+	}
+	
 	public void SetRotation(RigidBoneSystemInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = false) {
 		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(objectSpaceRotation);
 		if (applyClamp) {
@@ -83,7 +88,8 @@ public class RigidBone {
 	}
 
 	public DualQuaternion GetChainedTransform(RigidBoneSystemInputs inputs) {
-		DualQuaternion parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : DualQuaternion.Identity;
+		DualQuaternion rootTransform = DualQuaternion.FromTranslation(inputs.RootTranslation);
+		DualQuaternion parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : rootTransform;
 		return GetChainedTransform(inputs, parentTransform);
 	}
 }

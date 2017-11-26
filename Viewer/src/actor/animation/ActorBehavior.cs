@@ -103,6 +103,8 @@ public class ActorBehavior {
 		
 		Dictionary<string, float[]> boneRotations = new Dictionary<string, float[]>();
 		var poseDeltas = ikAnimator.PoseDeltas;
+
+		rootTranslation += Vector3.Transform(poseDeltas.RootTranslation / 100, rootTransform.Rotation);
 		foreach (var bone in model.MainDefinition.BoneSystem.Bones) {
 			var angles = poseDeltas.Rotations[bone.Index];
 			if (!angles.IsZero) {
