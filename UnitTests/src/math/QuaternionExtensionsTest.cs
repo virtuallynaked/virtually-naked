@@ -69,4 +69,20 @@ public class QuaternionExtensionsTest {
 				actualResult),
 			1e-6);
 	}
+
+	[TestMethod]
+	public void TestChain() {
+		Quaternion q1 = Quaternion.RotationYawPitchRoll(0.1f, 0.2f, 0.3f);
+		Quaternion q2 = Quaternion.RotationYawPitchRoll(0.2f, -0.3f, 0.4f);
+		Quaternion q12 = q1.Chain(q2);
+
+		Assert.AreEqual(1, q12.Length(), 1e-4, "chained result is normalized");
+
+		Vector3 v = new Vector3(3, 4, 5);
+
+		var expected = Vector3.Transform(Vector3.Transform(v, q1), q2);
+		var actual = Vector3.Transform(v, q1.Chain(q2));
+
+		Assert.AreEqual(0, Vector3.Distance(expected, actual), 1e-4);
+	}
 }
