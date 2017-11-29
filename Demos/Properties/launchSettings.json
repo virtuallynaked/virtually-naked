@@ -67,6 +67,10 @@
 		"FlatIk.FlatIkApp": {
 			"commandName": "Project",
 			"commandLineArgs": "FlatIk.FlatIkApp"
+		},
+		"PrintBoneHierarchyApp": {
+			"commandName": "Project",
+			"commandLineArgs": "PrintBoneHierarchyApp"
 		}
 	}
 }
