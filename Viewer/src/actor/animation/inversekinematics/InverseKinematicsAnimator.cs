@@ -11,7 +11,7 @@
 		channelSystem = definition.ChannelSystem;
 		boneSystem = new RigidBoneSystem(definition.BoneSystem);
 		ui = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
-		solver = new BasicInverseKinematicsSolver();
+		solver = new SingleJointInverseKinematicsSolver("lForearmBend");
 		poseDeltas = boneSystem.MakeZeroInputs();
 	}
 	
