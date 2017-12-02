@@ -11,6 +11,9 @@ public class OrientationSpace {
 		inverseOrientation.Invert();
 	}
 
+	public Quaternion Orientation => orientation;
+	public Quaternion OrientationInverse => inverseOrientation;
+
 	public Quaternion TransformFromOrientedSpace(Quaternion orientedSpaceRotation) {
 		Quaternion objectSpaceRotation = inverseOrientation.Chain(orientedSpaceRotation).Chain(orientation);
 		return objectSpaceRotation;

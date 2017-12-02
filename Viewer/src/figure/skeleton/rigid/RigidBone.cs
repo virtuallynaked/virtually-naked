@@ -25,6 +25,7 @@ public class RigidBone {
 	}
 
 	public Vector3 CenterPoint => centerPoint;
+	public OrientationSpace OrientationSpace => orientationSpace;
 
 	public void Synchronize(ChannelOutputs outputs) {
 		ScalingTransform parentScalingTransform = Parent != null ? Parent.chainedScalingTransform : ScalingTransform.Identity;
@@ -49,25 +50,32 @@ public class RigidBone {
 		return rotationAnglesDegrees;
 	}
 
-	public Quaternion ConvertAnglesToRotation(Vector3 rotationAngles) {
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
-		Quaternion objectSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
-
-		return objectSpaceRotation;
-	}
-
-	public Quaternion GetRotation(RigidBoneSystemInputs inputs) {
+	public Quaternion GetOrientedSpaceRotation(RigidBoneSystemInputs inputs) {
 		Vector3 rotationAngles = Constraint.ClampRotation(inputs.Rotations[Index]);
-		return ConvertAnglesToRotation(rotationAngles);
+		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		return orientedSpaceRotation;
 	}
-	
-	public void SetRotation(RigidBoneSystemInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = false) {
-		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(objectSpaceRotation);
+
+	public void SetOrientedSpaceRotation(RigidBoneSystemInputs inputs, Quaternion orientatedSpaceRotation, bool applyClamp = false) {
+		Vector3 rotationAnglesRadians = RotationOrder.ToAngles(orientatedSpaceRotation);
+		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
+		
 		if (applyClamp) {
 			rotationAnglesDegrees = Constraint.ClampRotation(rotationAnglesDegrees);
 		}
 
 		inputs.Rotations[Index] = rotationAnglesDegrees;
+	}
+
+	public Quaternion GetRotation(RigidBoneSystemInputs inputs) {
+		Quaternion orientedSpaceRotation = GetOrientedSpaceRotation(inputs);
+		Quaternion objectSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
+		return objectSpaceRotation;
+	}
+	
+	public void SetRotation(RigidBoneSystemInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = false) {
+		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
+		SetOrientedSpaceRotation(inputs, orientatedSpaceRotation, applyClamp);
 	}
 			
 	private DualQuaternion GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs) {
