@@ -1,5 +1,6 @@
 ﻿using SharpDX;
 using System;
+using static SharpDX.Vector3;
 
 public static class QuaternionExtensions {
 	public static Quaternion RotateBetween(Vector3 v1, Vector3 v2) {
@@ -17,4 +18,24 @@ public static class QuaternionExtensions {
 
 		swing = q * Quaternion.Invert(twist);
     }
+
+	public static Quaternion SwingBetween(Vector3 a, Vector3 b, Vector3 n) {
+		//Assumes a, b, and n are unit vectors
+
+		Vector3 axis = Normalize(Cross(n, a-b));
+
+		Vector3 rejectionA = a - axis * Dot(a, axis);
+		Vector3 rejectionB = b - axis * Dot(b, axis);
+
+		float cosAngle = Dot(Normalize(rejectionA), Normalize(rejectionB));
+		float angle = (float) Math.Acos(cosAngle);
+		
+		Vector3 crossRejection = Cross(rejectionA, rejectionB);
+		
+		if (Dot(axis, crossRejection) < 0) {
+			angle = -angle;
+		}
+
+		return Quaternion.RotationAxis(axis, angle);
+	}
 }

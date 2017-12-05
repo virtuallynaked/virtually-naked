@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX;
+using System;
 
 [TestClass]
 public class QuaternionExtensionsTest {
@@ -84,5 +85,24 @@ public class QuaternionExtensionsTest {
 		var actual = Vector3.Transform(v, q1.Chain(q2));
 
 		Assert.AreEqual(0, Vector3.Distance(expected, actual), 1e-4);
+	}
+
+	private static Vector3 MakeRandomUnitVector(Random rnd) {
+		return Vector3.Normalize(new Vector3(rnd.NextFloat(-1, 1), rnd.NextFloat(-1, 1), rnd.NextFloat(-1, 1)));
+	}
+
+	[TestMethod]
+	public void TestSwingBetween() {
+		var rnd = new Random(0);
+		Vector3 a = MakeRandomUnitVector(rnd);
+		Vector3 b = MakeRandomUnitVector(rnd);
+		Vector3 n = MakeRandomUnitVector(rnd);
+
+		Quaternion q = QuaternionExtensions.SwingBetween(a, b, n);
+		
+		Vector3 rotatedA = Vector3.Transform(a, q);
+		Assert.AreEqual(0, Vector3.Distance(b, rotatedA), 1e-4, "rotation takes a to b");
+
+		Assert.AreEqual(0, Vector3.Dot(q.Axis, n), 1e-4, "rotation axis lies in plane");
 	}
 }
