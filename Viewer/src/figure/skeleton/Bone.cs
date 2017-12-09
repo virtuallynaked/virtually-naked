@@ -8,13 +8,14 @@ public class Bone {
 	public RotationOrder RotationOrder {get; }
 	public bool InheritsScale {get; }
 	public ChannelTriplet CenterPoint {get; }
+	public ChannelTriplet EndPoint {get; }
 	public ChannelTriplet Orientation {get; }
 	public ChannelTriplet Rotation {get; }
 	public ChannelTriplet Translation {get; }
 	public ChannelTriplet Scale {get; }
 	public Channel GeneralScale {get; }
 
-	public Bone(string name, int index, Bone parent, RotationOrder rotationOrder, bool inheritsScale, ChannelTriplet centerPoint, ChannelTriplet orientation, ChannelTriplet rotation, ChannelTriplet translation, ChannelTriplet scale, Channel generalScale) {
+	public Bone(string name, int index, Bone parent, RotationOrder rotationOrder, bool inheritsScale, ChannelTriplet centerPoint, ChannelTriplet endPoint, ChannelTriplet orientation, ChannelTriplet rotation, ChannelTriplet translation, ChannelTriplet scale, Channel generalScale) {
 		if (parent == null) {
 			if (index != 0) {
 				throw new InvalidOperationException("root bone must be first");
@@ -29,6 +30,7 @@ public class Bone {
 		RotationOrder = rotationOrder;
 		InheritsScale = inheritsScale;
 		CenterPoint = centerPoint;
+		EndPoint = endPoint;
 		Orientation = orientation;
 		Rotation = rotation;
 		Translation = translation;

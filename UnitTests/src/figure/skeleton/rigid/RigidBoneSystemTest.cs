@@ -19,10 +19,11 @@ class BoneSystemBuilder {
 		return new ChannelTriplet(xChannel, yChannel, zChannel);
 	}
 
-	public Bone AddBone(string name, Bone parent, Vector3 centerPoint, Vector3 orientation) {
+	public Bone AddBone(string name, Bone parent, Vector3 centerPoint, Vector3 endPoint, Vector3 orientation) {
 		var bone = new Bone(
 			name, bones.Count, parent, RotationOrder.XYZ, false,
 			AddChannelTriplet(name + "/center", centerPoint),
+			AddChannelTriplet(name + "/end-point", endPoint),
 			AddChannelTriplet(name + "/orientation", orientation),
 			AddChannelTriplet(name + "/rotation", Vector3.Zero),
 			AddChannelTriplet(name + "/translation", Vector3.Zero),
@@ -46,9 +47,9 @@ public class RigidBoneSystemTest {
 	[TestMethod]
 	public void TestTransformConsistency() {
 		var builder = new BoneSystemBuilder();
-		var bone0 = builder.AddBone("bone0", null, new Vector3(1, 0, 0), Vector3.Zero);
-		var bone1 = builder.AddBone("bone1", bone0, new Vector3(2, 0, 0), Vector3.Zero);
-		var bone2 = builder.AddBone("bone2", bone1, new Vector3(3, 0, 0), Vector3.Zero);
+		var bone0 = builder.AddBone("bone0", null, new Vector3(1, 0, 0), new Vector3(2, 0, 0), Vector3.Zero);
+		var bone1 = builder.AddBone("bone1", bone0, new Vector3(2, 0, 0), new Vector3(3, 0, 0), Vector3.Zero);
+		var bone2 = builder.AddBone("bone2", bone1, new Vector3(3, 0, 0), new Vector3(4, 0, 0), Vector3.Zero);
 		var channelSystem = builder.BuildChannelSystem();
 		var boneSystem = builder.BuildBoneSystem();
 		

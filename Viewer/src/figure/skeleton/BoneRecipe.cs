@@ -11,6 +11,7 @@ public class BoneRecipe {
 	public void Bake(Dictionary<string, Channel> channels, List<Bone> bones, Dictionary<string, Bone> bonesByName) {
 		int index = bones.Count;
 		var centerPoint = ChannelTriplet.Lookup(channels, Name + "?center_point");
+		var endPoint = ChannelTriplet.Lookup(channels, Name + "?end_point");
 		var orientation = ChannelTriplet.Lookup(channels, Name + "?orientation");
 		var rotation = ChannelTriplet.Lookup(channels, Name + "?rotation");
 		var translation = ChannelTriplet.Lookup(channels, Name + "?translation");
@@ -25,6 +26,7 @@ public class BoneRecipe {
 			global::RotationOrder.FromString(RotationOrder),
 			InheritsScale,
 			centerPoint,
+			endPoint,
 			orientation,
 			rotation,
 			translation,
