@@ -44,7 +44,7 @@ public class RigidBone {
 	public Vector3 ConvertRotationToAngles(Quaternion objectSpaceRotation) {
 		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
 
-		Vector3 rotationAnglesRadians = RotationOrder.ToAngles(orientatedSpaceRotation);
+		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
 		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 
 		return rotationAnglesDegrees;
@@ -52,12 +52,12 @@ public class RigidBone {
 
 	public Quaternion GetOrientedSpaceRotation(RigidBoneSystemInputs inputs) {
 		Vector3 rotationAngles = Constraint.ClampRotation(inputs.Rotations[Index]);
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		return orientedSpaceRotation;
 	}
 
 	public void SetOrientedSpaceRotation(RigidBoneSystemInputs inputs, Quaternion orientatedSpaceRotation, bool applyClamp = false) {
-		Vector3 rotationAnglesRadians = RotationOrder.ToAngles(orientatedSpaceRotation);
+		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
 		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 		
 		if (applyClamp) {

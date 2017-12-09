@@ -78,7 +78,7 @@ public class ActorBehavior {
 			Vector3 rootRotation = new Vector3(rotation);
 			Vector3 rootTranslation = new Vector3(translation);
 			DualQuaternion rootTransform = DualQuaternion.FromRotationTranslation(
-				behaviour.model.MainDefinition.BoneSystem.RootBone.RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rootRotation)),
+				behaviour.model.MainDefinition.BoneSystem.RootBone.RotationOrder.FromEulerAngles(MathExtensions.DegreesToRadians(rootRotation)),
 				rootTranslation);
 			behaviour.dragHandle.Transform = rootTransform.ToMatrix();
 
@@ -98,7 +98,7 @@ public class ActorBehavior {
 
 	public PoseRecipe RecipizePose() {
 		var rootTransform = DualQuaternion.FromMatrix(dragHandle.Transform);
-		Vector3 rootRotation = MathExtensions.RadiansToDegrees(model.MainDefinition.BoneSystem.RootBone.RotationOrder.ToAngles(rootTransform.Rotation));
+		Vector3 rootRotation = MathExtensions.RadiansToDegrees(model.MainDefinition.BoneSystem.RootBone.RotationOrder.ToEulerAngles(rootTransform.Rotation));
 		Vector3 rootTranslation = rootTransform.Translation;
 		
 		Dictionary<string, float[]> boneRotations = new Dictionary<string, float[]>();

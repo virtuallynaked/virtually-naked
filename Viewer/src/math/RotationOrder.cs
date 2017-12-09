@@ -54,7 +54,33 @@ public struct RotationOrder {
 			(primaryAxis == 2 && secondaryAxis == 0); 
     }
 
-    public Quaternion FromAngles(Vector3 angles) {
+	public Quaternion FromTwistSwingAngles(Vector3 angles) {
+		Quaternion twistQ = Quaternion.RotationAxis(UnitVectors[primaryAxis], angles[primaryAxis]);
+		
+		Vector3 swingVector = angles;
+		swingVector[primaryAxis] = 0;
+		
+		float swingAngle = swingVector.Length();
+		Quaternion swingQ = Quaternion.RotationAxis(swingVector, swingAngle);
+
+		return twistQ.Chain(swingQ);
+	}
+
+	public Vector3 ToTwistSwingAngles(Quaternion quaternion) {
+		quaternion.DecomposeIntoTwistThenSwing(UnitVectors[primaryAxis], out Quaternion twistQ, out Quaternion swingQ);
+
+		float swingAngle = swingQ.Angle;
+		Vector3 swingAxis = swingQ.Axis;
+
+		Vector3 angles = default(Vector3);
+		angles[primaryAxis] = twistQ.Angle * twistQ.Axis[primaryAxis];
+		angles[secondaryAxis] = swingAngle * swingAxis[secondaryAxis];
+		angles[tertiaryAxis] = swingAngle * swingAxis[tertiaryAxis];
+
+		return angles;
+	}
+
+    public Quaternion FromEulerAngles(Vector3 angles) {
 		double halfAngle1 = angles[primaryAxis] / 2;
 		double halfAngle2 = angles[secondaryAxis] / 2;
 		double halfAngle3 = angles[tertiaryAxis] / 2;
@@ -81,7 +107,7 @@ public struct RotationOrder {
 		return q;
     }
 
-    public Vector3 ToAngles(Quaternion quaternion) {
+    public Vector3 ToEulerAngles(Quaternion quaternion) {
 		//From http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/quat_2_euler_paper_ver2-1.pdf
 		
 		double e = circular ? -1 : +1;
@@ -139,9 +165,5 @@ public struct RotationOrder {
 		angles[tertiaryAxis] = (float) angle3;
 
 		return angles;
-    }
-
-    public Quaternion FromAngles(float x, float y, float z) {
-        return FromAngles(new Vector3(x, y, z));
     }
 }

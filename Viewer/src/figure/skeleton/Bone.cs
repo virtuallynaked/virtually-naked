@@ -49,7 +49,7 @@ public class Bone {
 
 	public OrientationSpace GetOrientationSpace(ChannelOutputs outputs) {
 		Vector3 orientationAngles = Orientation.GetValue(outputs);
-		Quaternion orientation = RotationOrder.DazStandard.FromAngles(MathExtensions.DegreesToRadians(orientationAngles));
+		Quaternion orientation = RotationOrder.DazStandard.FromEulerAngles(MathExtensions.DegreesToRadians(orientationAngles));
 		return new OrientationSpace(orientation);
 	}
 
@@ -57,7 +57,7 @@ public class Bone {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 
 		Vector3 rotationAngles = Rotation.GetValue(outputs);
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
 		return worldSpaceRotation;
@@ -67,7 +67,7 @@ public class Bone {
 		OrientationSpace orientationSpace = GetOrientationSpace(orientationOutputs);
 		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
 
-		Vector3 rotationAnglesRadians = RotationOrder.ToAngles(orientatedSpaceRotation);
+		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
 		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 
 		return rotationAnglesDegrees;
@@ -101,7 +101,7 @@ public class Bone {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 
 		Vector3 rotationAngles = Rotation.GetValue(outputs);
-		Quaternion orientedSpaceRotation = RotationOrder.FromAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
 		Vector3 translation = Vector3.Transform(Translation.GetValue(outputs), parentScale);
