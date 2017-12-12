@@ -4,7 +4,7 @@ public class RigidBone {
 	public Bone Source { get; }
 	public int Index { get; }
 	public RigidBone Parent { get; }
-	public RigidBoneConstraint Constraint { get; }
+	public RotationConstraint Constraint { get; }
 
 	public RotationOrder RotationOrder { get; }
 
@@ -19,9 +19,8 @@ public class RigidBone {
 		Source = source;
 		Index = source.Index;
 		Parent = parent;
-
 		RotationOrder = source.RotationOrder;
-		Constraint = RigidBoneConstraint.InitializeFrom(source);
+		Constraint = source.RotationConstraint;
 	}
 
 	public Vector3 CenterPoint => centerPoint;
@@ -41,15 +40,6 @@ public class RigidBone {
 		orientationSpace = Source.GetOrientationSpace(outputs);
 	}
 	
-	public Vector3 ConvertRotationToAngles(Quaternion objectSpaceRotation) {
-		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
-
-		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
-		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
-
-		return rotationAnglesDegrees;
-	}
-
 	public Quaternion GetOrientedSpaceRotation(RigidBoneSystemInputs inputs) {
 		Vector3 rotationAngles = Constraint.ClampRotation(inputs.Rotations[Index]);
 		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));

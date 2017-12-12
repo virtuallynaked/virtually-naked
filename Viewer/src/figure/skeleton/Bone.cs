@@ -15,6 +15,8 @@ public class Bone {
 	public ChannelTriplet Scale {get; }
 	public Channel GeneralScale {get; }
 
+	public RotationConstraint RotationConstraint { get; }
+
 	public Bone(string name, int index, Bone parent, RotationOrder rotationOrder, bool inheritsScale, ChannelTriplet centerPoint, ChannelTriplet endPoint, ChannelTriplet orientation, ChannelTriplet rotation, ChannelTriplet translation, ChannelTriplet scale, Channel generalScale) {
 		if (parent == null) {
 			if (index != 0) {
@@ -36,6 +38,8 @@ public class Bone {
 		Translation = translation;
 		Scale = scale;
 		GeneralScale = generalScale;
+
+		RotationConstraint = RotationConstraint.InitializeFrom(rotationOrder, rotation);
 	}
 
 	private Matrix3x3 GetCombinedScale(ChannelOutputs outputs) {
@@ -54,35 +58,41 @@ public class Bone {
 		Quaternion orientation = RotationOrder.DazStandard.FromEulerAngles(MathExtensions.DegreesToRadians(orientationAngles));
 		return new OrientationSpace(orientation);
 	}
-
+	
 	public Quaternion GetRotation(ChannelOutputs outputs) {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 
 		Vector3 rotationAngles = Rotation.GetValue(outputs);
+		rotationAngles = RotationConstraint.ClampRotation(rotationAngles);
+
 		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
 		return worldSpaceRotation;
 	}
 
-	public Vector3 ConvertRotationToAngles(ChannelOutputs orientationOutputs, Quaternion objectSpaceRotation) {
+	public Vector3 ConvertRotationToAngles(ChannelOutputs orientationOutputs, Quaternion objectSpaceRotation, bool applyClamp) {
 		OrientationSpace orientationSpace = GetOrientationSpace(orientationOutputs);
 		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
 
 		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
 		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 
+		if (applyClamp) {
+			rotationAnglesDegrees = RotationConstraint.ClampRotation(rotationAnglesDegrees);
+		}
+
 		return rotationAnglesDegrees;
 	}
 
-	public void SetRotation(ChannelOutputs orientationOutputs, ChannelInputs inputs, Quaternion objectSpaceRotation, SetMask mask = SetMask.Any) {
-		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(orientationOutputs, objectSpaceRotation);
-		Rotation.SetValue(inputs, rotationAnglesDegrees, mask);
+	public void SetRotation(ChannelOutputs orientationOutputs, ChannelInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
+		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(orientationOutputs, objectSpaceRotation, applyClamp);
+		Rotation.SetValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
 	}
 
-	public void SetEffectiveRotation(ChannelInputs inputs, ChannelOutputs outputs, Quaternion objectSpaceRotation, SetMask mask = SetMask.Any) {
-		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(outputs, objectSpaceRotation);
-		Rotation.SetEffectiveValue(inputs, outputs, rotationAnglesDegrees, mask);
+	public void SetEffectiveRotation(ChannelInputs inputs, ChannelOutputs outputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
+		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(outputs, objectSpaceRotation, applyClamp);
+		Rotation.SetEffectiveValue(inputs, outputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
 	}
 	
 	public void SetTranslation(ChannelInputs inputs, Vector3 translation, SetMask mask = SetMask.Any) {
@@ -100,11 +110,7 @@ public class Bone {
 	}
 
 	private DualQuaternion GetJointCenteredRotationTransform(ChannelOutputs outputs, Matrix3x3 parentScale) {
-		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
-
-		Vector3 rotationAngles = Rotation.GetValue(outputs);
-		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
-		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
+		Quaternion worldSpaceRotation = GetRotation(outputs);
 
 		Vector3 translation = Vector3.Transform(Translation.GetValue(outputs), parentScale);
 		
