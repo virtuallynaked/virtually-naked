@@ -13,20 +13,24 @@ namespace FlatIk {
 		private readonly List<Bone> bones;
 		private readonly SkeletonInputs inputs;
 		private readonly IIkSolver solver;
-		private Vector2 target = new Vector2(2, 1);
+		private Vector2 target = new Vector2(5, 5);
 		
 		private static List<Bone> MakeStandardBones() {
 			float l = (float) Math.Sqrt(0.5);
 
 			float rotationLimit = MathUtil.Pi / 3;
 
-			var bone0 = Bone.MakeWithOffset(0, null, Vector2.UnitX, MathUtil.Pi);
-			var bone1 = Bone.MakeWithOffset(1, bone0, Vector2.UnitX, rotationLimit);
-			var bone2 = Bone.MakeWithOffset(2, bone1, Vector2.UnitX, rotationLimit);
-			var bone3 = Bone.MakeWithOffset(3, bone2, Vector2.UnitX, rotationLimit);
-			var bone4 = Bone.MakeWithOffset(4, bone3, Vector2.UnitX, rotationLimit);
+			var bone0 = Bone.MakeWithOffset(0, null, Vector2.UnitY, MathUtil.Pi);
+			var bone1 = Bone.MakeWithOffset(1, bone0, Vector2.UnitY, rotationLimit);
+			var bone2 = Bone.MakeWithOffset(2, bone1, Vector2.UnitY, rotationLimit);
+			var bone3 = Bone.MakeWithOffset(3, bone2, Vector2.UnitY, rotationLimit);
+			var bone4 = Bone.MakeWithOffset(4, bone3, Vector2.UnitY, rotationLimit);
+			var bone5 = Bone.MakeWithOffset(5, bone4, Vector2.UnitX, rotationLimit);
+			var bone6 = Bone.MakeWithOffset(6, bone5, Vector2.UnitX, rotationLimit);
+			var bone7 = Bone.MakeWithOffset(7, bone6, Vector2.UnitX, rotationLimit);
+			var bone8 = Bone.MakeWithOffset(8, bone7, Vector2.UnitX, rotationLimit);
 			
-			return new List<Bone> { bone0, bone1, bone2, bone3, bone4 };
+			return new List<Bone> { bone0, bone1, bone2, bone3, bone4, bone5, bone6, bone7, bone8 };
 		}
 		
 		public FlatIkApp() {
@@ -72,7 +76,7 @@ namespace FlatIk {
 		}
 
 		private Matrix3x2 GetWorldToFormTransform() {
-			float worldExtent = 10;
+			float worldExtent = 20;
 			var size = renderEnvironment.Size;
 			float scaling = Math.Min(size.Width, size.Height) / worldExtent;
 			return new Matrix3x2(1, 0, 0, -1, 0, 0) * Matrix3x2.Scaling(scaling) * Matrix3x2.Translation(size.Width / 2, size.Height / 2);
