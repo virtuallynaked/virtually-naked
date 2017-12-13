@@ -15,7 +15,7 @@ public class VRApp : IDisposable {
 	private const bool debugDevice = false;
 
 	private static String GetStackTrace() {
-		return new StackTrace(4, true).ToString();
+		return new StackTrace(4, false).ToString();
 	}
 
 	[Conditional("DEBUG")]
