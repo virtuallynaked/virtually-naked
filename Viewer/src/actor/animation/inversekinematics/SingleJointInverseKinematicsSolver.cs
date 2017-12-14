@@ -1,8 +1,6 @@
 ﻿using SharpDX;
 
 public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
-	private const int TwistAxis = Swing.XAxis;
-
 	private readonly string boneName;
 
 	public SingleJointInverseKinematicsSolver(string boneName) {
@@ -30,7 +28,8 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		var orientedSourceDirection = Vector3.Transform(worldSourceDirection, worldToOrientatedSpaceTransform);
 		var orientedTargetDirection = Vector3.Transform(worldTargetDirection, worldToOrientatedSpaceTransform);
 		
-		var newOrientedRotation = Swing.FromTo(TwistAxis, orientedSourceDirection, orientedTargetDirection).AsQuaternion(TwistAxis);
+		int twistAxis = bone.RotationOrder.primaryAxis;
+		var newOrientedRotation = Swing.FromTo(twistAxis, orientedSourceDirection, orientedTargetDirection).AsQuaternion(twistAxis);
 		bone.SetOrientedSpaceRotation(inputs, newOrientedRotation, true);
 	}
 }
