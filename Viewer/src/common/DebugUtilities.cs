@@ -32,5 +32,11 @@ static class DebugUtilities {
 		float dotProduct = Vector3.Dot(u1, u2);
 		Debug.Assert(Math.Abs(dotProduct - 1) < 1e-2f, "not same direction");
 	}
+
+	[Conditional("DEBUG")]
+	public static void AssertSameRotation(Quaternion q1, Quaternion q2) {
+		float dotProduct = Quaternion.Dot(q1, q2);
+		Debug.Assert(Math.Abs(dotProduct - 1) < 1e-2f, "not same rotation");
+	}
 }
 
