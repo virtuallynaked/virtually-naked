@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 
 public class Channel {
+	private const bool OverrideLimitsOnJoints = false; //for debugging purposes
+
 	public string Name {get; }
 	public int Index {get; }
 	public Channel ParentChannel {get;}
@@ -15,14 +17,17 @@ public class Channel {
 	private List<Formula> multiplyFormulas = new List<Formula>();
 	
 	public Channel(string name, int index, Channel parentChannel, double initialValue, double min, double max, bool clamped, bool visible, string path) {
+		bool isJoint = path != null && path.StartsWith("/Joints/");
+		bool overrideLimit = isJoint && OverrideLimitsOnJoints;
+
 		Name = name;
 		Index = index;
 		ParentChannel = parentChannel;
 		InitialValue = initialValue;
 		Min = min;
 		Max = max;
-		Clamped = clamped;
-		Visible = visible;
+		Clamped = clamped && !overrideLimit;
+		Visible = visible || overrideLimit;
 		Path = path;
 	}
 	
