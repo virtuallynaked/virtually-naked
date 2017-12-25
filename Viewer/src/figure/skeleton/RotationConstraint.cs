@@ -40,6 +40,13 @@ public class RotationConstraint {
 		this.maxRotation = maxRotation;
 	}
 
+	private bool IsLocked(int axisIdx) {
+		return minRotation[axisIdx] == maxRotation[axisIdx];
+	}
+
+	public bool TwistLocked => IsLocked(rotationOrder.primaryAxis);
+	public bool SwingLocked => IsLocked(rotationOrder.secondaryAxis) && IsLocked(rotationOrder.tertiaryAxis);
+	
 	public Vector3 ClampRotation(Vector3 value) {
 		float clampedPrimary = MathUtil.Clamp(
 			(float) Math.IEEERemainder(value[rotationOrder.primaryAxis], 360),
