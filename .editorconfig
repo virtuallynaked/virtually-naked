@@ -1,0 +1,6 @@
+[*]
+end_of_line = crlf
+tab_width = 4
+
+[*.{cs,hlsl}]
+indent_style = tab
