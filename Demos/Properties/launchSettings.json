@@ -71,6 +71,10 @@
 		"PrintBoneHierarchyApp": {
 			"commandName": "Project",
 			"commandLineArgs": "PrintBoneHierarchyApp"
+		},
+		"CalculateBoneAttributesDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "CalculateBoneAttributesDemo"
 		}
 	}
 }

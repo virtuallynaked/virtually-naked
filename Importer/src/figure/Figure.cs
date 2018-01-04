@@ -125,6 +125,7 @@ public class Figure {
 	}
 
 	public InverterParameters MakeInverterParameters() {
-		return new InverterParameters(Geometry.Faces, Geometry.FaceGroupMap, Geometry.FaceGroupNames, SkinBinding.FaceGroupToNodeMap);
+		var boneAttributes = new BoneAttributesCalculator(channelSystem, boneSystem, geometry, skinBinding).CalculateBoneAttributes();
+		return new InverterParameters(Geometry.Faces, Geometry.FaceGroupMap, Geometry.FaceGroupNames, SkinBinding.FaceGroupToNodeMap, boneAttributes);
 	}
 }
