@@ -26,6 +26,11 @@ static class DebugUtilities {
 	}
 
 	[Conditional("DEBUG")]
+	public static void AssertIsUnit(Vector3 v) {
+		Debug.Assert(v.IsNormalized, "not normalized");
+	}
+
+	[Conditional("DEBUG")]
 	public static void AssertSameDirection(Vector3 v1, Vector3 v2) {
 		Vector3 u1 = Vector3.Normalize(v1);
 		Vector3 u2 = Vector3.Normalize(v2);

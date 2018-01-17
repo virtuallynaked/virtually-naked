@@ -29,6 +29,9 @@ public struct Swing {
 	}
 	
 	public static Swing FromTo(int twistAxis, Vector3 from, Vector3 to) {
+		DebugUtilities.AssertIsUnit(from);
+		DebugUtilities.AssertIsUnit(to);
+
 		float fromX = from[(twistAxis + 1) % 3];
 		float fromY = from[(twistAxis + 2) % 3];
 		float fromZ = from[(twistAxis + 0) % 3];
