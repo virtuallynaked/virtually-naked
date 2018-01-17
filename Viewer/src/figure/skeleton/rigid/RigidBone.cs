@@ -47,6 +47,8 @@ public class RigidBone {
 	}
 
 	public void SetOrientedSpaceRotation(RigidBoneSystemInputs inputs, Quaternion orientatedSpaceRotation, bool applyClamp = false) {
+		DebugUtilities.AssertFinite(orientatedSpaceRotation);
+
 		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
 		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 		

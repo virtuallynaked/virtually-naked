@@ -38,5 +38,26 @@ static class DebugUtilities {
 		float dotProduct = Quaternion.Dot(q1, q2);
 		Debug.Assert(Math.Abs(dotProduct - 1) < 1e-2f, "not same rotation");
 	}
+
+	[Conditional("DEBUG")]
+	public static void AssertFinite(float f) {
+		Debug.Assert(!float.IsNaN(f), "value is NaN");
+		Debug.Assert(!float.IsInfinity(f), "value is infinity");
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertFinite(Vector3 v) {
+		AssertFinite(v.X);
+		AssertFinite(v.Y);
+		AssertFinite(v.Z);
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertFinite(Quaternion q) {
+		AssertFinite(q.X);
+		AssertFinite(q.Y);
+		AssertFinite(q.Z);
+		AssertFinite(q.W);
+	}
 }
 
