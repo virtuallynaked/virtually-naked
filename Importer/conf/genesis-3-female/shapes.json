@@ -281,5 +281,12 @@
 			"CTRLCathy": 1.0,
 			"CTRLVictoria7": 1.0
 		}
+	},
+	{
+		"name": "Anna",
+		"morphs": {
+			"CTRLAnna": 1.0,
+			"CTRLVictoria7": 1.0
+		}
 	}
 ]
