@@ -218,5 +218,13 @@
 		"paths": [
 			"/People/Genesis 3 Female/Characters/Senna/Materials/Senna All Mat.duf"
 		]
+	},
+	{
+		"name": "Cailin",
+		"paths": [ "/People/Genesis 3 Female/Characters/Cailin HD/Materials Iray/Cailin 01 Skin.duf" ]
+	},
+	{
+		"name": "Cathy",
+		"paths": [ "/People/Genesis 3 Female/Characters/Cathy/Materials Iray/Cathy 01 Skin.duf" ]
 	}
 ]

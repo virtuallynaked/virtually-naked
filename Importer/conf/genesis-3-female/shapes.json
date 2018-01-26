@@ -267,5 +267,19 @@
 			"CTRLSenna": 1.0,
 			"Genesis3Female-hd-correction": 1.0
 		}
+	},
+	{
+		"name": "Cailin",
+		"morphs": {
+			"CTRLCailin": 1.0,
+			"CTRLVictoria7": 1.0
+		}
+	},
+	{
+		"name": "Cathy",
+		"morphs": {
+			"CTRLCathy": 1.0,
+			"CTRLVictoria7": 1.0
+		}
 	}
 ]
