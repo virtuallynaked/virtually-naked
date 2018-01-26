@@ -234,5 +234,9 @@
 	{
 		"name": "Jolina",
 		"paths": [ "/People/Genesis 3 Female/Characters/Jolina/Materials Iray 4.9/Jolina 01 Skin.duf" ]
+	},
+	{
+		"name": "Sasha",
+		"paths": [ "/People/Genesis 3 Female/Characters/Sasha HD/Materials/Iray/01 Sasha Skin Iray.duf" ]
 	}
 ]

@@ -295,5 +295,12 @@
 			"CTRLJolina": 1.0,
 			"CTRLVictoria7": 1.0
 		}
+	},
+	{
+		"name": "Sasha",
+		"morphs": {
+			"CTRLSasha": 1.0,
+			"CTRLVictoria7": 1.0
+		}
 	}
 ]
