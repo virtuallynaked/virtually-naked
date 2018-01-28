@@ -308,5 +308,11 @@
 		"morphs": {
 			"Nyarai": 1.0
 		}
+	},
+	{
+		"name": "Priya",
+		"morphs": {
+			"CTRLPriya": 1.0
+		}
 	}
 ]

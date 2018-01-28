@@ -245,5 +245,12 @@
 			"/People/Genesis 3 Female/Characters/Saiyaness/Nyarai/Materials/Nyarai All Iray.duf",
 			"/patches/nyarai-glossy-roughness.duf"
 		]
-	}
+	},
+	{
+		"name": "Priya",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Saiyaness/Priya/Materials/Priya Iray.duf",
+			"/People/Genesis 3 Female/Characters/Saiyaness/Priya/Materials/Iray/Priya Gens 01.duf"
+		]
+	},
 ]
