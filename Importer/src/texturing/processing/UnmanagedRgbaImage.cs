@@ -12,7 +12,8 @@ public class UnmanagedRgbaImage : IDisposable {
 		PixelFormat.Format32bppRGB,
 		PixelFormat.Format32bppBGR,
 		PixelFormat.Format32bppRGBA,
-		PixelFormat.Format32bppBGRA
+		PixelFormat.Format32bppBGRA,
+		PixelFormat.Format8bppGray
 	};
 
 	public static UnmanagedRgbaImage Load(FileInfo file) {
