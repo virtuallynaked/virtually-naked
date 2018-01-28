@@ -302,5 +302,11 @@
 			"CTRLSasha": 1.0,
 			"CTRLVictoria7": 1.0
 		}
+	},
+	{
+		"name": "Nyarai",
+		"morphs": {
+			"Nyarai": 1.0
+		}
 	}
 ]

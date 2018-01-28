@@ -1,0 +1,98 @@
+{
+	"file_version" : "0.6.0.0",
+	"asset_info" : {
+		"id" : "/daz-asset-patches/nyarai-glossy-roughness.duf",
+		"type" : "preset_material",
+		"contributor" : {
+			"author" : "virtuallynaked",
+			"email" : "",
+			"website" : ""
+		},
+		"revision" : "1.0",
+		"modified" : "2018-01-27T21:32:22Z"
+	},
+	"scene" : {
+		"animations" : [
+			{
+				"url" : "Genesis3Female#materials/Fingernails:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.067 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Fingernails:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Toenails:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.067 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Toenails:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Face:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.47 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Face:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Lips:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.33 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Lips:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Ears:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.47 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Ears:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Legs:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.47 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Legs:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Torso:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.47 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Torso:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/EyeSocket:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.067 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/EyeSocket:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			},
+			
+			{
+				"url" : "Genesis3Female#materials/Arms:?extra/studio_material_channels/channels/Glossy%20Roughness/value",
+				"keys" : [ [ 0, 0.47 ] ]
+			},
+			{
+				"url" : "name://@selection#materials/Arms:?extra/studio_material_channels/channels/Glossy%20Roughness/image",
+				"keys" : [ [ 0, null ] ]
+			}
+		]
+	}
+}

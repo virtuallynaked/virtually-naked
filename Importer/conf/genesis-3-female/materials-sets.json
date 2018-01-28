@@ -238,5 +238,12 @@
 	{
 		"name": "Sasha",
 		"paths": [ "/People/Genesis 3 Female/Characters/Sasha HD/Materials/Iray/01 Sasha Skin Iray.duf" ]
+	},
+	{
+		"name": "Nyarai",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Saiyaness/Nyarai/Materials/Nyarai All Iray.duf",
+			"/patches/nyarai-glossy-roughness.duf"
+		]
 	}
 ]
