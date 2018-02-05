@@ -13,7 +13,7 @@ public class InverseKinematicsAnimator {
 		channelSystem = definition.ChannelSystem;
 		boneSystem = new RigidBoneSystem(definition.BoneSystem);
 		ui = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
-		solver = new SingleJointInverseKinematicsSolver("lForearmBend");
+		solver = new HarmonicInverseKinematicsSolver(inverterParameters.BoneAttributes);
 		poseDeltas = boneSystem.MakeZeroInputs();
 		Reset();
 	}
@@ -73,7 +73,7 @@ public class InverseKinematicsAnimator {
 			}
 		} else {
 			solver.Solve(boneSystem, problem, resultInputs);
-			lastIkDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
+			poseDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
 		}
 		
 		boneSystem.WriteInputs(channelInputs, channelOutputs, resultInputs);
