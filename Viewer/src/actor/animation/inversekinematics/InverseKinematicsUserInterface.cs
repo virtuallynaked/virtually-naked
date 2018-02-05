@@ -41,7 +41,9 @@ public class InverseKinematicsUserInterface {
 		["rPinky1"] = "rHand",
 		["rThumb2"] = "rHand",
 		["rRing2"] = "rHand",
-		["rRing1"] = "rHand"
+		["rRing1"] = "rHand",
+		["lToe"] = "lFoot",
+		["rToe"] = "rFoot",
 	};
 
 	private readonly ControllerManager controllerManager;
