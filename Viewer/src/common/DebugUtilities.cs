@@ -18,6 +18,11 @@ static class DebugUtilities {
 	}
 	
 	[Conditional("DEBUG")]
+	public static void AssertSame(float f1, float f2, string message) {
+		Debug.Assert(Math.Abs(f1 - f2) / (f1 + f2 + 1e-2) < 1e-2, message);
+	}
+
+	[Conditional("DEBUG")]
 	public static void AssertSamePosition(Vector3 v1, Vector3 v2) {
 		float distance = Vector3.Distance(v1, v2);
 		float denominator = (Vector3.Distance(v1, Vector3.Zero) + Vector3.Distance(v2, Vector3.Zero)) / 2 + 1e-1f;
@@ -27,7 +32,26 @@ static class DebugUtilities {
 
 	[Conditional("DEBUG")]
 	public static void AssertIsUnit(Vector3 v) {
-		Debug.Assert(v.IsNormalized, "not normalized");
+		float lengthSquared = v.LengthSquared();
+		Debug.Assert(Math.Abs(lengthSquared - 1) < 1e-2f, "not normalized");
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertIsUnit(Vector2 v) {
+		float lengthSquared = v.LengthSquared();
+		Debug.Assert(Math.Abs(lengthSquared - 1) < 1e-2f, "not normalized");
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertIsUnit(Quaternion q) {
+		float lengthSquared = q.LengthSquared();
+		Debug.Assert(Math.Abs(lengthSquared - 1) < 1e-2f, "not normalized");
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertIsUnit(float x, float y) {
+		float lengthSquared = x * x + y * y;
+		Debug.Assert(Math.Abs(lengthSquared - 1) < 1e-2f, "not normalized");
 	}
 
 	[Conditional("DEBUG")]
@@ -63,6 +87,40 @@ static class DebugUtilities {
 		AssertFinite(q.Y);
 		AssertFinite(q.Z);
 		AssertFinite(q.W);
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertFinite(Twist t) {
+		AssertFinite(t.X);
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertFinite(Swing s) {
+		AssertFinite(s.Y);
+		AssertFinite(s.Z);
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertFinite(TwistSwing ts) {
+		AssertFinite(ts.Twist);
+		AssertFinite(ts.Swing);
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertSame(Twist t1, Twist t2) {
+		AssertSame(t1.X, t2.X, "not same twist");
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertSame(Swing s1, Swing s2) {
+		AssertSame(s1.Y, s2.Y, "not same swing");
+		AssertSame(s1.Z, s2.Z, "not same swing");
+	}
+
+	[Conditional("DEBUG")]
+	public static void AssertSame(TwistSwing ts1, TwistSwing ts2) {
+		AssertSame(ts1.Twist, ts2.Twist);
+		AssertSame(ts1.Swing, ts2.Swing);
 	}
 }
 

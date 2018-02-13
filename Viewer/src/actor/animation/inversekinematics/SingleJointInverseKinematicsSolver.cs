@@ -28,7 +28,7 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		var orientedSourceDirection = Vector3.Transform(worldSourceDirection, worldToOrientatedSpaceTransform);
 		var orientedTargetDirection = Vector3.Transform(worldTargetDirection, worldToOrientatedSpaceTransform);
 		
-		int twistAxis = bone.RotationOrder.primaryAxis;
+		CartesianAxis twistAxis = (CartesianAxis) bone.RotationOrder.primaryAxis;
 		var newOrientedRotation = Swing.FromTo(twistAxis, orientedSourceDirection, orientedTargetDirection).AsQuaternion(twistAxis);
 		bone.SetOrientedSpaceRotation(inputs, newOrientedRotation, true);
 	}
