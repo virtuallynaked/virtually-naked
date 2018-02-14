@@ -108,27 +108,28 @@ public class RotationOrderTest {
 	
 	
 	private void TestFromTwistSwingAngles(RotationOrder order) {
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, 0, 0)), Quaternion.Identity, Acc);
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(+1, 0, 0)), Quaternion.RotationAxis(Vector3.UnitX, +1), Acc);
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(-1, 0, 0)), Quaternion.RotationAxis(Vector3.UnitX, -1), Acc);
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, +1, 0)), Quaternion.RotationAxis(Vector3.UnitY, +1), Acc);
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, -1, 0)), Quaternion.RotationAxis(Vector3.UnitY, -1), Acc);
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, 0, +1)), Quaternion.RotationAxis(Vector3.UnitZ, +1), Acc);
-		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, 0, -1)), Quaternion.RotationAxis(Vector3.UnitZ, -1), Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, 0, 0)).AsQuaternion(order.TwistAxis), Quaternion.Identity, Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(+1, 0, 0)).AsQuaternion(order.TwistAxis), Quaternion.RotationAxis(Vector3.UnitX, +1), Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(-1, 0, 0)).AsQuaternion(order.TwistAxis), Quaternion.RotationAxis(Vector3.UnitX, -1), Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, +1, 0)).AsQuaternion(order.TwistAxis), Quaternion.RotationAxis(Vector3.UnitY, +1), Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, -1, 0)).AsQuaternion(order.TwistAxis), Quaternion.RotationAxis(Vector3.UnitY, -1), Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, 0, +1)).AsQuaternion(order.TwistAxis), Quaternion.RotationAxis(Vector3.UnitZ, +1), Acc);
+		MathAssert.AreEqual(order.FromTwistSwingAngles(new Vector3(0, 0, -1)).AsQuaternion(order.TwistAxis), Quaternion.RotationAxis(Vector3.UnitZ, -1), Acc);
 	}
-	
+		
 	private void TestToTwistSwingAngles(RotationOrder order) {
-		MathAssert.AreEqual(new Vector3(0, 0, 0), order.ToTwistSwingAngles(Quaternion.Identity), Acc);
-		MathAssert.AreEqual(new Vector3(+1, 0, 0), order.ToTwistSwingAngles(Quaternion.RotationAxis(Vector3.UnitX, +1)), Acc);
-		MathAssert.AreEqual(new Vector3(-1, 0, 0), order.ToTwistSwingAngles(Quaternion.RotationAxis(Vector3.UnitX, -1)), Acc);
-		MathAssert.AreEqual(new Vector3(0, +1, 0), order.ToTwistSwingAngles(Quaternion.RotationAxis(Vector3.UnitY, +1)), Acc);
-		MathAssert.AreEqual(new Vector3(0, -1, 0), order.ToTwistSwingAngles(Quaternion.RotationAxis(Vector3.UnitY, -1)), Acc);
-		MathAssert.AreEqual(new Vector3(0, 0, +1), order.ToTwistSwingAngles(Quaternion.RotationAxis(Vector3.UnitZ, +1)), Acc);
-		MathAssert.AreEqual(new Vector3(0, 0, -1), order.ToTwistSwingAngles(Quaternion.RotationAxis(Vector3.UnitZ, -1)), Acc);
+		MathAssert.AreEqual(new Vector3(0, 0, 0), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.Identity)), Acc);
+		MathAssert.AreEqual(new Vector3(+1, 0, 0), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.RotationAxis(Vector3.UnitX, +1))), Acc);
+		MathAssert.AreEqual(new Vector3(-1, 0, 0), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.RotationAxis(Vector3.UnitX, -1))), Acc);
+		MathAssert.AreEqual(new Vector3(0, +1, 0), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.RotationAxis(Vector3.UnitY, +1))), Acc);
+		MathAssert.AreEqual(new Vector3(0, -1, 0), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.RotationAxis(Vector3.UnitY, -1))), Acc);
+		MathAssert.AreEqual(new Vector3(0, 0, +1), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.RotationAxis(Vector3.UnitZ, +1))), Acc);
+		MathAssert.AreEqual(new Vector3(0, 0, -1), order.ToTwistSwingAngles(TwistSwing.Decompose(order.TwistAxis, Quaternion.RotationAxis(Vector3.UnitZ, -1))), Acc);
 	}
 
 	private void TestTwistSwingRoundTrip(RotationOrder order, Quaternion q) {
-		MathAssert.AreEqual(q, order.FromTwistSwingAngles(order.ToTwistSwingAngles(q)), Acc);
+		var ts = TwistSwing.Decompose(order.TwistAxis, q);
+		MathAssert.AreEqual(q, order.FromTwistSwingAngles(order.ToTwistSwingAngles(ts)).AsQuaternion(order.TwistAxis), Acc);
 	}
 
 	private void TestTwistSwingRoundTrip(RotationOrder order) {

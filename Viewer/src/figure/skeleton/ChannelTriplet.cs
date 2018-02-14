@@ -46,5 +46,26 @@ public class ChannelTriplet {
 		Y.SetEffectiveValue(inputs, outputsForDelta, value.Y, mask);
 		Z.SetEffectiveValue(inputs, outputsForDelta, value.Z, mask);
 	}
+	
+	private static void ExtractMinMax(Channel channel, int idx, ref Vector3 min, ref Vector3 max) {
+		if (!channel.Visible) {
+			min[idx] = (float) channel.InitialValue;
+			max[idx] = (float) channel.InitialValue;
+		} else if (!channel.Clamped) {
+			min[idx] = float.NegativeInfinity;
+			max[idx] = float.PositiveInfinity;
+		} else {
+			min[idx] = (float) channel.Min;
+			max[idx] = (float) channel.Max;
+		}
+	}
+
+	public void ExtractMinMax(out Vector3 min, out Vector3 max) {
+		min = Vector3.Zero;
+		max = Vector3.Zero;
+		ExtractMinMax(X, 0, ref min, ref max);
+		ExtractMinMax(Y, 1, ref min, ref max);
+		ExtractMinMax(Z, 2, ref min, ref max);
+	}
 }
 

@@ -15,7 +15,7 @@ public class Bone {
 	public ChannelTriplet Scale {get; }
 	public Channel GeneralScale {get; }
 
-	public RotationConstraint RotationConstraint { get; }
+	public TwistSwingConstraint RotationConstraint { get; }
 
 	public Bone(string name, int index, Bone parent, RotationOrder rotationOrder, bool inheritsScale, ChannelTriplet centerPoint, ChannelTriplet endPoint, ChannelTriplet orientation, ChannelTriplet rotation, ChannelTriplet translation, ChannelTriplet scale, Channel generalScale) {
 		if (parent == null) {
@@ -39,7 +39,10 @@ public class Bone {
 		Scale = scale;
 		GeneralScale = generalScale;
 
-		RotationConstraint = RotationConstraint.InitializeFrom(rotationOrder, rotation);
+		rotation.ExtractMinMax(out Vector3 minDegrees, out Vector3 maxDegrees);
+		Vector3 minRadians = MathExtensions.DegreesToRadians(minDegrees);
+		Vector3 maxRadians = MathExtensions.DegreesToRadians(maxDegrees);
+		RotationConstraint = TwistSwingConstraint.MakeFromRadians(rotationOrder.TwistAxis, minRadians, maxRadians);
 	}
 
 	private Matrix3x3 GetCombinedScale(ChannelOutputs outputs) {
@@ -63,9 +66,10 @@ public class Bone {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 
 		Vector3 rotationAngles = Rotation.GetValue(outputs);
-		rotationAngles = RotationConstraint.ClampRotation(rotationAngles);
+		TwistSwing rotationTwistSwing = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		rotationTwistSwing = RotationConstraint.Clamp(rotationTwistSwing);
 
-		Quaternion orientedSpaceRotation = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
+		Quaternion orientedSpaceRotation = rotationTwistSwing.AsQuaternion(RotationOrder.TwistAxis);
 		Quaternion worldSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 
 		return worldSpaceRotation;
@@ -73,15 +77,16 @@ public class Bone {
 
 	public Vector3 ConvertRotationToAngles(ChannelOutputs orientationOutputs, Quaternion objectSpaceRotation, bool applyClamp) {
 		OrientationSpace orientationSpace = GetOrientationSpace(orientationOutputs);
-		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
+		Quaternion orientatedSpaceRotationQ = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
+		TwistSwing orientatedSpaceRotation = TwistSwing.Decompose(RotationOrder.TwistAxis, orientatedSpaceRotationQ);
+
+		if (applyClamp) {
+			orientatedSpaceRotation = RotationConstraint.Clamp(orientatedSpaceRotation);
+		}
 
 		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientatedSpaceRotation);
 		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
-
-		if (applyClamp) {
-			rotationAnglesDegrees = RotationConstraint.ClampRotation(rotationAnglesDegrees);
-		}
-
+		
 		return rotationAnglesDegrees;
 	}
 

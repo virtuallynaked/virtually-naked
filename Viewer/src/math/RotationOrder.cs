@@ -54,28 +54,25 @@ public struct RotationOrder {
 			(primaryAxis == 2 && secondaryAxis == 0); 
     }
 
-	public Quaternion FromTwistSwingAngles(Vector3 angles) {
-		Quaternion twistQ = Quaternion.RotationAxis(UnitVectors[primaryAxis], angles[primaryAxis]);
-		
-		Vector3 swingVector = angles;
-		swingVector[primaryAxis] = 0;
-		
-		float swingAngle = swingVector.Length();
-		Quaternion swingQ = Quaternion.RotationAxis(swingVector, swingAngle);
+	public CartesianAxis TwistAxis => (CartesianAxis) primaryAxis;
 
-		return twistQ.Chain(swingQ);
+	public TwistSwing FromTwistSwingAngles(Vector3 angles /* in radians */) {
+		Twist twist = Twist.MakeFromAngle(angles[primaryAxis]);
+				
+		Swing swing = Swing.MakeFromAxisAngleProduct(
+			angles[(primaryAxis + 1) % 3],
+			angles[(primaryAxis + 2) % 3]);
+
+		return new TwistSwing(twist, swing);
 	}
-
-	public Vector3 ToTwistSwingAngles(Quaternion quaternion) {
-		quaternion.DecomposeIntoTwistThenSwing(UnitVectors[primaryAxis], out Quaternion twistQ, out Quaternion swingQ);
-
-		float swingAngle = swingQ.Angle;
-		Vector3 swingAxis = swingQ.Axis;
+	
+	public Vector3 ToTwistSwingAngles(TwistSwing twistSwing) {
+		Vector2 swingAxisAngleProduct = twistSwing.Swing.AxisAngleProduct;
 
 		Vector3 angles = default(Vector3);
-		angles[primaryAxis] = twistQ.Angle * twistQ.Axis[primaryAxis];
-		angles[secondaryAxis] = swingAngle * swingAxis[secondaryAxis];
-		angles[tertiaryAxis] = swingAngle * swingAxis[tertiaryAxis];
+		angles[primaryAxis] = twistSwing.Twist.Angle;
+		angles[(primaryAxis + 1) % 3] = swingAxisAngleProduct.X;
+		angles[(primaryAxis + 2) % 3] = swingAxisAngleProduct.Y;
 
 		return angles;
 	}

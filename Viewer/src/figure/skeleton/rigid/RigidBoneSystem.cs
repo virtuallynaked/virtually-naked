@@ -81,7 +81,7 @@ public class RigidBoneSystem {
 		
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			sumInputs.Rotations[boneIdx] = bone.Constraint.ClampRotation(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
+			sumInputs.Rotations[boneIdx] = bone.ClampAngles(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
 		}
 
 		return sumInputs;
