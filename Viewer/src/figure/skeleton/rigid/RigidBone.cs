@@ -40,48 +40,34 @@ public class RigidBone {
 		orientationSpace = Source.GetOrientationSpace(outputs);
 	}
 	
-	public Quaternion GetOrientedSpaceRotation(RigidBoneSystemInputs inputs) {
-		Vector3 rotationAngles = inputs.Rotations[Index];
-		TwistSwing rotationTwistSwing = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
+	public TwistSwing GetOrientedSpaceRotation(RigidBoneSystemInputs inputs) {
+		TwistSwing rotationTwistSwing = inputs.Rotations[Index];
 		rotationTwistSwing = Constraint.Clamp(rotationTwistSwing);
-
-		Quaternion orientedSpaceRotation = rotationTwistSwing.AsQuaternion(RotationOrder.TwistAxis);
-		return orientedSpaceRotation;
+		return rotationTwistSwing;
 	}
 
-	public void SetOrientedSpaceRotation(RigidBoneSystemInputs inputs, Quaternion orientatedSpaceRotation, bool applyClamp = false) {
+	public void SetOrientedSpaceRotation(RigidBoneSystemInputs inputs, TwistSwing orientatedSpaceRotation, bool applyClamp = false) {
 		DebugUtilities.AssertFinite(orientatedSpaceRotation);
 
-		TwistSwing orientedSpaceTwistSwing = TwistSwing.Decompose(RotationOrder.TwistAxis, orientatedSpaceRotation);
-
 		if (applyClamp) {
-			orientedSpaceTwistSwing = Constraint.Clamp(orientedSpaceTwistSwing);
+			orientatedSpaceRotation = Constraint.Clamp(orientatedSpaceRotation);
 		}
-
-		Vector3 rotationAnglesRadians = RotationOrder.ToTwistSwingAngles(orientedSpaceTwistSwing);
-		Vector3 rotationAnglesDegrees = MathExtensions.RadiansToDegrees(rotationAnglesRadians);
 		
-		inputs.Rotations[Index] = rotationAnglesDegrees;
+		inputs.Rotations[Index] = orientatedSpaceRotation;
 	}
 
 	public Quaternion GetRotation(RigidBoneSystemInputs inputs) {
-		Quaternion orientedSpaceRotation = GetOrientedSpaceRotation(inputs);
+		Quaternion orientedSpaceRotation = GetOrientedSpaceRotation(inputs).AsQuaternion(RotationOrder.TwistAxis);
 		Quaternion objectSpaceRotation = orientationSpace.TransformFromOrientedSpace(orientedSpaceRotation);
 		return objectSpaceRotation;
 	}
 	
 	public void SetRotation(RigidBoneSystemInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = false) {
 		Quaternion orientatedSpaceRotation = orientationSpace.TransformToOrientedSpace(objectSpaceRotation);
-		SetOrientedSpaceRotation(inputs, orientatedSpaceRotation, applyClamp);
+		TwistSwing orientedSpaceTwistSwing = TwistSwing.Decompose(RotationOrder.TwistAxis, orientatedSpaceRotation);
+		SetOrientedSpaceRotation(inputs, orientedSpaceTwistSwing, applyClamp);
 	}
-
-	//TODO: Remove this
-	public Vector3 ClampAngles(Vector3 angles) {
-		var ts = RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(angles));
-		var clampedTs = Constraint.Clamp(ts);
-		return MathExtensions.RadiansToDegrees(RotationOrder.ToTwistSwingAngles(clampedTs));
-	}
-
+	
 	private DualQuaternion GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs) {
 		Quaternion worldSpaceRotation = GetRotation(inputs);
 		return DualQuaternion.FromRotationTranslation(worldSpaceRotation, Vector3.Zero);

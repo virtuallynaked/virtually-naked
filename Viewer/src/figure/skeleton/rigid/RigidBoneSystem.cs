@@ -59,7 +59,9 @@ public class RigidBoneSystem {
 		inputs.RootTranslation = source.RootBone.Translation.GetValue(channelOutputs);
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			inputs.Rotations[boneIdx] = bone.Source.Rotation.GetValue(channelOutputs);
+			var rotationAngles = bone.Source.Rotation.GetValue(channelOutputs);
+			var rotation = bone.RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(rotationAngles));
+			inputs.Rotations[boneIdx] = rotation;
 		}
 
 		return inputs;
@@ -69,7 +71,9 @@ public class RigidBoneSystem {
 		source.RootBone.Translation.SetEffectiveValue(channelInputs, channelOutputs, inputs.RootTranslation, SetMask.ApplyClampAndVisibleOnly);
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			bone.Source.Rotation.SetEffectiveValue(channelInputs, channelOutputs, inputs.Rotations[boneIdx], SetMask.ApplyClampAndVisibleOnly);
+			var rotation = inputs.Rotations[boneIdx];
+			var rotationAngles = MathExtensions.RadiansToDegrees(bone.RotationOrder.ToTwistSwingAngles(rotation));
+			bone.Source.Rotation.SetEffectiveValue(channelInputs, channelOutputs, rotationAngles, SetMask.ApplyClampAndVisibleOnly);
 		}
 	}
 
@@ -81,7 +85,7 @@ public class RigidBoneSystem {
 		
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			sumInputs.Rotations[boneIdx] = bone.ClampAngles(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
+			sumInputs.Rotations[boneIdx] = bone.Constraint.Clamp(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
 		}
 
 		return sumInputs;

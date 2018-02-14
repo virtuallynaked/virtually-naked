@@ -20,15 +20,22 @@ public class InverseKinematicsAnimator {
 	
 	public RigidBoneSystemInputs PoseDeltas => poseDeltas;
 
+	private void SetInitialRotationAngles(string boneName, Vector3 angles) {
+		var bone = boneSystem.BonesByName[boneName];
+		var twistSwing = bone.RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(angles));
+		poseDeltas.Rotations[bone.Index] = twistSwing;
+	}
+
+
 	public void Reset() {
 		poseDeltas.ClearToZero();
-		poseDeltas.Rotations[boneSystem.BonesByName["lForearmBend"].Index] = new Vector3(0, -75, 0);
-		//poseDeltas.Rotations[boneSystem.BonesByName["lShldrBend"].Index] = new Vector3(0, 0, -85);
-		//poseDeltas.Rotations[boneSystem.BonesByName["lThighBend"].Index] = new Vector3(0, 0, 85f);
-		//poseDeltas.Rotations[boneSystem.BonesByName["lThighTwist"].Index] = new Vector3(0, 75f, 0);
-		//poseDeltas.Rotations[boneSystem.BonesByName["lShin"].Index] = new Vector3(109, -25, 3.5f);
-		//poseDeltas.Rotations[boneSystem.BonesByName["rThighBend"].Index] = new Vector3(0, 0, -85f);
-		//poseDeltas.Rotations[boneSystem.BonesByName["rThighTwist"].Index] = new Vector3(0, -75f, 0);
+		//SetInitialRotationAngles("lForearmBend", new Vector3(0, -75, 0));
+		//SetInitialRotationAngles("lShldrBend", new Vector3(0, 0, -85));
+		//SetInitialRotationAngles("lThighBend", new Vector3(0, 0, 85f));
+		//SetInitialRotationAngles("lThighTwist", new Vector3(0, 75f, 0));
+		//SetInitialRotationAngles("lShin", new Vector3(109, -25, 3.5f));
+		//SetInitialRotationAngles("rThighBend", new Vector3(0, 0, -85f));
+		//SetInitialRotationAngles("rThighTwist", new Vector3(0, -75f, 0));
 	}
 		
 	public void Update(FrameUpdateParameters updateParameters, ChannelInputs channelInputs, ControlVertexInfo[] previousFrameControlVertexInfos) {

@@ -11,7 +11,7 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		var bone = boneSystem.BonesByName[boneName];
 
 		//get bone transforms with the current bone rotation zeroed out
-		inputs.Rotations[bone.Index] = Vector3.Zero;
+		inputs.Rotations[bone.Index] = TwistSwing.Zero;
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var boneTransform = boneTransforms[bone.Index];
 
@@ -29,7 +29,7 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		var orientedTargetDirection = Vector3.Transform(worldTargetDirection, worldToOrientatedSpaceTransform);
 		
 		CartesianAxis twistAxis = (CartesianAxis) bone.RotationOrder.primaryAxis;
-		var newOrientedRotation = Swing.FromTo(twistAxis, orientedSourceDirection, orientedTargetDirection).AsQuaternion(twistAxis);
-		bone.SetOrientedSpaceRotation(inputs, newOrientedRotation, true);
+		var newOrientedRotation = Swing.FromTo(twistAxis, orientedSourceDirection, orientedTargetDirection);
+		bone.SetOrientedSpaceRotation(inputs, new TwistSwing(Twist.Zero, newOrientedRotation), true);
 	}
 }

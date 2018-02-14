@@ -91,7 +91,8 @@ public class ActorBehavior {
 				} else {
 					angles = Vector3.Zero;
 				}
-				poseDeltas.Rotations[bone.Index] = angles;
+				var twistSwing = bone.RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(angles));
+				poseDeltas.Rotations[bone.Index] = twistSwing;
 			}
 		}
 	}
@@ -106,7 +107,8 @@ public class ActorBehavior {
 
 		rootTranslation += Vector3.Transform(poseDeltas.RootTranslation / 100, rootTransform.Rotation);
 		foreach (var bone in model.MainDefinition.BoneSystem.Bones) {
-			var angles = poseDeltas.Rotations[bone.Index];
+			var twistSwing = poseDeltas.Rotations[bone.Index];
+			var angles = MathExtensions.RadiansToDegrees(bone.RotationOrder.ToTwistSwingAngles(twistSwing));
 			if (!angles.IsZero) {
 				boneRotations.Add(bone.Name, angles.ToArray());
 			}
