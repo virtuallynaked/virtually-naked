@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Mercurial Guardian Sleeves.duf" ]
+	},
+	{
+		"name": "Thalenia",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Thalenia Sleeves.duf" ]
+	},
+	{
+		"name": "Bathusa",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Bathusa Sleeves.duf" ]
+	},
+	{
+		"name": "Lyseshi",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Lyseshi Sleeves.duf" ]
+	},
+	{
+		"name": "Misionis",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Misionis Sleeves.duf" ]
+	},
+	{
+		"name": "Syrali",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Syrali Sleeves.duf" ]
+	}
+]

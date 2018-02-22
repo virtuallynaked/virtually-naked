@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Mercurial Guardian Boots.duf" ]
+	},
+	{
+		"name": "Thalenia",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Thalenia Boots.duf" ]
+	},
+	{
+		"name": "Bathusa",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Bathusa Boots.duf" ]
+	},
+	{
+		"name": "Lyseshi",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Lyseshi Boots.duf" ]
+	},
+	{
+		"name": "Misionis",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Misionis Boots.duf" ]
+	},
+	{
+		"name": "Syrali",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Syrali Boots.duf" ]
+	}
+]

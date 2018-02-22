@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Mercurial Guardian Shoulder Armor.duf" ]
+	},
+	{
+		"name": "Thalenia",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Thalenia ShoulderArmor.duf" ]
+	},
+	{
+		"name": "Bathusa",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Bathusa ShoulderArmor.duf" ]
+	},
+	{
+		"name": "Lyseshi",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Lyseshi ShoulderArmor.duf" ]
+	},
+	{
+		"name": "Misionis",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Misionis ShoulderArmor.duf" ]
+	},
+	{
+		"name": "Syrali",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Mercurial Guardian/Materials/Iray/Syrali ShoulderArmor.duf" ]
+	}
+]
