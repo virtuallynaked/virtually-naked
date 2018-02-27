@@ -1,5 +1,6 @@
 ﻿using SharpDX;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -58,11 +59,54 @@ public class BoneAttributesCalculator {
 		//assume a density of 1 kg per liter
 		return totalBoneVolumes;
 	}
+	
+	private bool[] CalculateIkability() {
+		bool[] areIkable = new bool[boneSystem.Bones.Count];
+
+		//descendant of these bones are non-IKable
+		HashSet<string> nonIkableDescendants = new HashSet<string> {
+			"lFoot",
+			"rFoot",
+			"head",
+			"lHand",
+			"rHand"
+		};
+
+		//these bones (and an their children) are non-IKable
+		HashSet<string> nonIkable = new HashSet<string> {
+			"lPectoral",
+			"rPectoral"
+		};
+
+		foreach (var bone in boneSystem.Bones) {
+			bool isIkable;
+
+			if (nonIkable.Contains(bone.Name)) {
+				isIkable = false;
+			} else if (bone.Parent == null) {
+				isIkable = true;
+			} else if (!areIkable[bone.Parent.Index]) {
+				isIkable = false;
+			} else if (nonIkableDescendants.Contains(bone.Parent.Name)) {
+				isIkable = false;
+			} else {
+				isIkable = true;
+			}
+
+			areIkable[bone.Index] = isIkable;
+		}
+
+		return areIkable;
+	}
 
 	public BoneAttributes[] CalculateBoneAttributes() {
+		bool[] areIkable = CalculateIkability();
 		float[] masses = CalculateBoneMasses();
-		return masses
-			.Select(mass => new BoneAttributes(mass))
-			.ToArray();
+
+		BoneAttributes[] boneAttributes = new BoneAttributes[boneSystem.Bones.Count];
+		for (int i = 0; i < boneAttributes.Length; ++i) {
+			boneAttributes[i] = new BoneAttributes(areIkable[i], masses[i]);
+		}
+		return boneAttributes;
 	}
 }
