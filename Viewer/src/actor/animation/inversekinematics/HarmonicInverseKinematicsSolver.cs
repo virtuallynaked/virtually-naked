@@ -62,7 +62,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		
 		var force = boneSpaceTarget - boneSpaceSource;
 		var torque = Vector3.Cross(boneSpaceSource, force);
-		float mass = boneAttributes[bone.Index].Mass;
+		float mass = boneAttributes[bone.Index].MassIncludingDescendants;
 		float momentOfInertia = (float) Pow(mass, 5/3f);
 		var angularVelocity = torque / momentOfInertia;
 		var linearVelocity = Vector3.Cross(angularVelocity, boneSpaceSource);

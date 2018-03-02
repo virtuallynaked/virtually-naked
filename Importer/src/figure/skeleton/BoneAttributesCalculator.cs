@@ -48,16 +48,19 @@ public class BoneAttributesCalculator {
 				}
 			}
 		}
+		
+		//assume a density of 1 kg per liter
+		return boneVolumes;
+	}
 
-		float[] totalBoneVolumes = new float[boneSystem.Bones.Count];
+	public float[] SumChildren(float[] boneMasses) {
+		float[] totalBoneMasses = new float[boneSystem.Bones.Count];
 		foreach (var bone in boneSystem.Bones) {
 			for (var ancestor = bone; ancestor != null; ancestor = ancestor.Parent) {
-				totalBoneVolumes[ancestor.Index] += boneVolumes[bone.Index];
+				totalBoneMasses[ancestor.Index] += boneMasses[bone.Index];
 			}
 		}
-
-		//assume a density of 1 kg per liter
-		return totalBoneVolumes;
+		return totalBoneMasses;
 	}
 	
 	private bool[] CalculateIkability() {
@@ -102,10 +105,11 @@ public class BoneAttributesCalculator {
 	public BoneAttributes[] CalculateBoneAttributes() {
 		bool[] areIkable = CalculateIkability();
 		float[] masses = CalculateBoneMasses();
+		float[] massesIncludingDescendants = SumChildren(masses);
 
 		BoneAttributes[] boneAttributes = new BoneAttributes[boneSystem.Bones.Count];
 		for (int i = 0; i < boneAttributes.Length; ++i) {
-			boneAttributes[i] = new BoneAttributes(areIkable[i], masses[i]);
+			boneAttributes[i] = new BoneAttributes(areIkable[i], masses[i], massesIncludingDescendants[i]);
 		}
 		return boneAttributes;
 	}
