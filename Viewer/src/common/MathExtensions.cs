@@ -84,4 +84,12 @@ public static class MathExtensions {
 			m.M21 * v.X + m.M22 * v.Y + m.M23 * v.Z,
 			m.M31 * v.X + m.M32 * v.Y + m.M33 * v.Z);
 	}
+
+	//returns a matrix m such that Mul(m, r) == Cross(v, r)
+	public static Matrix3x3 CrossProductMatrix(Vector3 v) {
+		return new Matrix3x3(
+			0, -v.Z, +v.Y,
+			+v.Z, 0, -v.X,
+			-v.Y, +v.X, 0);
+	}
 }

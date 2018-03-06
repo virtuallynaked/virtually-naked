@@ -26,4 +26,14 @@ public class MathExtensionsTest {
 
 		Assert.IsTrue(Vector3.NearEqual(expectedResult, actualResult, 1e-5f * Vector3.One));
 	}
+
+	[TestMethod]
+	public void TestCrossProductMatrix() {
+		Vector3 v = new Vector3(2, 3, 4);
+		Vector3 u = new Vector3(9, 7, 5);
+
+		Matrix3x3 m = MathExtensions.CrossProductMatrix(v);
+
+		MathAssert.AreEqual(Vector3.Cross(v, u), MathExtensions.Mul(m, u), 1e-5f);
+	}
 }
