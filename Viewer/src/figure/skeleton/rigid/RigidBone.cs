@@ -23,6 +23,10 @@ public class RigidBone {
 		Constraint = source.RotationConstraint;
 	}
 
+	public override string ToString() {
+		return $"RigidBone[{Source.Name}]";
+	}
+
 	public Vector3 CenterPoint => centerPoint;
 	public OrientationSpace OrientationSpace => orientationSpace;
 

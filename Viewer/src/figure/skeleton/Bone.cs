@@ -45,6 +45,10 @@ public class Bone {
 		RotationConstraint = TwistSwingConstraint.MakeFromRadians(rotationOrder.TwistAxis, minRadians, maxRadians);
 	}
 
+	public override string ToString() {
+		return $"Bone[{Name}]";
+	}
+
 	private Matrix3x3 GetCombinedScale(ChannelOutputs outputs) {
 		Vector3 scale = Scale.GetValue(outputs);
 		float generalScale = (float) GeneralScale.GetValue(outputs);
