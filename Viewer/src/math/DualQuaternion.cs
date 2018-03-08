@@ -35,6 +35,17 @@ public struct DualQuaternion {
 		return FromRotationTranslation(rotation, translation);
 	}
 
+	public static DualQuaternion FromRotation(Quaternion rotation) {
+		return new DualQuaternion(rotation, Quaternion.Zero);
+	}
+
+	public static DualQuaternion FromRotation(Quaternion rotation, Vector3 center) {
+		//TODO: optimize
+		return FromTranslation(-center)
+			.Chain(FromRotation(rotation))
+			.Chain(FromTranslation(+center));
+	}
+
 	public static DualQuaternion FromRotationTranslation(Quaternion rotation, Vector3 translation) {
 		Quaternion real = rotation;
 		Quaternion dual = 0.5f * (new Quaternion(translation.X, translation.Y, translation.Z, 0) * rotation);
