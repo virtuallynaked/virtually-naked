@@ -97,4 +97,8 @@ public struct DualQuaternion {
 		var inverseTranslation = Vector3.Transform(-Translation, inverseRotation);
 		return DualQuaternion.FromRotationTranslation(inverseRotation, inverseTranslation);
 	}
+
+	public override string ToString() {
+		return $"DualQuaternion[Rotation={Rotation.FormatForMathematica()}, Translation={Translation.FormatForMathematica()}]";
+	}
 }
