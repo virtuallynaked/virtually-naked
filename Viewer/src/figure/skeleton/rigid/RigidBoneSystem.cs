@@ -80,10 +80,20 @@ public class RigidBoneSystem {
 	public RigidBoneSystemInputs ApplyDeltas(RigidBoneSystemInputs baseInputs, RigidBoneSystemInputs deltaInputs) {
 		var sumInputs = new RigidBoneSystemInputs(bones.Length) {};
 
-		Quaternion baseRotation = RootBone.GetRotation(baseInputs);
-		sumInputs.RootTranslation = baseInputs.RootTranslation + Vector3.Transform(deltaInputs.RootTranslation, baseRotation);
+		DualQuaternion baseRootTransform = DualQuaternion.FromRotationTranslation(
+			RootBone.GetRotation(baseInputs),
+			baseInputs.RootTranslation);
+
+		DualQuaternion deltaRootTransform = DualQuaternion.FromRotationTranslation(
+			RootBone.GetRotation(deltaInputs),
+			deltaInputs.RootTranslation);
+
+		DualQuaternion sumRootTransform = deltaRootTransform.Chain(baseRootTransform);
+
+		sumInputs.RootTranslation = sumRootTransform.Translation;
+		RootBone.SetRotation(sumInputs, sumRootTransform.Rotation);
 		
-		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
+		for (int boneIdx = 1; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
 			sumInputs.Rotations[boneIdx] = bone.Constraint.Clamp(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
 		}
@@ -94,10 +104,20 @@ public class RigidBoneSystem {
 	public RigidBoneSystemInputs CalculateDeltas(RigidBoneSystemInputs baseInputs, RigidBoneSystemInputs sumInputs) {
 		var deltaInputs = new RigidBoneSystemInputs(bones.Length) {};
 
-		Quaternion baseRotation = RootBone.GetRotation(baseInputs);
-		deltaInputs.RootTranslation = Vector3.Transform(sumInputs.RootTranslation - baseInputs.RootTranslation, Quaternion.Invert(baseRotation));
-		
-		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
+		DualQuaternion baseRootTransform = DualQuaternion.FromRotationTranslation(
+			RootBone.GetRotation(baseInputs),
+			baseInputs.RootTranslation);
+
+		DualQuaternion sumRootTransform = DualQuaternion.FromRotationTranslation(
+			RootBone.GetRotation(sumInputs),
+			sumInputs.RootTranslation);
+
+		DualQuaternion deltaRootTransform = sumRootTransform.Chain(baseRootTransform.Invert());
+
+		deltaInputs.RootTranslation = deltaRootTransform.Translation;
+		RootBone.SetRotation(deltaInputs, deltaRootTransform.Rotation);
+
+		for (int boneIdx = 1; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
 			deltaInputs.Rotations[boneIdx] = sumInputs.Rotations[boneIdx] - baseInputs.Rotations[boneIdx];
 		}
