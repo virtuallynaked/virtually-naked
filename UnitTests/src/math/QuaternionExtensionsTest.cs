@@ -105,4 +105,18 @@ public class QuaternionExtensionsTest {
 
 		Assert.AreEqual(0, Vector3.Dot(q.Axis, n), 1e-4, "rotation axis lies in plane");
 	}
+
+	[TestMethod]
+	public void TestFromRotationVector() {
+		Vector3 v = new Vector3(0.1f, 0.2f, 0.3f);
+
+		var expected = Quaternion.RotationAxis(v, v.Length());
+		MathAssert.AreEqual(expected, QuaternionExtensions.FromRotationVector(v), 1e-4f);
+	}
+
+	[TestMethod]
+	public void TestAccurateAngle() {
+		Quaternion q = Quaternion.RotationYawPitchRoll(0.1f, 0.2f, 0.3f);
+		Assert.AreEqual(q.Angle, q.AccurateAngle(), 1e-4f);
+	}
 }

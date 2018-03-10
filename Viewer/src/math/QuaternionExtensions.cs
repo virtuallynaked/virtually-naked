@@ -1,6 +1,8 @@
 ﻿using SharpDX;
 using System;
 using static SharpDX.Vector3;
+using static MathExtensions;
+using static System.Math;
 
 public static class QuaternionExtensions {
 	public static Quaternion RotateBetween(Vector3 v1, Vector3 v2) {
@@ -37,5 +39,18 @@ public static class QuaternionExtensions {
 		}
 
 		return Quaternion.RotationAxis(axis, angle);
+	}
+
+	//In general, gives the same result as Quaternion.Angle, but is more numerically accurate for angles close to 0
+	public static float AccurateAngle(this Quaternion q) {
+		double lengthSquared = Sqr((double) q.X) + Sqr((double) q.Y) + Sqr((double) q.Z);
+		double angle = 2 * Math.Asin(Sqrt(lengthSquared));
+		return (float) angle;
+	}
+
+	public static Quaternion FromRotationVector(Vector3 v) {
+		Quaternion.RotationAxis(v, 1);
+		Quaternion logQ = new Quaternion(v / 2, 0);
+		return Quaternion.Exponential(logQ);
 	}
 }
