@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
 using static System.Math;
-using static SharpDX.MathUtil;
 using static MathExtensions;
 
 public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
@@ -31,10 +30,31 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		public float time;
 	}
 
+	private struct RootTranslationPartialSolution {
+		public Vector3 linearVelocity;
+		public float time;
+	}
+
 	private static float BetterAngle(Quaternion q) {
 		double lengthSquared = Sqr((double) q.X) + Sqr((double) q.Y) + Sqr((double) q.Z);
 		double angle = 2 * Math.Asin(Sqrt(lengthSquared));
 		return (float) angle;
+	}
+
+	private const float MomentOfInertiaCoefficient = 0.5f;
+	private const float MetersPerCentimeter = 0.01f; 
+
+	private RootTranslationPartialSolution SolveRootTranslation(
+			Vector3 worldSource, Vector3 worldTarget) {
+		var force = (worldTarget - worldSource);
+		float mass = boneAttributes[0].MassIncludingDescendants;
+		var linearVelocity = force / mass;
+		var time = mass;
+
+		return new RootTranslationPartialSolution {
+			linearVelocity = linearVelocity,
+			time = time,
+		};
 	}
 
 	private BonePartialSolution SolveSingleBone(
@@ -61,9 +81,9 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		var distance = BetterAngle(rotation) * radius;
 		
 		var force = boneSpaceTarget - boneSpaceSource;
-		var torque = Vector3.Cross(boneSpaceSource, force);
+		var torque = Vector3.Cross(boneSpaceSource * MetersPerCentimeter, force);
 		float mass = boneAttributes[bone.Index].MassIncludingDescendants;
-		float momentOfInertia = (float) Pow(mass, 5/3f);
+		float momentOfInertia = MomentOfInertiaCoefficient * (float) Pow(mass, 5/3f);
 		var angularVelocity = torque / momentOfInertia;
 		var linearVelocity = Vector3.Cross(angularVelocity, boneSpaceSource);
 		
@@ -88,7 +108,9 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 			bonePartialSolutions[i] = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, inputs, boneTransforms);
 			totalRate += 1 / bonePartialSolutions[i].time;
 		}
-		
+		var rootTranslationPartialSolution = SolveRootTranslation(sourcePosition, problem.TargetPosition);
+		totalRate += 1 / rootTranslationPartialSolution.time;
+
 		float time = 1 / totalRate;
 
 		for (int i = 0; i < bones.Length; ++i) {
@@ -103,6 +125,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 			
 			inputs.Rotations[bone.Index] = bone.Constraint.Clamp(newRotation);
 		}
+		inputs.RootTranslation += time * rootTranslationPartialSolution.linearVelocity;
 	}
 
 	private Quaternion AngularVelocityToQ(Vector3 angularVelocity, float time) {
