@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
 using static System.Math;
-using static MathExtensions;
 
 public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private const int Iterations = 10;
+	private const float MomentOfInertiaCoefficient = 0.5f;
+	private const float MetersPerCentimeter = 0.01f; 
 
+	private readonly RigidBoneSystem boneSystem;
 	private readonly BoneAttributes[] boneAttributes;
 
-	public HarmonicInverseKinematicsSolver(BoneAttributes[] boneAttributes) {
+	public HarmonicInverseKinematicsSolver(RigidBoneSystem boneSystem, BoneAttributes[] boneAttributes) {
+		this.boneSystem = boneSystem;
 		this.boneAttributes = boneAttributes;
 	}
 
@@ -25,24 +27,10 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 	}
 	
-	private struct BonePartialSolution {
-		public Vector3 angularVelocity;
-		public float time;
-	}
-
 	private struct RootTranslationPartialSolution {
 		public Vector3 linearVelocity;
 		public float time;
 	}
-
-	private static float BetterAngle(Quaternion q) {
-		double lengthSquared = Sqr((double) q.X) + Sqr((double) q.Y) + Sqr((double) q.Z);
-		double angle = 2 * Math.Asin(Sqrt(lengthSquared));
-		return (float) angle;
-	}
-
-	private const float MomentOfInertiaCoefficient = 0.5f;
-	private const float MetersPerCentimeter = 0.01f; 
 
 	private RootTranslationPartialSolution SolveRootTranslation(
 			Vector3 worldSource, Vector3 worldTarget) {
@@ -57,6 +45,15 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		};
 	}
 
+	private void ApplyPartialSolution(RootTranslationPartialSolution partialSolution, RigidBoneSystemInputs inputs, float time) {
+		inputs.RootTranslation += time * partialSolution.linearVelocity;
+	}
+
+	private struct BonePartialSolution {
+		public Vector3 angularVelocity;
+		public float time;
+	}
+
 	private BonePartialSolution SolveSingleBone(
 			RigidBone bone,
 			Vector3 worldSource, Vector3 worldTarget,
@@ -69,24 +66,19 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		var boneSpaceSource = Vector3.Transform(worldSource - center, worldToBoneSpaceRotation);
 		var boneSpaceTarget = Vector3.Transform(worldTarget - center, worldToBoneSpaceRotation);
 		
-		var targetOnSphere = boneSpaceSource.Length() * Vector3.Normalize(boneSpaceTarget);
-		
-		var rotation = QuaternionExtensions.RotateBetween(
-			Vector3.Normalize(boneSpaceSource),
-			Vector3.Normalize(boneSpaceTarget));
-
-		var rotatedSource = Vector3.Transform(boneSpaceSource, rotation);
-		
-		var radius = boneSpaceSource.Length();
-		var distance = BetterAngle(rotation) * radius;
-		
 		var force = boneSpaceTarget - boneSpaceSource;
 		var torque = Vector3.Cross(boneSpaceSource * MetersPerCentimeter, force);
 		float mass = boneAttributes[bone.Index].MassIncludingDescendants;
 		float momentOfInertia = MomentOfInertiaCoefficient * (float) Pow(mass, 5/3f);
 		var angularVelocity = torque / momentOfInertia;
 		var linearVelocity = Vector3.Cross(angularVelocity, boneSpaceSource);
-		
+
+		var rotation = QuaternionExtensions.RotateBetween(
+			Vector3.Normalize(boneSpaceSource),
+			Vector3.Normalize(boneSpaceTarget));
+		var radius = boneSpaceSource.Length();
+		var distance = rotation.AccurateAngle() * radius;
+
 		float time = distance == 0 ? 0 : distance / linearVelocity.Length();
 
 		return new BonePartialSolution {
@@ -95,7 +87,17 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		};
 	}
 
-	private void DoIteration(int iteration, RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
+	private void ApplyPartialSolution(RigidBone bone, BonePartialSolution partialSolution, RigidBoneSystemInputs inputs, float time) {
+		var twistAxis = bone.RotationOrder.TwistAxis;
+		var originalRotationQ = inputs.Rotations[bone.Index].AsQuaternion(twistAxis);
+		var rotationDelta = QuaternionExtensions.FromRotationVector(time * partialSolution.angularVelocity);
+		var newRotationQ = originalRotationQ.Chain(rotationDelta);
+		var newRotation = TwistSwing.Decompose(twistAxis, newRotationQ);
+			
+		inputs.Rotations[bone.Index] = bone.Constraint.Clamp(newRotation);
+	}
+
+	private void DoIteration(int iteration, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.UnposedSourcePosition);
 
@@ -103,39 +105,29 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		//var bones = new RigidBone[] { boneSystem.BonesByName["lForearmBend"], boneSystem.BonesByName["lShldrBend"] };
 		
 		float totalRate = 0;
+
 		var bonePartialSolutions = new BonePartialSolution[bones.Length];
 		for (int i = 0; i < bones.Length; ++i) {
-			bonePartialSolutions[i] = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, inputs, boneTransforms);
-			totalRate += 1 / bonePartialSolutions[i].time;
+			var partialSolution = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, inputs, boneTransforms);
+
+			bonePartialSolutions[i] = partialSolution;
+			totalRate += 1 / partialSolution.time;
 		}
+
 		var rootTranslationPartialSolution = SolveRootTranslation(sourcePosition, problem.TargetPosition);
 		totalRate += 1 / rootTranslationPartialSolution.time;
 
 		float time = 1 / totalRate;
 
 		for (int i = 0; i < bones.Length; ++i) {
-			var bone = bones[i];
-			var partialSolution = bonePartialSolutions[i];
-
-			var twistAxis = bone.RotationOrder.TwistAxis;
-			var originalRotationQ = inputs.Rotations[bone.Index].AsQuaternion(twistAxis);
-			var rotationDelta = AngularVelocityToQ(partialSolution.angularVelocity, time);
-			var newRotationQ = originalRotationQ.Chain(rotationDelta);
-			var newRotation = TwistSwing.Decompose(twistAxis, newRotationQ);
-			
-			inputs.Rotations[bone.Index] = bone.Constraint.Clamp(newRotation);
+			ApplyPartialSolution(bones[i],  bonePartialSolutions[i], inputs, time);
 		}
-		inputs.RootTranslation += time * rootTranslationPartialSolution.linearVelocity;
+		ApplyPartialSolution(rootTranslationPartialSolution, inputs, time);
 	}
-
-	private Quaternion AngularVelocityToQ(Vector3 angularVelocity, float time) {
-		Quaternion logQ = new Quaternion(angularVelocity * time / 2, 0);
-		return Quaternion.Exponential(logQ);
-	}
-
+	
 	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
 		for (int i = 0; i < Iterations; ++i) {
-			DoIteration(i, boneSystem, problem, inputs);
+			DoIteration(i, problem, inputs);
 		}
 	}
 }

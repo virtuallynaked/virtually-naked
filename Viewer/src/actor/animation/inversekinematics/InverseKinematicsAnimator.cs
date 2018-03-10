@@ -13,7 +13,7 @@ public class InverseKinematicsAnimator {
 		channelSystem = definition.ChannelSystem;
 		boneSystem = new RigidBoneSystem(definition.BoneSystem);
 		ui = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
-		solver = new HarmonicInverseKinematicsSolver(inverterParameters.BoneAttributes);
+		solver = new HarmonicInverseKinematicsSolver(boneSystem, inverterParameters.BoneAttributes);
 		poseDeltas = boneSystem.MakeZeroInputs();
 		Reset();
 	}
