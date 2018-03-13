@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
-using static System.Math;
 
 public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private const int Iterations = 10;
-	private const float MomentOfInertiaCoefficient = 0.3f;
-	private const float MetersPerCentimeter = 0.01f; 
 
 	private readonly RigidBoneSystem boneSystem;
 	private readonly BoneAttributes[] boneAttributes;
@@ -56,10 +53,10 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	}
 
 	private const int FigureCenterBoneIndex = 1;
-
+	
 	private BonePartialSolution SolveSingleBone(
 			RigidBone bone,
-			Vector3 worldSource, Vector3 worldTarget, Vector3 figureCenterOverride,
+			Vector3 worldSource, Vector3 worldTarget, MassMomentAccumulator[] massMoments, Vector3 figureCenterOverride,
 			RigidBoneSystemInputs inputs, DualQuaternion[] boneTransforms) {
 		
 		var center = bone.Index != FigureCenterBoneIndex ? boneTransforms[bone.Index].Transform(bone.CenterPoint) : figureCenterOverride;
@@ -70,9 +67,19 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		var boneSpaceTarget = Vector3.Transform(worldTarget - center, worldToBoneSpaceRotation);
 		
 		var force = boneSpaceTarget - boneSpaceSource;
-		var torque = Vector3.Cross(boneSpaceSource * MetersPerCentimeter, force);
+		var torque = Vector3.Cross(boneSpaceSource, force);
 		float mass = boneAttributes[bone.Index].MassIncludingDescendants;
-		float momentOfInertia = MomentOfInertiaCoefficient * (float) Pow(mass, 5/3f);
+		Vector3 unnormalizedAxisOfRotation = Vector3.Cross(worldSource - center, worldTarget - center);
+		float unnormalizedAxisOfRotationLength = unnormalizedAxisOfRotation.Length();
+		if (MathUtil.IsZero(unnormalizedAxisOfRotationLength)) {
+			return new BonePartialSolution {
+				angularVelocity = Vector3.Zero,
+				time = float.PositiveInfinity
+			};
+		}
+		Vector3 axisOfRotation = unnormalizedAxisOfRotation / unnormalizedAxisOfRotationLength;
+		float momentOfInertia = massMoments[bone.Index].GetMomentOfInertia(axisOfRotation, center);
+
 		var angularVelocity = torque / momentOfInertia;
 		var linearVelocity = Vector3.Cross(angularVelocity, boneSpaceSource);
 
@@ -110,7 +117,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 	}
 	
-	public Vector3[] GetCentersOfMass(DualQuaternion[] totalTransforms) {
+	private Vector3[] GetCentersOfMass(DualQuaternion[] totalTransforms) {
 		float[] descendantMasses = new float[boneSystem.Bones.Length];
 		Vector3[] descendantMassPositions = new Vector3[boneSystem.Bones.Length];
 		Vector3[] centersOfMass = new Vector3[boneSystem.Bones.Length];
@@ -133,6 +140,25 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 
 		return centersOfMass;
+	}
+
+	private MassMomentAccumulator[] GetMassMoments(DualQuaternion[] totalTransforms) {
+		MassMomentAccumulator[] accumulators = new MassMomentAccumulator[boneSystem.Bones.Length];
+
+		foreach (var bone in boneSystem.Bones.Reverse()) {
+			float mass = boneAttributes[bone.Index].Mass;
+			var unposedPosition = bone.CenterPoint + boneAttributes[bone.Index].CenterOfMass;
+			var position = totalTransforms[bone.Index].Transform(unposedPosition);
+			
+			accumulators[bone.Index].Add(mass, position);
+
+			var parent = bone.Parent;
+			if (parent != null) {
+				accumulators[parent.Index].Add(accumulators[bone.Index]);
+			}
+		}
+
+		return accumulators;
 	}
 
 	private void CountertransformOffChainBones(DualQuaternion[] preTotalTransforms, Vector3[] preCentersOfMass, RigidBoneSystemInputs inputs, RigidBone[] boneChain) {
@@ -190,7 +216,8 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private void DoIteration(int iteration, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var centersOfMass = GetCentersOfMass(boneTransforms);
-		var figureCenterOverride = centersOfMass[0];
+		var massMoments = GetMassMoments(boneTransforms);
+		var figureCenterOverride = massMoments[0].GetCenterOfMass();
 		
 		var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.UnposedSourcePosition);
 
@@ -201,7 +228,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 		var bonePartialSolutions = new BonePartialSolution[bones.Length];
 		for (int i = 0; i < bones.Length; ++i) {
-			var partialSolution = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, figureCenterOverride, inputs, boneTransforms);
+			var partialSolution = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, massMoments, figureCenterOverride, inputs, boneTransforms);
 
 			bonePartialSolutions[i] = partialSolution;
 			totalRate += 1 / partialSolution.time;

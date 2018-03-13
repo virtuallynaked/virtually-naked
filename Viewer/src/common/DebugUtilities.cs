@@ -37,6 +37,12 @@ static class DebugUtilities {
 	}
 
 	[Conditional("DEBUG")]
+	public static void AssertIsUnitOrZero(Vector3 v) {
+		float length = v.Length();
+		Debug.Assert(MathUtil.IsZero(length) || Math.Abs(length - 1) < 1e-2f, "not normalized or zero");
+	}
+
+	[Conditional("DEBUG")]
 	public static void AssertIsUnit(Vector2 v) {
 		float lengthSquared = v.LengthSquared();
 		Debug.Assert(Math.Abs(lengthSquared - 1) < 1e-2f, "not normalized");
