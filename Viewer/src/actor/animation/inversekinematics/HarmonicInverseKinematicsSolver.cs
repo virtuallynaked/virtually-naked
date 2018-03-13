@@ -55,12 +55,14 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		public float time;
 	}
 
+	private const int FigureCenterBoneIndex = 1;
+
 	private BonePartialSolution SolveSingleBone(
 			RigidBone bone,
-			Vector3 worldSource, Vector3 worldTarget,
+			Vector3 worldSource, Vector3 worldTarget, Vector3 figureCenterOverride,
 			RigidBoneSystemInputs inputs, DualQuaternion[] boneTransforms) {
-			
-		var center = boneTransforms[bone.Index].Transform(bone.CenterPoint);
+		
+		var center = bone.Index != FigureCenterBoneIndex ? boneTransforms[bone.Index].Transform(bone.CenterPoint) : figureCenterOverride;
 		var parentTotalRotation = bone.Parent != null ? boneTransforms[bone.Parent.Index].Rotation : Quaternion.Identity;
 		var boneToWorldSpaceRotation = bone.OrientationSpace.Orientation.Chain(parentTotalRotation);
 		var worldToBoneSpaceRotation = Quaternion.Invert(boneToWorldSpaceRotation);
@@ -88,7 +90,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		};
 	}
 
-	private void ApplyPartialSolution(RigidBone bone, BonePartialSolution partialSolution, RigidBoneSystemInputs inputs, float time) {
+	private void ApplyPartialSolution(RigidBone bone, BonePartialSolution partialSolution, DualQuaternion[] boneTransforms, Vector3 figureCenterOverride, RigidBoneSystemInputs inputs, float time) {
 		var twistAxis = bone.RotationOrder.TwistAxis;
 		var originalRotationQ = inputs.Rotations[bone.Index].AsQuaternion(twistAxis);
 		var rotationDelta = QuaternionExtensions.FromRotationVector(time * partialSolution.angularVelocity);
@@ -96,6 +98,16 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		var newRotation = TwistSwing.Decompose(twistAxis, newRotationQ);
 			
 		inputs.Rotations[bone.Index] = bone.Constraint.Clamp(newRotation);
+
+		if (bone.Index == FigureCenterBoneIndex) {
+			var preTotalTransform = boneTransforms[bone.Index];
+			var postTotalTransform = bone.GetChainedTransform(inputs, boneTransforms[bone.Parent.Index]);
+			var unposedFigureCenterOverride = preTotalTransform.InverseTransform(figureCenterOverride);
+			var postFigureCenterOverride = postTotalTransform.Transform(unposedFigureCenterOverride);
+
+			var centerDisplacement = figureCenterOverride - postFigureCenterOverride;
+			inputs.RootTranslation += centerDisplacement;
+		}
 	}
 	
 	public Vector3[] GetCentersOfMass(DualQuaternion[] totalTransforms) {
@@ -123,15 +135,13 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		return centersOfMass;
 	}
 
-	private void CountertransformOffChainBones(DualQuaternion[] preTotalTransforms, RigidBoneSystemInputs inputs, RigidBone[] boneChain) {
+	private void CountertransformOffChainBones(DualQuaternion[] preTotalTransforms, Vector3[] preCentersOfMass, RigidBoneSystemInputs inputs, RigidBone[] boneChain) {
 		bool[] areOnChain = new bool[boneSystem.Bones.Length];
 		areOnChain[0] = true; //root bone is always on the chain
 		foreach (var bone in boneChain) {
 			areOnChain[bone.Index] = true;
 		}
-
-		var preCentersOfMass = GetCentersOfMass(preTotalTransforms);
-
+		
 		var rootTransform = DualQuaternion.FromTranslation(inputs.RootTranslation);
 		DualQuaternion[] postTotalTransforms = new DualQuaternion[preTotalTransforms.Length];
 
@@ -179,6 +189,9 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 	private void DoIteration(int iteration, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
+		var centersOfMass = GetCentersOfMass(boneTransforms);
+		var figureCenterOverride = centersOfMass[0];
+		
 		var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.UnposedSourcePosition);
 
 		var bones = GetBoneChain(problem.SourceBone).ToArray();
@@ -188,7 +201,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 		var bonePartialSolutions = new BonePartialSolution[bones.Length];
 		for (int i = 0; i < bones.Length; ++i) {
-			var partialSolution = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, inputs, boneTransforms);
+			var partialSolution = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, figureCenterOverride, inputs, boneTransforms);
 
 			bonePartialSolutions[i] = partialSolution;
 			totalRate += 1 / partialSolution.time;
@@ -200,11 +213,11 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		float time = 1 / totalRate;
 
 		for (int i = 0; i < bones.Length; ++i) {
-			ApplyPartialSolution(bones[i],  bonePartialSolutions[i], inputs, time);
+			ApplyPartialSolution(bones[i], bonePartialSolutions[i], boneTransforms, figureCenterOverride, inputs, time);
 		}
 		ApplyPartialSolution(rootTranslationPartialSolution, inputs, time);
 
-		CountertransformOffChainBones(boneTransforms, inputs, bones);
+		CountertransformOffChainBones(boneTransforms, centersOfMass, inputs, bones);
 	}
 	
 	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
