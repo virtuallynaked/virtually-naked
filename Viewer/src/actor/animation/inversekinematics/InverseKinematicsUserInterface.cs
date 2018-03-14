@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Valve.VR;
 
-public class InverseKinematicsUserInterface {
+public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 	private static Dictionary<string, string> FaceGroupGrabMap = new Dictionary<string, string> {
 		["lThumb3"] = "lHand",
 		["lIndex3"] = "lHand",

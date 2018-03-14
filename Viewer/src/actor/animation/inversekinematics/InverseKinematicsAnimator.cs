@@ -3,7 +3,7 @@
 public class InverseKinematicsAnimator {
 	private readonly ChannelSystem channelSystem;
 	private readonly RigidBoneSystem boneSystem;
-	private readonly InverseKinematicsUserInterface ui;
+	private readonly IInverseKinematicsGoalProvider goalProvider;
 	private readonly IInverseKinematicsSolver solver;
 
 	private RigidBoneSystemInputs poseDeltas;
@@ -12,7 +12,8 @@ public class InverseKinematicsAnimator {
 	public InverseKinematicsAnimator(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
 		channelSystem = definition.ChannelSystem;
 		boneSystem = new RigidBoneSystem(definition.BoneSystem);
-		ui = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
+		goalProvider = new InverseKinematicsUserInterface(controllerManager, channelSystem, boneSystem, inverterParameters);
+		//goalProvider = new DemoInverseKinematicsGoalProvider(boneSystem);
 		solver = new HarmonicInverseKinematicsSolver(boneSystem, inverterParameters.BoneAttributes);
 		poseDeltas = boneSystem.MakeZeroInputs();
 		Reset();
@@ -45,24 +46,8 @@ public class InverseKinematicsAnimator {
 		var baseInputs = boneSystem.ReadInputs(channelOutputs);
 		var resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 		
-		InverseKinematicsGoal goal = ui.GetGoal(updateParameters, resultInputs, previousFrameControlVertexInfos);
-		
-		/*
-		var goal = new InverseKinematicsGoal(
-			boneSystem.BonesByName["lShin"],
-			boneSystem.BonesByName["lFoot"].CenterPoint,
-			boneSystem.BonesByName["lFoot"].GetChainedTransform(resultInputs).Transform(boneSystem.BonesByName["lFoot"].CenterPoint));
-		*/
-
-		/*
-		var forearmBone = boneSystem.BonesByName["lForearmBend"];
-		var handBone = boneSystem.BonesByName["lHand"];
-		var goal = new InverseKinematicsGoal(
-			forearmBone,
-			handBone.CenterPoint,
-			forearmBone.CenterPoint + Vector3.Down * Vector3.Distance(handBone.CenterPoint, forearmBone.CenterPoint));
-		*/
-		
+		InverseKinematicsGoal goal = goalProvider.GetGoal(updateParameters, resultInputs, previousFrameControlVertexInfos);
+				
 		if (goal == null) {
 			if (lastIkDeltas != null) {
 				poseDeltas = lastIkDeltas;
