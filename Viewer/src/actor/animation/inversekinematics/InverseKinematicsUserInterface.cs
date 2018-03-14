@@ -77,7 +77,7 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 		return boneSystem.BonesByName[boneName];
 	}
 
-	public InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+	private InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		if (!tracking) {
 			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {
 				ControllerStateTracker stateTracker = controllerManager.StateTrackers[deviceIdx];
@@ -123,6 +123,15 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 			return new InverseKinematicsGoal(sourceBone, boneRelativeSourcePosition, targetPosition);
 		} else {
 			return null;
+		}
+	}
+
+	public List<InverseKinematicsGoal> GetGoals(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+		var goal = GetGoal(updateParameters, inputs, previousFrameControlVertexInfos);
+		if (goal != null) {
+			return new List<InverseKinematicsGoal>{ goal };
+		} else {
+			return new List<InverseKinematicsGoal>{};
 		}
 	}
 }

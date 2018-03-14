@@ -1,3 +1,5 @@
-﻿public interface IInverseKinematicsSolver {
-	void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs);
+﻿using System.Collections.Generic;
+
+public interface IInverseKinematicsSolver {
+	void Solve(RigidBoneSystem boneSystem, List<InverseKinematicsGoal> goals, RigidBoneSystemInputs inputs);
 }

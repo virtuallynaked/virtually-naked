@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System.Collections.Generic;
 
 public class InverseKinematicsAnimator {
 	private readonly ChannelSystem channelSystem;
@@ -44,12 +45,10 @@ public class InverseKinematicsAnimator {
 		var baseInputs = boneSystem.ReadInputs(channelOutputs);
 		var resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 		
-		InverseKinematicsGoal goal = goalProvider.GetGoal(updateParameters, resultInputs, previousFrameControlVertexInfos);
+		List<InverseKinematicsGoal> goals = goalProvider.GetGoals(updateParameters, resultInputs, previousFrameControlVertexInfos);
 		
-		if (goal != null) {
-			solver.Solve(boneSystem, goal, resultInputs);
-			poseDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
-		}
+		solver.Solve(boneSystem, goals, resultInputs);
+		poseDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
 		
 		boneSystem.WriteInputs(channelInputs, channelOutputs, resultInputs);
 	}

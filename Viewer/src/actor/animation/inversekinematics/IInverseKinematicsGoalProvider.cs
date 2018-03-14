@@ -1,3 +1,5 @@
-﻿public interface IInverseKinematicsGoalProvider {
-	InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos);
+﻿using System.Collections.Generic;
+
+public interface IInverseKinematicsGoalProvider {
+	List<InverseKinematicsGoal> GetGoals(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos);
 }

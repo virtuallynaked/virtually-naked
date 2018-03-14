@@ -247,9 +247,11 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		CountertransformOffChainBones(boneTransforms, centersOfMass, inputs, bones);
 	}
 	
-	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
+	public void Solve(RigidBoneSystem boneSystem, List<InverseKinematicsGoal> goals, RigidBoneSystemInputs inputs) {
 		for (int i = 0; i < Iterations; ++i) {
-			DoIteration(i, goal, inputs);
+			foreach (var goal in goals) {
+				DoIteration(i, goal, inputs);
+			}
 		}
 	}
 }

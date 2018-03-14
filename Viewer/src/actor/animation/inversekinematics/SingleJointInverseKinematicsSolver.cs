@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System.Collections.Generic;
 
 public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 	private readonly string boneName;
@@ -7,7 +8,7 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		this.boneName = boneName;
 	}
 		
-	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
+	private void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var bone = boneSystem.BonesByName[boneName];
 
 		//get bone transforms with the current bone rotation zeroed out
@@ -31,5 +32,11 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		CartesianAxis twistAxis = (CartesianAxis) bone.RotationOrder.primaryAxis;
 		var newOrientedRotation = Swing.FromTo(twistAxis, orientedSourceDirection, orientedTargetDirection);
 		bone.SetOrientedSpaceRotation(inputs, new TwistSwing(Twist.Zero, newOrientedRotation), true);
+	}
+
+	public void Solve(RigidBoneSystem boneSystem, List<InverseKinematicsGoal> goals, RigidBoneSystemInputs inputs) {
+		foreach (var goal in goals) {
+			Solve(boneSystem, goal, inputs);
+		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System.Collections.Generic;
 
 class DemoInverseKinematicsGoalProvider : IInverseKinematicsGoalProvider {
 	private readonly RigidBoneSystem boneSystem;
@@ -23,8 +24,10 @@ class DemoInverseKinematicsGoalProvider : IInverseKinematicsGoalProvider {
 			boneSystem.BonesByName["lFoot"].GetChainedTransform(inputs).Transform(boneSystem.BonesByName["lFoot"].CenterPoint));
 	}
 
-	public InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
-		return MakeMoveHandDownGoal(inputs);
-		//return MakeKeepFootInPlaceGoal(inputs);
+	public List<InverseKinematicsGoal> GetGoals(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+		return new List<InverseKinematicsGoal> {
+			MakeMoveHandDownGoal(inputs),
+			//MakeKeepFootInPlaceGoal(inputs)
+		};
 	}
 }

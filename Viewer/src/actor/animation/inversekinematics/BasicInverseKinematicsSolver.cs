@@ -1,4 +1,5 @@
 ﻿using SharpDX;
+using System.Collections.Generic;
 
 public class BasicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private Vector3 GetCenterPosition(DualQuaternion[] boneTransforms, RigidBone bone) {
@@ -39,9 +40,11 @@ public class BasicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 	}
 
-	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
+	public void Solve(RigidBoneSystem boneSystem, List<InverseKinematicsGoal> goals, RigidBoneSystemInputs inputs) {
 		for (int i = 0; i < 1; ++i) {
-			DoIteration(boneSystem, goal, inputs);
+			foreach (var goal in goals) {
+				DoIteration(boneSystem, goal, inputs);
+			}
 		}
 	}
 }
