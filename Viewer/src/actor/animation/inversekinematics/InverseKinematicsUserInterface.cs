@@ -46,23 +46,88 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 		["rToe"] = "rFoot",
 	};
 
-	private readonly ControllerManager controllerManager;
 	private readonly ChannelSystem channelSystem;
 	private readonly RigidBoneSystem boneSystem;
 	private readonly InverterParameters inverterParameters;
-
-	private bool tracking = false;
-	private uint trackedDeviceIdx;
-	private RigidBone sourceBone;
-	private Vector3 boneRelativeSourcePosition;
-
+	private readonly DeviceTracker[] deviceTrackers;
+		
 	public InverseKinematicsUserInterface(ControllerManager controllerManager, ChannelSystem channelSystem, RigidBoneSystem boneSystem, InverterParameters inverterParameters) {
-		this.controllerManager = controllerManager;
 		this.channelSystem = channelSystem;
 		this.boneSystem = boneSystem;
 		this.inverterParameters = inverterParameters;
+
+		deviceTrackers = controllerManager.StateTrackers
+			.Select(stateTracker => new DeviceTracker(this, stateTracker))
+			.ToArray();
 	}
-	
+
+	private class DeviceTracker {
+		private readonly InverseKinematicsUserInterface parentInstance;
+		private readonly ControllerStateTracker stateTracker;
+		private bool tracking = false;
+		private RigidBone sourceBone;
+		private Vector3 boneRelativeSourcePosition;
+
+		public DeviceTracker(InverseKinematicsUserInterface parentInstance, ControllerStateTracker stateTracker) {
+			this.parentInstance = parentInstance;
+			this.stateTracker = stateTracker;
+		}
+
+		private void MaybeStartTracking(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+			if (tracking == true) {
+				//already tracking
+				return;
+			}
+
+			if (!stateTracker.NonMenuActive) {
+				return;
+			}
+				
+			bool triggerPressed = stateTracker.IsPressed(EVRButtonId.k_EButton_SteamVR_Trigger);
+			if (!triggerPressed) {
+				return;
+			}
+
+			tracking = true;
+				
+			TrackedDevicePose_t gamePose = updateParameters.GamePoses[stateTracker.DeviceIdx];
+			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
+			var worldSourcePosition = controllerTransform.TranslationVector * 100;
+
+			sourceBone = parentInstance.MapPositionToBone(worldSourcePosition, previousFrameControlVertexInfos);
+			boneRelativeSourcePosition = sourceBone.GetChainedTransform(inputs).InverseTransform(worldSourcePosition);
+		}
+
+		private InverseKinematicsGoal MaybeContinueTracking(FrameUpdateParameters updateParameters) {
+			if (!tracking) {
+				return null;
+			}
+
+			if (!stateTracker.NonMenuActive) {
+				tracking = false;
+				return null;
+			}
+
+			bool triggerPressed = stateTracker.IsPressed(EVRButtonId.k_EButton_SteamVR_Trigger);
+			if (!triggerPressed) {
+				tracking = false;
+				return null;
+			}
+
+			TrackedDevicePose_t gamePose = updateParameters.GamePoses[stateTracker.DeviceIdx];
+			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
+			var targetPosition = controllerTransform.TranslationVector * 100;
+
+			return new InverseKinematicsGoal(sourceBone, boneRelativeSourcePosition, targetPosition);
+		}
+
+		public InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+			MaybeStartTracking(updateParameters, inputs, previousFrameControlVertexInfos);
+			var goal =  MaybeContinueTracking(updateParameters);
+			return goal;
+		}
+	}
+
 	private RigidBone MapPositionToBone(Vector3 position, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		Vector3[] previousFrameControlVertexPositions = previousFrameControlVertexInfos.Select(vertexInfo => vertexInfo.position).ToArray();
 		int faceIdx = ClosestPoint.FindClosestFaceOnMesh(inverterParameters.ControlFaces, previousFrameControlVertexPositions, position);
@@ -76,62 +141,15 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 		string boneName = inverterParameters.FaceGroupToNodeMap[grabFaceGroupName];
 		return boneSystem.BonesByName[boneName];
 	}
-
-	private InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
-		if (!tracking) {
-			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {
-				ControllerStateTracker stateTracker = controllerManager.StateTrackers[deviceIdx];
-				if (!stateTracker.NonMenuActive) {
-					continue;
-				}
-				
-				bool triggerPressed = stateTracker.IsPressed(EVRButtonId.k_EButton_SteamVR_Trigger);
-				if (!triggerPressed) {
-					continue;
-				}
-
-				tracking = true;
-				trackedDeviceIdx = deviceIdx;
-				
-				TrackedDevicePose_t gamePose = updateParameters.GamePoses[deviceIdx];
-				Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
-				var worldSourcePosition = controllerTransform.TranslationVector * 100;
-
-				sourceBone = MapPositionToBone(worldSourcePosition, previousFrameControlVertexInfos);
-				boneRelativeSourcePosition = sourceBone.GetChainedTransform(inputs).InverseTransform(worldSourcePosition);
-			}
-		}
-
-		if (tracking) {
-			ControllerStateTracker stateTracker = controllerManager.StateTrackers[trackedDeviceIdx];
-
-			if (!stateTracker.NonMenuActive) {
-				tracking = false;
-				return null;
-			}
-
-			bool triggerPressed = stateTracker.IsPressed(EVRButtonId.k_EButton_SteamVR_Trigger);
-			if (!triggerPressed) {
-				tracking = false;
-				return null;
-			}
-
-			TrackedDevicePose_t gamePose = updateParameters.GamePoses[trackedDeviceIdx];
-			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
-			var targetPosition = controllerTransform.TranslationVector * 100;
-
-			return new InverseKinematicsGoal(sourceBone, boneRelativeSourcePosition, targetPosition);
-		} else {
-			return null;
-		}
-	}
-
+	
 	public List<InverseKinematicsGoal> GetGoals(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
-		var goal = GetGoal(updateParameters, inputs, previousFrameControlVertexInfos);
-		if (goal != null) {
-			return new List<InverseKinematicsGoal>{ goal };
-		} else {
-			return new List<InverseKinematicsGoal>{};
+		List<InverseKinematicsGoal> goals = new List<InverseKinematicsGoal>();
+		foreach (var deviceTracker in deviceTrackers) {
+			var goal = deviceTracker.GetGoal(updateParameters, inputs, previousFrameControlVertexInfos);
+			if (goal != null) {
+				goals.Add(goal);
+			}
 		}
+		return goals;
 	}
 }

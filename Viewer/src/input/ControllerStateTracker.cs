@@ -59,6 +59,8 @@ public class ControllerStateTracker {
 	public bool MenuActive => active && menuOpen;
 	public bool NonMenuActive => active && !menuOpen;
 
+	public uint DeviceIdx => deviceIdx;
+
 	public bool WasClicked(EVRButtonId buttonId) {
 		return staleness == 0 && previousState.IsPressed(buttonId) && !currentState.IsPressed(buttonId);
 	}
