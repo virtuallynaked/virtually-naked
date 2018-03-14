@@ -45,10 +45,10 @@ public class InverseKinematicsAnimator {
 		var baseInputs = boneSystem.ReadInputs(channelOutputs);
 		var resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 		
-		InverseKinematicsProblem problem = ui.GetProblem(updateParameters, resultInputs, previousFrameControlVertexInfos);
+		InverseKinematicsGoal goal = ui.GetGoal(updateParameters, resultInputs, previousFrameControlVertexInfos);
 		
 		/*
-		var problem = new InverseKinematicsProblem(
+		var goal = new InverseKinematicsGoal(
 			boneSystem.BonesByName["lShin"],
 			boneSystem.BonesByName["lFoot"].CenterPoint,
 			boneSystem.BonesByName["lFoot"].GetChainedTransform(resultInputs).Transform(boneSystem.BonesByName["lFoot"].CenterPoint));
@@ -57,13 +57,13 @@ public class InverseKinematicsAnimator {
 		/*
 		var forearmBone = boneSystem.BonesByName["lForearmBend"];
 		var handBone = boneSystem.BonesByName["lHand"];
-		var problem = new InverseKinematicsProblem(
+		var goal = new InverseKinematicsGoal(
 			forearmBone,
 			handBone.CenterPoint,
 			forearmBone.CenterPoint + Vector3.Down * Vector3.Distance(handBone.CenterPoint, forearmBone.CenterPoint));
 		*/
 		
-		if (problem == null) {
+		if (goal == null) {
 			if (lastIkDeltas != null) {
 				poseDeltas = lastIkDeltas;
 				lastIkDeltas = null;
@@ -72,7 +72,7 @@ public class InverseKinematicsAnimator {
 				resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 			}
 		} else {
-			solver.Solve(boneSystem, problem, resultInputs);
+			solver.Solve(boneSystem, goal, resultInputs);
 			poseDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
 		}
 		

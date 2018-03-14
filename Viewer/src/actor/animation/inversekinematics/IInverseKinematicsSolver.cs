@@ -1,3 +1,3 @@
 ﻿public interface IInverseKinematicsSolver {
-	void Solve(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs);
+	void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs);
 }

@@ -213,28 +213,28 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 	}
 
-	private void DoIteration(int iteration, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
+	private void DoIteration(int iteration, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var centersOfMass = GetCentersOfMass(boneTransforms);
 		var massMoments = GetMassMoments(boneTransforms);
 		var figureCenterOverride = massMoments[0].GetCenterOfMass();
 		
-		var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.UnposedSourcePosition);
+		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
 
-		var bones = GetBoneChain(problem.SourceBone).ToArray();
+		var bones = GetBoneChain(goal.SourceBone).ToArray();
 		//var bones = new RigidBone[] { boneSystem.BonesByName["lForearmBend"], boneSystem.BonesByName["lShldrBend"] };
 		
 		float totalRate = 0;
 
 		var bonePartialSolutions = new BonePartialSolution[bones.Length];
 		for (int i = 0; i < bones.Length; ++i) {
-			var partialSolution = SolveSingleBone(bones[i], sourcePosition, problem.TargetPosition, massMoments, figureCenterOverride, inputs, boneTransforms);
+			var partialSolution = SolveSingleBone(bones[i], sourcePosition, goal.TargetPosition, massMoments, figureCenterOverride, inputs, boneTransforms);
 
 			bonePartialSolutions[i] = partialSolution;
 			totalRate += 1 / partialSolution.time;
 		}
 
-		var rootTranslationPartialSolution = SolveRootTranslation(sourcePosition, problem.TargetPosition);
+		var rootTranslationPartialSolution = SolveRootTranslation(sourcePosition, goal.TargetPosition);
 		totalRate += 1 / rootTranslationPartialSolution.time;
 
 		float time = 1 / totalRate;
@@ -247,9 +247,9 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		CountertransformOffChainBones(boneTransforms, centersOfMass, inputs, bones);
 	}
 	
-	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
+	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		for (int i = 0; i < Iterations; ++i) {
-			DoIteration(i, problem, inputs);
+			DoIteration(i, goal, inputs);
 		}
 	}
 }

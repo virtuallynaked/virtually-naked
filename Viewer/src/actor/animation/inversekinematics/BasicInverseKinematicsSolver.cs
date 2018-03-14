@@ -29,19 +29,19 @@ public class BasicInverseKinematicsSolver : IInverseKinematicsSolver {
 		sourcePosition = newSourcePosition;
 	}
 
-	private void DoIteration(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
+	private void DoIteration(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
-		var sourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.UnposedSourcePosition);
+		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
 
 		float weight = 0.5f;
-		for (var bone = problem.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
-			ApplyCorrection(inputs, boneTransforms, bone, ref sourcePosition, problem.TargetPosition, weight);
+		for (var bone = goal.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
+			ApplyCorrection(inputs, boneTransforms, bone, ref sourcePosition, goal.TargetPosition, weight);
 		}
 	}
 
-	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
+	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		for (int i = 0; i < 1; ++i) {
-			DoIteration(boneSystem, problem, inputs);
+			DoIteration(boneSystem, goal, inputs);
 		}
 	}
 }

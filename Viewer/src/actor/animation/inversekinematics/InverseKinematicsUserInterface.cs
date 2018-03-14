@@ -77,7 +77,7 @@ public class InverseKinematicsUserInterface {
 		return boneSystem.BonesByName[boneName];
 	}
 
-	public InverseKinematicsProblem GetProblem(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
+	public InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		if (!tracking) {
 			for (uint deviceIdx = 0; deviceIdx < OpenVR.k_unMaxTrackedDeviceCount; ++deviceIdx) {
 				ControllerStateTracker stateTracker = controllerManager.StateTrackers[deviceIdx];
@@ -120,7 +120,7 @@ public class InverseKinematicsUserInterface {
 			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
 			var targetPosition = controllerTransform.TranslationVector * 100;
 
-			return new InverseKinematicsProblem(sourceBone, boneRelativeSourcePosition, targetPosition);
+			return new InverseKinematicsGoal(sourceBone, boneRelativeSourcePosition, targetPosition);
 		} else {
 			return null;
 		}

@@ -7,7 +7,7 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		this.boneName = boneName;
 	}
 		
-	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsProblem problem, RigidBoneSystemInputs inputs) {
+	public void Solve(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var bone = boneSystem.BonesByName[boneName];
 
 		//get bone transforms with the current bone rotation zeroed out
@@ -15,8 +15,8 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var boneTransform = boneTransforms[bone.Index];
 
-		var worldSourcePosition = boneTransforms[problem.SourceBone.Index].Transform(problem.UnposedSourcePosition);
-		var worldTargetPosition = problem.TargetPosition;
+		var worldSourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
+		var worldTargetPosition = goal.TargetPosition;
 		var worldCenterPosition = boneTransform.Transform(bone.CenterPoint);
 		var worldSourceDirection = Vector3.Normalize(worldSourcePosition - worldCenterPosition);
 		var worldTargetDirection = Vector3.Normalize(worldTargetPosition - worldCenterPosition);
