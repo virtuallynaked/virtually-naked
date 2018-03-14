@@ -7,7 +7,6 @@ public class InverseKinematicsAnimator {
 	private readonly IInverseKinematicsSolver solver;
 
 	private RigidBoneSystemInputs poseDeltas;
-	private RigidBoneSystemInputs lastIkDeltas;
 
 	public InverseKinematicsAnimator(ControllerManager controllerManager, FigureDefinition definition, InverterParameters inverterParameters) {
 		channelSystem = definition.ChannelSystem;
@@ -26,7 +25,6 @@ public class InverseKinematicsAnimator {
 		var twistSwing = bone.RotationOrder.FromTwistSwingAngles(MathExtensions.DegreesToRadians(angles));
 		poseDeltas.Rotations[bone.Index] = twistSwing;
 	}
-
 
 	public void Reset() {
 		poseDeltas.ClearToZero();
@@ -47,16 +45,8 @@ public class InverseKinematicsAnimator {
 		var resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
 		
 		InverseKinematicsGoal goal = goalProvider.GetGoal(updateParameters, resultInputs, previousFrameControlVertexInfos);
-				
-		if (goal == null) {
-			if (lastIkDeltas != null) {
-				poseDeltas = lastIkDeltas;
-				lastIkDeltas = null;
-
-				//reapply deltas
-				resultInputs = boneSystem.ApplyDeltas(baseInputs, poseDeltas);
-			}
-		} else {
+		
+		if (goal != null) {
 			solver.Solve(boneSystem, goal, resultInputs);
 			poseDeltas = boneSystem.CalculateDeltas(baseInputs, resultInputs);
 		}
