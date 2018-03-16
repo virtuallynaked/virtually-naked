@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
+using static System.Math;
+using static MathExtensions;
 
 public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private const int Iterations = 10;
@@ -97,6 +99,13 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		float momentOfInertia = massMoments[bone.Index].GetMomentOfInertia(axisOfRotation, center);
 
 		var angularVelocity = torque / momentOfInertia;
+
+		var existingRotation = bone.GetOrientedSpaceRotation(inputs).AsQuaternion(bone.RotationOrder.TwistAxis);
+		var existingRotationVector = new Vector3(existingRotation.X, existingRotation.Y, existingRotation.Z);
+		float dot = Vector3.Dot(Vector3.Normalize(angularVelocity), Vector3.Normalize(existingRotationVector));
+		float retificationBias = 1 - dot / 2;
+		angularVelocity *= retificationBias;
+
 		var linearVelocity = Vector3.Cross(angularVelocity, boneSpaceSource);
 
 		var rotation = QuaternionExtensions.RotateBetween(
