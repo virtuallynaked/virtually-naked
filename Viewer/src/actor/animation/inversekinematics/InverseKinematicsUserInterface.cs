@@ -22,6 +22,7 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 		["LowerJaw"] = "Head",
 		["UpperJaw"] = "Head",
 		["Tongue"] = "Head",
+		["Neck"] = "ChestUpper",
 		["lThumb1"] = "lHand",
 		["lIndex1"] = "lHand",
 		["lIndex2"] = "lHand",
