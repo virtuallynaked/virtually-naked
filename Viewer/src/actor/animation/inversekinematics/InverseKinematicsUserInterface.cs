@@ -4,49 +4,6 @@ using System.Linq;
 using Valve.VR;
 
 public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
-	private static Dictionary<string, string> FaceGroupGrabMap = new Dictionary<string, string> {
-		["lThumb3"] = "lHand",
-		["lIndex3"] = "lHand",
-		["lMid3"] = "lHand",
-		["lRing3"] = "lHand",
-		["lPinky3"] = "lHand",
-		["rThumb3"] = "rHand",
-		["rIndex3"] = "rHand",
-		["rMid3"] = "rHand",
-		["rRing3"] = "rHand",
-		["rPinky3"] = "rHand",
-		["lPectoral"] = "Chest",
-		["rPectoral"] = "Chest",
-		["lEye"] = "Head",
-		["rEye"] = "Head",
-		["LowerJaw"] = "Head",
-		["UpperJaw"] = "Head",
-		["Tongue"] = "Head",
-		["Neck"] = "ChestUpper",
-		["lThumb1"] = "lHand",
-		["lIndex1"] = "lHand",
-		["lIndex2"] = "lHand",
-		["lMid2"] = "lHand",
-		["lMid1"] = "lHand",
-		["lPinky2"] = "lHand",
-		["lPinky1"] = "lHand",
-		["lThumb2"] = "lHand",
-		["lRing2"] = "lHand",
-		["lRing1"] = "lHand",
-		["rThumb1"] = "rHand",
-		["rIndex1"] = "rHand",
-		["rIndex2"] = "rHand",
-		["rMid2"] = "rHand",
-		["rMid1"] = "rHand",
-		["rPinky2"] = "rHand",
-		["rPinky1"] = "rHand",
-		["rThumb2"] = "rHand",
-		["rRing2"] = "rHand",
-		["rRing1"] = "rHand",
-		["lToe"] = "lFoot",
-		["rToe"] = "rFoot",
-	};
-
 	private readonly ChannelSystem channelSystem;
 	private readonly RigidBoneSystem boneSystem;
 	private readonly InverterParameters inverterParameters;
@@ -141,15 +98,9 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 	private RigidBone MapPositionToBone(Vector3 position, ControlVertexInfo[] previousFrameControlVertexInfos) {
 		Vector3[] previousFrameControlVertexPositions = previousFrameControlVertexInfos.Select(vertexInfo => vertexInfo.position).ToArray();
 		int faceIdx = ClosestPoint.FindClosestFaceOnMesh(inverterParameters.ControlFaces, previousFrameControlVertexPositions, position);
-		int faceGroupIdx = inverterParameters.FaceGroupMap[faceIdx];
-		string faceGroupName = inverterParameters.FaceGroupNames[faceGroupIdx];
-		
-		if (!FaceGroupGrabMap.TryGetValue(faceGroupName, out string grabFaceGroupName)) {
-			grabFaceGroupName = faceGroupName;
-		}
-
-		string boneName = inverterParameters.FaceGroupToNodeMap[grabFaceGroupName];
-		return boneSystem.BonesByName[boneName];
+		int boneIdx = inverterParameters.ControlFaceToBoneMap[faceIdx];
+		var bone = boneSystem.Bones[boneIdx];
+		return bone;
 	}
 	
 	public List<InverseKinematicsGoal> GetGoals(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {

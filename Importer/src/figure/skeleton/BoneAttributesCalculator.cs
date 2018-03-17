@@ -130,4 +130,47 @@ public class BoneAttributesCalculator {
 		}
 		return boneAttributes;
 	}
+
+	public int[] CalculateFaceToBoneMap() {
+		bool[] areIkable = CalculateIkability();
+		Bone[] boneToIkableAncestorMap = new Bone[boneSystem.Bones.Count];
+		foreach (var bone in boneSystem.Bones) {
+			var ikableAncestor = areIkable[bone.Index] ? bone : boneToIkableAncestorMap[bone.Parent.Index];
+			boneToIkableAncestorMap[bone.Index] = ikableAncestor;
+		}
+
+		var controlFaceToBoneMap = geometry.Faces
+			.Select(quad => {
+				//gather the bone weights across all vertices of the face
+				var allBoneWeights = 
+					skinBinding.BoneWeights.GetElements(quad.Index0)
+					.Concat(skinBinding.BoneWeights.GetElements(quad.Index1))
+					.Concat(skinBinding.BoneWeights.GetElements(quad.Index2))
+					.Concat(skinBinding.BoneWeights.GetElements(quad.Index3));
+
+				//map each bone to closest IKable ancestor
+				var ikableBoneWeights = allBoneWeights
+					.Select(boneWeight => {
+						Bone bone = skinBinding.Bones[boneWeight.Index];
+						Bone ikableBone = boneToIkableAncestorMap[bone.Index];
+						return new BoneWeight(ikableBone.Index, boneWeight.Weight);
+					});
+
+				//sum the weights of each IKable ancestor
+				var mergedBoneWeights = ikableBoneWeights.GroupBy(
+					boneWeight => boneWeight.Index,
+					boneWeight => boneWeight.Weight)
+					.Select(group => new BoneWeight(group.Key, group.Sum(weight => weight)));
+
+				//select the highest weighted IKable  bone
+				var maxBoneWeight = mergedBoneWeights
+					.OrderByDescending(boneWeight => boneWeight.Weight)
+					.First();
+
+				return maxBoneWeight.Index;
+			})
+			.ToArray();
+
+		return controlFaceToBoneMap;
+	}
 }
