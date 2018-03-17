@@ -140,7 +140,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 		foreach (var bone in boneSystem.Bones.Reverse()) {
 			float mass = boneAttributes[bone.Index].Mass;
-			var position = totalTransforms[bone.Index].Transform(bone.CenterPoint);
+			var position = totalTransforms[bone.Index].Transform(bone.CenterPoint + boneAttributes[bone.Index].CenterOfMass);
 			var massPosition = mass * position;
 
 			var totalMass = descendantMasses[bone.Index] + mass;
