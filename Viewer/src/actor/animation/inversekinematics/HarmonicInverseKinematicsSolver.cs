@@ -8,16 +8,32 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 	private readonly RigidBoneSystem boneSystem;
 	private readonly BoneAttributes[] boneAttributes;
+	private readonly bool[] areOrientable;
 
 	public HarmonicInverseKinematicsSolver(RigidBoneSystem boneSystem, BoneAttributes[] boneAttributes) {
 		this.boneSystem = boneSystem;
 		this.boneAttributes = boneAttributes;
+		areOrientable = MakeAreOrientable(boneSystem);
 	}
 
-	private IEnumerable<RigidBone> GetBoneChain(RigidBone sourceBone) {
+	private static bool[] MakeAreOrientable(RigidBoneSystem boneSystem) {
+		bool[] areOrientable = new bool[boneSystem.Bones.Length];
+		areOrientable[boneSystem.BonesByName["lHand"].Index] = true;
+		areOrientable[boneSystem.BonesByName["rHand"].Index] = true;
+		areOrientable[boneSystem.BonesByName["lFoot"].Index] = true;
+		areOrientable[boneSystem.BonesByName["rFoot"].Index] = true;
+		return areOrientable;
+	}
+
+	private IEnumerable<RigidBone> GetBoneChain(RigidBone sourceBone, bool hasOrientationGoal) {
 		for (var bone = sourceBone; bone != null; bone = bone.Parent) {
 			if (bone.Parent == null) {
 				//omit root bone
+				continue;
+			}
+
+			if (areOrientable[bone.Index] && hasOrientationGoal) {
+				//omit orientable bones if there's a orientation goal since rotation for those bone is already set
 				continue;
 			}
 
@@ -213,7 +229,30 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 	}
 
-	private void DoIteration(int iteration, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
+	private void ApplyOrientationGoal(InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
+		if (!areOrientable[goal.SourceBone.Index] || !goal.HasOrientation) {
+			return;
+		}
+
+		var bone = goal.SourceBone;
+		var parentBone = bone.Parent;
+		var grandparentBone = parentBone.Parent;
+
+		var grandparentTotalTransform = grandparentBone.GetChainedTransform(inputs);
+		var parentTotalTransform = parentBone.GetChainedTransform(inputs, grandparentTotalTransform);
+
+		var goalTotalRotation = Quaternion.Invert(goal.UnposedSourceOrientation).Chain(goal.TargetOrientation);
+		
+		var newLocalRotation = goalTotalRotation.Chain(Quaternion.Invert(parentTotalTransform.Rotation));
+		bone.SetRotation(inputs, newLocalRotation, true);
+		
+		var clampedNewLocalRotation = bone.GetRotation(inputs);
+		var residualGoalTotalRotation = Quaternion.Invert(clampedNewLocalRotation).Chain(goalTotalRotation);
+		var parentNewLocalRotation = residualGoalTotalRotation.Chain(Quaternion.Invert(grandparentTotalTransform.Rotation));
+		parentBone.SetTwistOnly(inputs, parentNewLocalRotation);
+	}
+
+	private void ApplyPositionGoal(InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var centersOfMass = GetCentersOfMass(boneTransforms);
 		var massMoments = GetMassMoments(boneTransforms);
@@ -221,7 +260,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		
 		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
 
-		var bones = GetBoneChain(goal.SourceBone).ToArray();
+		var bones = GetBoneChain(goal.SourceBone, goal.HasOrientation).ToArray();
 		//var bones = new RigidBone[] { boneSystem.BonesByName["lForearmBend"], boneSystem.BonesByName["lShldrBend"] };
 		
 		float totalRate = 0;
@@ -245,6 +284,11 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		ApplyPartialSolution(rootTranslationPartialSolution, inputs, time);
 
 		CountertransformOffChainBones(boneTransforms, centersOfMass, inputs, bones);
+	}
+
+	private void DoIteration(int iteration, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
+		ApplyOrientationGoal(goal, inputs);
+		ApplyPositionGoal(goal, inputs);
 	}
 	
 	public void Solve(RigidBoneSystem boneSystem, List<InverseKinematicsGoal> goals, RigidBoneSystemInputs inputs) {

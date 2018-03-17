@@ -67,6 +67,7 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 		private bool tracking = false;
 		private RigidBone sourceBone;
 		private Vector3 boneRelativeSourcePosition;
+		private Quaternion boneRelativeSourceOrientation;
 
 		public DeviceTracker(InverseKinematicsUserInterface parentInstance, ControllerStateTracker stateTracker) {
 			this.parentInstance = parentInstance;
@@ -92,10 +93,14 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 				
 			TrackedDevicePose_t gamePose = updateParameters.GamePoses[stateTracker.DeviceIdx];
 			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
-			var worldSourcePosition = controllerTransform.TranslationVector * 100;
+			DualQuaternion controllerTransformDq = DualQuaternion.FromMatrix(controllerTransform); 
+			var worldSourcePosition = controllerTransformDq.Translation * 100;
+			var worldSourceOrientation = controllerTransformDq.Rotation;
 
 			sourceBone = parentInstance.MapPositionToBone(worldSourcePosition, previousFrameControlVertexInfos);
-			boneRelativeSourcePosition = sourceBone.GetChainedTransform(inputs).InverseTransform(worldSourcePosition);
+			var inverseSourceBoneTotalTransform = sourceBone.GetChainedTransform(inputs).Invert();
+			boneRelativeSourcePosition = inverseSourceBoneTotalTransform.Transform(worldSourcePosition);
+			boneRelativeSourceOrientation = worldSourceOrientation.Chain(inverseSourceBoneTotalTransform.Rotation);
 		}
 
 		private InverseKinematicsGoal MaybeContinueTracking(FrameUpdateParameters updateParameters) {
@@ -116,9 +121,13 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 
 			TrackedDevicePose_t gamePose = updateParameters.GamePoses[stateTracker.DeviceIdx];
 			Matrix controllerTransform = gamePose.mDeviceToAbsoluteTracking.Convert();
-			var targetPosition = controllerTransform.TranslationVector * 100;
+			var controllerTransformDq = DualQuaternion.FromMatrix(controllerTransform);
+			var targetPosition = controllerTransformDq.Translation * 100;
+			var targetOrientation = controllerTransformDq.Rotation;
 
-			return new InverseKinematicsGoal(sourceBone, boneRelativeSourcePosition, targetPosition);
+			return new InverseKinematicsGoal(sourceBone,
+				boneRelativeSourcePosition, boneRelativeSourceOrientation,
+				targetPosition, targetOrientation);
 		}
 
 		public InverseKinematicsGoal GetGoal(FrameUpdateParameters updateParameters, RigidBoneSystemInputs inputs, ControlVertexInfo[] previousFrameControlVertexInfos) {
