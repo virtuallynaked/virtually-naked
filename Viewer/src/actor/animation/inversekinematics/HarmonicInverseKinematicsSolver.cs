@@ -72,7 +72,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	
 	private BonePartialSolution SolveSingleBone(
 			RigidBone bone,
-			Vector3 worldSource, Vector3 worldTarget, MassMomentAccumulator[] massMoments, Vector3 figureCenterOverride,
+			Vector3 worldSource, Vector3 worldTarget, MassMoment[] massMoments, Vector3 figureCenterOverride,
 			RigidBoneSystemInputs inputs, DualQuaternion[] boneTransforms) {
 		
 		var center = bone.Index != FigureCenterBoneIndex ? boneTransforms[bone.Index].Transform(bone.CenterPoint) : figureCenterOverride;
@@ -158,19 +158,19 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		return centersOfMass;
 	}
 
-	private MassMomentAccumulator[] GetMassMoments(DualQuaternion[] totalTransforms) {
-		MassMomentAccumulator[] accumulators = new MassMomentAccumulator[boneSystem.Bones.Length];
+	private MassMoment[] GetMassMoments(DualQuaternion[] totalTransforms) {
+		MassMoment[] accumulators = new MassMoment[boneSystem.Bones.Length];
 
 		foreach (var bone in boneSystem.Bones.Reverse()) {
 			float mass = boneAttributes[bone.Index].Mass;
 			var unposedPosition = bone.CenterPoint + boneAttributes[bone.Index].CenterOfMass;
 			var position = totalTransforms[bone.Index].Transform(unposedPosition);
 			
-			accumulators[bone.Index].Add(mass, position);
+			accumulators[bone.Index].AddInplace(mass, position);
 
 			var parent = bone.Parent;
 			if (parent != null) {
-				accumulators[parent.Index].Add(accumulators[bone.Index]);
+				accumulators[parent.Index].AddInplace(accumulators[bone.Index]);
 			}
 		}
 

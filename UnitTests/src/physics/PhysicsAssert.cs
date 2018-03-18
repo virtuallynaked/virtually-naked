@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 public static class PhysicsAssert {
-	public static void AreEqual(MassMomentAccumulator expected, MassMomentAccumulator actual, float delta) {
+	public static void AreEqual(MassMoment expected, MassMoment actual, float delta) {
 		Assert.AreEqual(expected.Mass, actual.Mass, delta, "Mass");
 		MathAssert.AreEqual(expected.MassPosition, actual.MassPosition, delta);
 		Assert.AreEqual(expected.InertiaXX, actual.InertiaXX, delta, "InertiaXX");

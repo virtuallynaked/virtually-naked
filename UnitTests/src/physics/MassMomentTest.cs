@@ -3,7 +3,7 @@ using SharpDX;
 using System;
 
 [TestClass]
-public class MassMomentAccumulatorTest {
+public class MassMomentTest {
 	private const float Acc = 1e-4f;
 
 	[TestMethod]
@@ -13,10 +13,10 @@ public class MassMomentAccumulatorTest {
 		Vector3 p2 = RandomUtil.Vector3(rnd); float m2 = RandomUtil.PositiveFloat(rnd);
 		Vector3 p3 = RandomUtil.Vector3(rnd); float m3 = RandomUtil.PositiveFloat(rnd);
 
-		var accum = new MassMomentAccumulator();
-		accum.Add(m1, p1);
-		accum.Add(m2, p2);
-		accum.Add(m3, p3);
+		var accum = new MassMoment();
+		accum.AddInplace(m1, p1);
+		accum.AddInplace(m2, p2);
+		accum.AddInplace(m3, p3);
 		
 		Vector3 expectedCenterOfMass = (m1 * p1 + m2 * p2 + m3 * p3) / (m1 + m2 + m3);
 		MathAssert.AreEqual(expectedCenterOfMass, accum.GetCenterOfMass(), Acc);
@@ -36,10 +36,10 @@ public class MassMomentAccumulatorTest {
 		Vector3 p2 = RandomUtil.Vector3(rnd); float m2 = RandomUtil.PositiveFloat(rnd);
 		Vector3 p3 = RandomUtil.Vector3(rnd); float m3 = RandomUtil.PositiveFloat(rnd);
 
-		var accum = new MassMomentAccumulator();
-		accum.Add(m1, p1);
-		accum.Add(m2, p2);
-		accum.Add(m3, p3);
+		var accum = new MassMoment();
+		accum.AddInplace(m1, p1);
+		accum.AddInplace(m2, p2);
+		accum.AddInplace(m3, p3);
 
 		Vector3 axisOfRotation = RandomUtil.UnitVector3(rnd);
 		Vector3 centerOfRotation = RandomUtil.Vector3(rnd);
@@ -52,23 +52,23 @@ public class MassMomentAccumulatorTest {
 	}
 
 	[TestMethod]
-	public void TestAddingAccumulators() {
+	public void TestAddingMassMoments() {
 		Random rnd = new Random(2);
 		Vector3 p1 = RandomUtil.Vector3(rnd); float m1 = RandomUtil.PositiveFloat(rnd);
 		Vector3 p2 = RandomUtil.Vector3(rnd); float m2 = RandomUtil.PositiveFloat(rnd);
 		Vector3 p3 = RandomUtil.Vector3(rnd); float m3 = RandomUtil.PositiveFloat(rnd);
 
-		var accumA = new MassMomentAccumulator();
-		accumA.Add(m1, p1);
-		accumA.Add(m2, p2);
-		accumA.Add(m3, p3);
+		var accumA = new MassMoment();
+		accumA.AddInplace(m1, p1);
+		accumA.AddInplace(m2, p2);
+		accumA.AddInplace(m3, p3);
 
-		var accumB = new MassMomentAccumulator();
-		accumB.Add(m1, p1);
-		var accumB2 = new MassMomentAccumulator();
-		accumB2.Add(m2, p2);
-		accumB2.Add(m3, p3);
-		accumB.Add(accumB2);
+		var accumB = new MassMoment();
+		accumB.AddInplace(m1, p1);
+		var accumB2 = new MassMoment();
+		accumB2.AddInplace(m2, p2);
+		accumB2.AddInplace(m3, p3);
+		accumB.AddInplace(accumB2);
 		
 		PhysicsAssert.AreEqual(accumA, accumB, Acc);
 	}
@@ -82,13 +82,13 @@ public class MassMomentAccumulatorTest {
 
 		Vector3 translation = RandomUtil.Vector3(rnd);
 
-		var accum = new MassMomentAccumulator();
-		var translatedAccum = new MassMomentAccumulator();
-		accum.Add(m1, p1); translatedAccum.Add(m1, p1 + translation);
-		accum.Add(m2, p2); translatedAccum.Add(m2, p2 + translation);
-		accum.Add(m3, p3); translatedAccum.Add(m3, p3 + translation);
+		var massMoment = new MassMoment();
+		var translatedMassMoment = new MassMoment();
+		massMoment.AddInplace(m1, p1); translatedMassMoment.AddInplace(m1, p1 + translation);
+		massMoment.AddInplace(m2, p2); translatedMassMoment.AddInplace(m2, p2 + translation);
+		massMoment.AddInplace(m3, p3); translatedMassMoment.AddInplace(m3, p3 + translation);
 
-		PhysicsAssert.AreEqual(accum.Translate(translation), translatedAccum, Acc);
+		PhysicsAssert.AreEqual(massMoment.Translate(translation), translatedMassMoment, Acc);
 	}
 
 	[TestMethod]
@@ -100,12 +100,12 @@ public class MassMomentAccumulatorTest {
 
 		Quaternion rotation = RandomUtil.UnitQuaternion(rnd);
 
-		var accum = new MassMomentAccumulator();
-		var translatedAccum = new MassMomentAccumulator();
-		accum.Add(m1, p1); translatedAccum.Add(m1, Vector3.Transform(p1, rotation));
-		accum.Add(m2, p2); translatedAccum.Add(m2, Vector3.Transform(p2, rotation));
-		accum.Add(m3, p3); translatedAccum.Add(m3, Vector3.Transform(p3, rotation));
+		var massMoment = new MassMoment();
+		var rotatedMassMoment = new MassMoment();
+		massMoment.AddInplace(m1, p1); rotatedMassMoment.AddInplace(m1, Vector3.Transform(p1, rotation));
+		massMoment.AddInplace(m2, p2); rotatedMassMoment.AddInplace(m2, Vector3.Transform(p2, rotation));
+		massMoment.AddInplace(m3, p3); rotatedMassMoment.AddInplace(m3, Vector3.Transform(p3, rotation));
 
-		PhysicsAssert.AreEqual(accum.Rotate(rotation), translatedAccum, Acc);
+		PhysicsAssert.AreEqual(massMoment.Rotate(rotation), rotatedMassMoment, Acc);
 	}
 }
