@@ -61,15 +61,32 @@ public struct MassMoment {
 	}
 
 
-	public void AddInplace(MassMoment accumulator) {
-		mass += accumulator.mass;
-		massPosition += accumulator.massPosition;
-		inertiaXX += accumulator.inertiaXX;
-		inertiaYY += accumulator.inertiaYY;
-		inertiaZZ += accumulator.inertiaZZ;
-		inertiaXY += accumulator.inertiaXY;
-		inertiaXZ += accumulator.inertiaXZ;
-		inertiaYZ += accumulator.inertiaYZ;
+	public void AddInplace(MassMoment massMoment) {
+		mass += massMoment.mass;
+		massPosition += massMoment.massPosition;
+		inertiaXX += massMoment.inertiaXX;
+		inertiaYY += massMoment.inertiaYY;
+		inertiaZZ += massMoment.inertiaZZ;
+		inertiaXY += massMoment.inertiaXY;
+		inertiaXZ += massMoment.inertiaXZ;
+		inertiaYZ += massMoment.inertiaYZ;
+	}
+
+	/**
+	 * Add a child body on a flexible hinge.
+	 * The result is a interpolation between adding a rigid body and adding a point mass at the hinge point.
+	 */
+	public void AddFlexibleInPlace(MassMoment massMoment, float flexibility, Vector3 centerOfRotation) {
+		float rigidity = 1 - flexibility;
+
+		mass += massMoment.mass;
+		massPosition += rigidity * massMoment.massPosition + flexibility * massMoment.mass * centerOfRotation;
+		inertiaXX += rigidity * massMoment.inertiaXX + flexibility * massMoment.mass * (Sqr(centerOfRotation.Y) + Sqr(centerOfRotation.Z));
+		inertiaYY += rigidity * massMoment.inertiaYY + flexibility * massMoment.mass * (Sqr(centerOfRotation.X) + Sqr(centerOfRotation.Z));
+		inertiaZZ += rigidity * massMoment.inertiaZZ + flexibility * massMoment.mass * (Sqr(centerOfRotation.X) + Sqr(centerOfRotation.Y));
+		inertiaXY += rigidity * massMoment.inertiaXY - flexibility * massMoment.mass * centerOfRotation.X * centerOfRotation.Y;
+		inertiaXZ += rigidity * massMoment.inertiaXZ - flexibility * massMoment.mass * centerOfRotation.X * centerOfRotation.Z;
+		inertiaYZ += rigidity * massMoment.inertiaYZ - flexibility * massMoment.mass * centerOfRotation.Y * centerOfRotation.Z;
 	}
 
 	public Vector3 GetCenterOfMass() {

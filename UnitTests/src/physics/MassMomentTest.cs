@@ -72,6 +72,34 @@ public class MassMomentTest {
 		
 		PhysicsAssert.AreEqual(accumA, accumB, Acc);
 	}
+
+	[TestMethod]
+	public void TestAddFlexibleInPlace() {
+		Random rnd = new Random(2);
+		Vector3 p1 = RandomUtil.Vector3(rnd); float m1 = RandomUtil.PositiveFloat(rnd);
+		Vector3 p2 = RandomUtil.Vector3(rnd); float m2 = RandomUtil.PositiveFloat(rnd);
+		Vector3 p3 = RandomUtil.Vector3(rnd); float m3 = RandomUtil.PositiveFloat(rnd);
+
+		MassMoment momentToAdd = new MassMoment();
+		momentToAdd.AddInplace(m1, p1);
+		momentToAdd.AddInplace(m2, p2);
+		momentToAdd.AddInplace(m3, p3);
+
+		float flexiblity = 0.6f;
+		Vector3 centerOfRotation = RandomUtil.Vector3(rnd);
+		MassMoment massMoment = new MassMoment();
+		massMoment.AddFlexibleInPlace(momentToAdd, flexiblity, centerOfRotation);
+
+		MassMoment expectedMoment = new MassMoment();
+		expectedMoment.AddInplace((1 - flexiblity) * m1, p1);
+		expectedMoment.AddInplace((1 - flexiblity) * m2, p2);
+		expectedMoment.AddInplace((1 - flexiblity) * m3, p3);
+		expectedMoment.AddInplace(flexiblity * m1, centerOfRotation);
+		expectedMoment.AddInplace(flexiblity * m2, centerOfRotation);
+		expectedMoment.AddInplace(flexiblity * m3, centerOfRotation);
+
+		PhysicsAssert.AreEqual(massMoment, expectedMoment, Acc);
+	}
 	
 	[TestMethod]
 	public void TestTranslate() {

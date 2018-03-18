@@ -160,20 +160,34 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		return centersOfMass;
 	}
 
-	private MassMoment[] GetMassMoments(DualQuaternion[] totalTransforms) {
+	private MassMoment[] GetMassMoments(DualQuaternion[] totalTransforms, RigidBone[] boneChain) {
 		MassMoment[] accumulators = new MassMoment[boneSystem.Bones.Length];
+
+		bool[] areOnChain = new bool[boneSystem.Bones.Length];
+		areOnChain[0] = true; //root bone is always on the chain
+		foreach (var bone in boneChain) {
+			areOnChain[bone.Index] = true;
+		}
 
 		foreach (var bone in boneSystem.Bones.Reverse()) {
 			var unposedBoneCenteredMassMoment = boneAttributes[bone.Index].MassMoment;
 			var unposedMassMoment = unposedBoneCenteredMassMoment.Translate(bone.CenterPoint);
 			var totalTransform = totalTransforms[bone.Index];
 			var massMoment = unposedMassMoment.Rotate(totalTransform.Rotation).Translate(totalTransform.Translation);
+			var centerOfRation = totalTransform.Transform(bone.CenterPoint);
 
 			accumulators[bone.Index].AddInplace(massMoment);
 			
 			var parent = bone.Parent;
 			if (parent != null) {
-				accumulators[parent.Index].AddInplace(accumulators[bone.Index]);
+				float counterRotationRatio;
+				if (areOnChain[bone.Index]) {
+					counterRotationRatio = 0;
+				} else {
+					counterRotationRatio = boneAttributes[bone.Index].MassMoment.Mass / boneAttributes[0].MassIncludingDescendants;
+				}
+
+				accumulators[parent.Index].AddFlexibleInPlace(accumulators[bone.Index], counterRotationRatio, centerOfRation);
 			}
 		}
 
@@ -258,14 +272,15 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private void ApplyPositionGoal(InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var centersOfMass = GetCentersOfMass(boneTransforms);
-		var massMoments = GetMassMoments(boneTransforms);
-		var figureCenterOverride = massMoments[0].GetCenterOfMass();
 		
 		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
 
 		var bones = GetBoneChain(goal.SourceBone, goal.HasOrientation).ToArray();
 		//var bones = new RigidBone[] { boneSystem.BonesByName["lForearmBend"], boneSystem.BonesByName["lShldrBend"] };
 		
+		var massMoments = GetMassMoments(boneTransforms, bones);
+		var figureCenterOverride = massMoments[0].GetCenterOfMass();
+
 		float totalRate = 0;
 
 		var bonePartialSolutions = new BonePartialSolution[bones.Length];
