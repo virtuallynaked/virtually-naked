@@ -139,8 +139,8 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		Vector3[] centersOfMass = new Vector3[boneSystem.Bones.Length];
 
 		foreach (var bone in boneSystem.Bones.Reverse()) {
-			float mass = boneAttributes[bone.Index].Mass;
-			var position = totalTransforms[bone.Index].Transform(bone.CenterPoint + boneAttributes[bone.Index].CenterOfMass);
+			float mass = boneAttributes[bone.Index].MassMoment.Mass;
+			var position = totalTransforms[bone.Index].Transform(bone.CenterPoint + boneAttributes[bone.Index].MassMoment.GetCenterOfMass());
 			var massPosition = mass * position;
 
 			var totalMass = descendantMasses[bone.Index] + mass;
@@ -162,12 +162,14 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		MassMoment[] accumulators = new MassMoment[boneSystem.Bones.Length];
 
 		foreach (var bone in boneSystem.Bones.Reverse()) {
-			float mass = boneAttributes[bone.Index].Mass;
-			var unposedPosition = bone.CenterPoint + boneAttributes[bone.Index].CenterOfMass;
-			var position = totalTransforms[bone.Index].Transform(unposedPosition);
+			float mass = boneAttributes[bone.Index].MassMoment.Mass;
 			
-			accumulators[bone.Index].AddInplace(mass, position);
-
+			if (mass != 0) {
+				var unposedPosition = bone.CenterPoint + boneAttributes[bone.Index].MassMoment.GetCenterOfMass();
+				var position = totalTransforms[bone.Index].Transform(unposedPosition);
+				accumulators[bone.Index].AddInplace(mass, position);
+			}
+			
 			var parent = bone.Parent;
 			if (parent != null) {
 				accumulators[parent.Index].AddInplace(accumulators[bone.Index]);
@@ -219,7 +221,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 				var counterRotation = worldCounterRotation.Chain(Quaternion.Invert(parentPostTotalTransform.Rotation));
 
 				var originalRotation = bone.GetRotation(inputs);
-				float shrinkRatio = boneAttributes[bone.Index].Mass / boneAttributes[0].MassIncludingDescendants;
+				float shrinkRatio = boneAttributes[bone.Index].MassMoment.Mass / boneAttributes[0].MassIncludingDescendants;
 				var shrunkCounterRotation = Quaternion.Lerp(originalRotation, counterRotation, shrinkRatio);
 				bone.SetRotation(inputs, shrunkCounterRotation, true);
 			}

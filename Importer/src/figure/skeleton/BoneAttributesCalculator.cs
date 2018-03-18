@@ -26,11 +26,10 @@ public class BoneAttributesCalculator {
 		return 1/6f * Vector3.Dot(Vector3.Cross(p10, p20), p30);
 	}
 
-	private (float[], Vector3[]) CalculateBoneMasses() {
+	private MassMoment[] CalculateBoneMassMoments() {
 		Debug.Assert(skinBinding.BoneWeights.Count == geometry.VertexCount);
 
-		float[] boneVolumes = new float[boneSystem.Bones.Count];
-		Vector3[] boneVolumePositions = new Vector3[boneSystem.Bones.Count];
+		MassMoment[] massMoments = new MassMoment[boneSystem.Bones.Count];
 
 		foreach (var quad in geometry.Faces) {
 			for (int cornerIdx = 0; cornerIdx < Quad.SideCount; ++cornerIdx) {
@@ -45,29 +44,16 @@ public class BoneAttributesCalculator {
 					var boneCenter = bone.CenterPoint.GetValue(channelSystem.DefaultOutputs);
 
 					float volume = SignedTetrahedralVolume(boneCenter, p1, p2, p3) / CubicCentimetersPerLiter;
+					float mass = volume / 2; //assume a density of 1 kg per liter, half because each point is covered by two tetrahedra
 					Vector3 position = (boneCenter + p1 + p2 + p3) / 4;
-					Vector3 volumePosition = volume * position;
+					Vector3 relativePosition = position - boneCenter;
 
-					boneVolumes[bone.Index] += 1/2f * volume; //half because each point is covered by two tetrahedra
-					boneVolumePositions[bone.Index] += 1/2f * volumePosition;
+					massMoments[bone.Index].AddInplace(mass, relativePosition);
 				}
 			}
 		}
-		
-		//assume a density of 1 kg per liter
-		var boneMasses = boneVolumes;
-
-		var boneCentersOfMass = new Vector3[boneSystem.Bones.Count];
-		for (int i = 0; i < boneSystem.Bones.Count; ++i) {
-			var bone = boneSystem.Bones[i];
-			var boneCenter = bone.CenterPoint.GetValue(channelSystem.DefaultOutputs);
-			var boneVolume = boneVolumes[i];
-			var boneVolumePosition = boneVolumePositions[i];
-			var boneCenterOfMass = boneVolume != 0 ? (boneVolumePosition / boneVolume) - boneCenter : Vector3.Zero;
-			boneCentersOfMass[i] = boneCenterOfMass;
-		}
-		
-		return (boneMasses, boneCentersOfMass);
+				
+		return massMoments;
 	}
 
 	public float[] SumChildren(float[] boneMasses) {
@@ -121,12 +107,13 @@ public class BoneAttributesCalculator {
 
 	public BoneAttributes[] CalculateBoneAttributes() {
 		bool[] areIkable = CalculateIkability();
-		(float[] masses, Vector3[] centersOfMass) = CalculateBoneMasses();
+		MassMoment[] massMoments = CalculateBoneMassMoments();
+		float[] masses = massMoments.Select(massMoment => massMoment.Mass).ToArray();
 		float[] massesIncludingDescendants = SumChildren(masses);
 
 		BoneAttributes[] boneAttributes = new BoneAttributes[boneSystem.Bones.Count];
 		for (int i = 0; i < boneAttributes.Length; ++i) {
-			boneAttributes[i] = new BoneAttributes(areIkable[i], masses[i], centersOfMass[i], massesIncludingDescendants[i]);
+			boneAttributes[i] = new BoneAttributes(areIkable[i], massMoments[i], massesIncludingDescendants[i]);
 		}
 		return boneAttributes;
 	}
