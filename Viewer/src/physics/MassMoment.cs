@@ -65,7 +65,11 @@ public struct MassMoment {
 	}
 
 	public Vector3 GetCenterOfMass() {
-		return massPosition / mass;
+		if (mass == 0) {
+			return Vector3.Zero;
+		} else {
+			return massPosition / mass;
+		}
 	}
 
 	public float GetMomentOfInertia(Vector3 axisOfRotation, Vector3 centerOfRotation) {
