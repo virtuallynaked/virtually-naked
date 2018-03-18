@@ -34,4 +34,14 @@ public static class RandomUtil {
 		v.Normalize();
 		return v;
 	}
+
+	public static Quaternion UnitQuaternion(Random rnd) {
+		Quaternion q;
+		q.W = (float) Normal.Sample(rnd, 0, 1);
+		q.X = (float) Normal.Sample(rnd, 0, 1);
+		q.Y = (float) Normal.Sample(rnd, 0, 1);
+		q.Z = (float) Normal.Sample(rnd, 0, 1);
+		q.Normalize();
+		return q;
+	}
 }

@@ -70,6 +70,42 @@ public class MassMomentAccumulatorTest {
 		accumB2.Add(m3, p3);
 		accumB.Add(accumB2);
 		
-		MathAssert.AreEqual(accumA.GetCenterOfMass(), accumB.GetCenterOfMass(), Acc);
+		PhysicsAssert.AreEqual(accumA, accumB, Acc);
+	}
+	
+	[TestMethod]
+	public void TestTranslate() {
+		Random rnd = new Random(1);
+		Vector3 p1 = RandomUtil.Vector3(rnd); float m1 = RandomUtil.PositiveFloat(rnd);
+		Vector3 p2 = RandomUtil.Vector3(rnd); float m2 = RandomUtil.PositiveFloat(rnd);
+		Vector3 p3 = RandomUtil.Vector3(rnd); float m3 = RandomUtil.PositiveFloat(rnd);
+
+		Vector3 translation = RandomUtil.Vector3(rnd);
+
+		var accum = new MassMomentAccumulator();
+		var translatedAccum = new MassMomentAccumulator();
+		accum.Add(m1, p1); translatedAccum.Add(m1, p1 + translation);
+		accum.Add(m2, p2); translatedAccum.Add(m2, p2 + translation);
+		accum.Add(m3, p3); translatedAccum.Add(m3, p3 + translation);
+
+		PhysicsAssert.AreEqual(accum.Translate(translation), translatedAccum, Acc);
+	}
+
+	[TestMethod]
+	public void TestRotate() {
+		Random rnd = new Random(1);
+		Vector3 p1 = RandomUtil.Vector3(rnd); float m1 = RandomUtil.PositiveFloat(rnd);
+		Vector3 p2 = RandomUtil.Vector3(rnd); float m2 = RandomUtil.PositiveFloat(rnd);
+		Vector3 p3 = RandomUtil.Vector3(rnd); float m3 = RandomUtil.PositiveFloat(rnd);
+
+		Quaternion rotation = RandomUtil.UnitQuaternion(rnd);
+
+		var accum = new MassMomentAccumulator();
+		var translatedAccum = new MassMomentAccumulator();
+		accum.Add(m1, p1); translatedAccum.Add(m1, Vector3.Transform(p1, rotation));
+		accum.Add(m2, p2); translatedAccum.Add(m2, Vector3.Transform(p2, rotation));
+		accum.Add(m3, p3); translatedAccum.Add(m3, Vector3.Transform(p3, rotation));
+
+		PhysicsAssert.AreEqual(accum.Rotate(rotation), translatedAccum, Acc);
 	}
 }
