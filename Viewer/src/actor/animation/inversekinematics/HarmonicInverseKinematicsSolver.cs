@@ -164,13 +164,12 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		MassMoment[] accumulators = new MassMoment[boneSystem.Bones.Length];
 
 		foreach (var bone in boneSystem.Bones.Reverse()) {
-			float mass = boneAttributes[bone.Index].MassMoment.Mass;
-			
-			if (mass != 0) {
-				var unposedPosition = bone.CenterPoint + boneAttributes[bone.Index].MassMoment.GetCenterOfMass();
-				var position = totalTransforms[bone.Index].Transform(unposedPosition);
-				accumulators[bone.Index].AddInplace(mass, position);
-			}
+			var unposedBoneCenteredMassMoment = boneAttributes[bone.Index].MassMoment;
+			var unposedMassMoment = unposedBoneCenteredMassMoment.Translate(bone.CenterPoint);
+			var totalTransform = totalTransforms[bone.Index];
+			var massMoment = unposedMassMoment.Rotate(totalTransform.Rotation).Translate(totalTransform.Translation);
+
+			accumulators[bone.Index].AddInplace(massMoment);
 			
 			var parent = bone.Parent;
 			if (parent != null) {
