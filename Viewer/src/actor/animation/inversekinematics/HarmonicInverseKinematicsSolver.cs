@@ -107,6 +107,8 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 		float time = distance == 0 ? 0 : distance / linearVelocity.Length();
 
+		DebugUtilities.AssertFinite(angularVelocity);
+
 		return new BonePartialSolution {
 			angularVelocity = angularVelocity,
 			time = time
