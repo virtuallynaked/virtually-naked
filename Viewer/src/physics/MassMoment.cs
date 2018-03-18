@@ -40,6 +40,13 @@ public struct MassMoment {
 	public float InertiaXZ => inertiaXZ;
 	public float InertiaYZ => inertiaYZ;
 
+	public override string ToString() {
+		return string.Format("MassMoment[Mass = {0}, CenterOfMass = {1}, Inertia = {{{2}, {3}, {4}, {5}, {6}, {7}}}]",
+			Mass,
+			GetCenterOfMass().FormatForMathematica(),
+			InertiaXX, InertiaYY, InertiaZZ, InertiaXY, InertiaXZ, inertiaYZ);
+	}
+
 	public void AddInplace(float mass, Vector3 position) {
 		this.mass += mass;
 		massPosition += mass * position;
@@ -52,6 +59,7 @@ public struct MassMoment {
 		inertiaXZ += -mass * position.X * position.Z;
 		inertiaYZ += -mass * position.Y * position.Z;
 	}
+
 
 	public void AddInplace(MassMoment accumulator) {
 		mass += accumulator.mass;
