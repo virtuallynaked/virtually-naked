@@ -84,4 +84,15 @@ public class TwistSwingConstraintTest {
 		TestClampRotation(new Vector3(0.20f, 0.30f, 0), new Vector3(0.15f, 0.25f, 0));
 		TestClampRotation(new Vector3(0.20f, 0, 0.40f), new Vector3(0.15f, 0, 0.35f));
 	}
+
+	[TestMethod]
+	public void TestCenter() {
+		var constraint = new TwistSwingConstraint(
+			new TwistConstraint(-0.1f, 0.3f),
+			new SwingConstraint(
+				-0.2f, 0.6f,
+				-0.4f, 1.0f));
+
+		MathAssert.AreEqual(TwistSwing.MakeFromCoordinates(0.1f, 0.2f, 0.3f), constraint.Center, 1e-4f);
+	}
 }

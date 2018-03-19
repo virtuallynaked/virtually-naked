@@ -29,6 +29,8 @@ public struct TwistConstraint {
 		);
 	}
 
+	public Twist Center => new Twist((MinX + MaxX) / 2);
+
 	public bool Test(Twist twist) {
 		return twist.X >= MinX && twist.X <= MaxX;
 	}

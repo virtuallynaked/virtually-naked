@@ -18,6 +18,8 @@ public struct TwistSwingConstraint {
 	public TwistConstraint Twist => twistConstraint;
 	public SwingConstraint Swing => swingConstraint;
 
+	public TwistSwing Center => new TwistSwing(Twist.Center, Swing.Center);
+
 	public bool Test(TwistSwing twistSwing) {
 		return Twist.Test(twistSwing.Twist) && Swing.Test(twistSwing.Swing);
 	}

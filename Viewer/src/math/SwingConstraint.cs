@@ -58,6 +58,8 @@ public struct SwingConstraint {
 		return MakeSymmetric(SinHalfAngleFromRadians(limit));
 	}
 	
+	public Swing Center => new Swing((MinY + MaxY) / 2, (MinZ + MaxZ) / 2);
+
 	public bool Test(Swing swing) {
 		float limitY = swing.Y < 0 ? MinY : MaxY;
 		float limitZ = swing.Z < 0 ? MinZ : MaxZ;
