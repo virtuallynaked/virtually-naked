@@ -52,4 +52,15 @@ public static class QuaternionExtensions {
 		Quaternion logQ = new Quaternion(v / 2, 0);
 		return Quaternion.Exponential(logQ);
 	}
+
+	public static Vector3 ToRotationVector(this Quaternion q) {
+		double lengthSquared = Sqr((double) q.X) + Sqr((double) q.Y) + Sqr((double) q.Z);
+		double sinAngle = Sqrt(lengthSquared);
+		double angle = 2 * Math.Asin(sinAngle);
+		double m = Sign(q.W) * angle / sinAngle;
+		return new Vector3(
+			(float) (m * q.X),
+			(float) (m * q.Y),
+			(float) (m * q.Z));
+	}
 }

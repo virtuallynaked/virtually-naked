@@ -112,6 +112,16 @@ public class QuaternionExtensionsTest {
 
 		var expected = Quaternion.RotationAxis(v, v.Length());
 		MathAssert.AreEqual(expected, QuaternionExtensions.FromRotationVector(v), 1e-4f);
+		MathAssert.AreEqual(Quaternion.Invert(expected), QuaternionExtensions.FromRotationVector(-v), 1e-4f);
+	}
+
+	[TestMethod]
+	public void TestToRotationVector() {
+		Vector3 v = new Vector3(0.1f, 0.2f, 0.3f);
+		var q = Quaternion.RotationAxis(v, v.Length());
+
+		MathAssert.AreEqual(v, q.ToRotationVector(), 1e-4f);
+		MathAssert.AreEqual(v, (-q).ToRotationVector(), 1e-4f);
 	}
 
 	[TestMethod]
