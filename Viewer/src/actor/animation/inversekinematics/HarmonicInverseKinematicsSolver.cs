@@ -100,11 +100,11 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 		var angularVelocity = torque / momentOfInertia;
 
-		var existingRotation = bone.GetOrientedSpaceRotation(inputs).AsQuaternion(bone.RotationOrder.TwistAxis);
-		var existingRotationVector = new Vector3(existingRotation.X, existingRotation.Y, existingRotation.Z);
-		float dot = Vector3.Dot(Vector3.Normalize(angularVelocity), Vector3.Normalize(existingRotationVector));
-		float retificationBias = 1 - dot / 2;
-		angularVelocity *= retificationBias;
+		var twistAxis = bone.RotationOrder.TwistAxis;
+		var existingRotation = bone.GetOrientedSpaceRotation(inputs).AsQuaternion(twistAxis);
+		var relaxedRotation = bone.Constraint.Center.AsQuaternion(twistAxis);
+		float relaxationBias = InverseKinematicsUtilities.CalculateRelaxationBias(relaxedRotation, existingRotation, angularVelocity);
+		angularVelocity *= relaxationBias;
 
 		var linearVelocity = Vector3.Cross(angularVelocity, boneSpaceSource);
 
