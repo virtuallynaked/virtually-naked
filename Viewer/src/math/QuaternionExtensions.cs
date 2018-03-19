@@ -49,7 +49,6 @@ public static class QuaternionExtensions {
 	}
 
 	public static Quaternion FromRotationVector(Vector3 v) {
-		Quaternion.RotationAxis(v, 1);
 		Quaternion logQ = new Quaternion(v / 2, 0);
 		return Quaternion.Exponential(logQ);
 	}
