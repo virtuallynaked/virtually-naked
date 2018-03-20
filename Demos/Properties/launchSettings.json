@@ -75,6 +75,10 @@
 		"CalculateBoneAttributesDemo": {
 			"commandName": "Project",
 			"commandLineArgs": "CalculateBoneAttributesDemo"
+		},
+		"InverseKinematicsPerformanceDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "InverseKinematicsPerformanceDemo"
 		}
 	}
 }

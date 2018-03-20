@@ -1,7 +1,7 @@
 ﻿using SharpDX;
 using System.Collections.Generic;
 
-class DemoInverseKinematicsGoalProvider : IInverseKinematicsGoalProvider {
+public class DemoInverseKinematicsGoalProvider : IInverseKinematicsGoalProvider {
 	private readonly RigidBoneSystem boneSystem;
 
 	public DemoInverseKinematicsGoalProvider(RigidBoneSystem boneSystem) {
