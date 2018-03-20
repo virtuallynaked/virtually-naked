@@ -72,14 +72,9 @@ public class RigidBone {
 		SetOrientedSpaceRotation(inputs, orientedSpaceTwistSwing, applyClamp);
 	}
 	
-	private RigidTransform GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs) {
-		Quaternion worldSpaceRotation = GetRotation(inputs);
-		return RigidTransform.FromRotationTranslation(worldSpaceRotation, Vector3.Zero);
-	}
-
 	private RigidTransform GetObjectCenteredRotationTransform(RigidBoneSystemInputs inputs) {
-		RigidTransform localSpaceTransform = GetJointCenteredRotationTransform(inputs);
-		return RigidTransform.FromTranslation(-centerPoint).Chain(localSpaceTransform).Chain(RigidTransform.FromTranslation(+centerPoint));
+		Quaternion rotation = GetRotation(inputs);
+		return RigidTransform.FromRotation(rotation, centerPoint);
 	}
 	
 	public RigidTransform GetChainedTransform(RigidBoneSystemInputs inputs, RigidTransform parentTransform) {
