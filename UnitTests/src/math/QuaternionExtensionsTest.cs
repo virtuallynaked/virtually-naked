@@ -4,6 +4,8 @@ using System;
 
 [TestClass]
 public class QuaternionExtensionsTest {
+	private const float Acc = 1e-4f;
+
 	[TestMethod]
 	public void TestDecomposeIntoSwingThenTwistAlongX() {
 		Quaternion q = Quaternion.RotationYawPitchRoll(0.1f, 0.2f, 0.3f);
@@ -36,6 +38,24 @@ public class QuaternionExtensionsTest {
 		//check that swing-then-twist is equivalent to original rotation
 		Quaternion swingThenTwist = twist.Chain(swing);
 		Assert.AreEqual(swingThenTwist, q);
+	}
+
+	[TestMethod]
+	public void TestDecomposeIntoTwistThenSwingAlongArbitraryAxis() {
+		Random rnd = new Random(0);
+		Quaternion q = RandomUtil.UnitQuaternion(rnd);
+		Vector3 axis = RandomUtil.UnitVector3(rnd);
+
+		q.DecomposeIntoTwistThenSwing(axis, out var twist, out var swing);
+
+		//check that twist axis parallel to axis
+		Assert.AreEqual(1, Math.Abs(Vector3.Dot(twist.Axis, axis)), Acc);
+
+		//check that swing axis is perpendicular to axis
+		Assert.AreEqual(0, Vector3.Dot(swing.Axis, axis), Acc);
+
+		//check that swing-then-twist is equivalent to original rotation
+		MathAssert.AreEqual(q, twist.Chain(swing), Acc);
 	}
 
 	[TestMethod]

@@ -14,10 +14,11 @@ public static class QuaternionExtensions {
 	}
 
 	public static void DecomposeIntoTwistThenSwing(this Quaternion q, Vector3 axis, out Quaternion twist, out Quaternion swing) {
-		//Note: I'm unsure if this works with anything except unit vectors as the axis
-		twist = new Quaternion(axis.X * q.X, axis.Y * q.Y, axis.Z * q.Z, q.W);
-		twist.Normalize();
+		DebugUtilities.AssertIsUnit(axis);
 
+		float dot = axis.X * q.X + axis.Y * q.Y + axis.Z * q.Z;
+		twist = new Quaternion(dot * axis, q.W);
+		twist.Normalize();
 		swing = q * Quaternion.Invert(twist);
     }
 
