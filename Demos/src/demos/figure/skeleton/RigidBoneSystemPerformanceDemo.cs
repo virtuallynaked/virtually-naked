@@ -35,12 +35,16 @@ public class RigidBoneSystemPerformanceDemo : IDemoApp {
 			var boneTransformA = boneTransformsA[i];
 			var boneTransformB = boneTransformsB[i];
 
+			var unposedCenterA = boneSystem.Bones[i].CenterPoint.GetValue(channelOutputs);
+			var unposedCenterB = rigidBoneSystem.Bones[i].CenterPoint;
+			
 			foreach (var testVector in new Vector3[] { Vector3.Zero, Vector3.Right, Vector3.Up, Vector3.BackwardRH }) {
-				var transformedVectorA = boneTransformA.Transform(testVector);
-				var transformedVectorB = boneTransformB.Transform(testVector);
+				var transformedVectorA = boneTransformA.Transform(unposedCenterA + testVector);
+				var transformedVectorB = boneTransformB.Transform(
+					unposedCenterB + boneTransformA.ScalingStage.Transform(testVector));
 				float distance = Vector3.Distance(transformedVectorA, transformedVectorB);
 
-				if (distance > 1e-5) {
+				if (distance > 1e-3) {
 					throw new Exception("rigid and non-rigid bone transforms are inconsistent");
 				}
 			}
