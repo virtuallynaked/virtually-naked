@@ -72,26 +72,26 @@ public class RigidBone {
 		SetOrientedSpaceRotation(inputs, orientedSpaceTwistSwing, applyClamp);
 	}
 	
-	private DualQuaternion GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs) {
+	private RigidTransform GetJointCenteredRotationTransform(RigidBoneSystemInputs inputs) {
 		Quaternion worldSpaceRotation = GetRotation(inputs);
-		return DualQuaternion.FromRotationTranslation(worldSpaceRotation, Vector3.Zero);
+		return RigidTransform.FromRotationTranslation(worldSpaceRotation, Vector3.Zero);
 	}
 
-	private DualQuaternion GetObjectCenteredRotationTransform(RigidBoneSystemInputs inputs) {
-		DualQuaternion localSpaceTransform = GetJointCenteredRotationTransform(inputs);
-		return DualQuaternion.FromTranslation(-centerPoint).Chain(localSpaceTransform).Chain(DualQuaternion.FromTranslation(+centerPoint));
+	private RigidTransform GetObjectCenteredRotationTransform(RigidBoneSystemInputs inputs) {
+		RigidTransform localSpaceTransform = GetJointCenteredRotationTransform(inputs);
+		return RigidTransform.FromTranslation(-centerPoint).Chain(localSpaceTransform).Chain(RigidTransform.FromTranslation(+centerPoint));
 	}
 	
-	public DualQuaternion GetChainedTransform(RigidBoneSystemInputs inputs, DualQuaternion parentTransform) {
-		DualQuaternion rotationTransform = GetObjectCenteredRotationTransform(inputs);
-		DualQuaternion chainedRotationTransform = rotationTransform.Chain(parentTransform);
+	public RigidTransform GetChainedTransform(RigidBoneSystemInputs inputs, RigidTransform parentTransform) {
+		RigidTransform rotationTransform = GetObjectCenteredRotationTransform(inputs);
+		RigidTransform chainedRotationTransform = rotationTransform.Chain(parentTransform);
 
 		return chainedRotationTransform;
 	}
 
-	public DualQuaternion GetChainedTransform(RigidBoneSystemInputs inputs) {
-		DualQuaternion rootTransform = DualQuaternion.FromTranslation(inputs.RootTranslation);
-		DualQuaternion parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : rootTransform;
+	public RigidTransform GetChainedTransform(RigidBoneSystemInputs inputs) {
+		RigidTransform rootTransform = RigidTransform.FromTranslation(inputs.RootTranslation);
+		RigidTransform parentTransform = Parent != null ? Parent.GetChainedTransform(inputs) : rootTransform;
 		return GetChainedTransform(inputs, parentTransform);
 	}
 }

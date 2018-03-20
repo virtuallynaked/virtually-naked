@@ -75,7 +75,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	private BonePartialSolution SolveSingleBone(
 			RigidBone bone,
 			Vector3 worldSource, Vector3 worldTarget, MassMoment[] massMoments, Vector3 figureCenterOverride,
-			RigidBoneSystemInputs inputs, DualQuaternion[] boneTransforms) {
+			RigidBoneSystemInputs inputs, RigidTransform[] boneTransforms) {
 		
 		var center = bone.Index != FigureCenterBoneIndex ? boneTransforms[bone.Index].Transform(bone.CenterPoint) : figureCenterOverride;
 		var parentTotalRotation = bone.Parent != null ? boneTransforms[bone.Parent.Index].Rotation : Quaternion.Identity;
@@ -124,7 +124,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		};
 	}
 
-	private void ApplyPartialSolution(RigidBone bone, BonePartialSolution partialSolution, DualQuaternion[] boneTransforms, Vector3 figureCenterOverride, RigidBoneSystemInputs inputs, float time) {
+	private void ApplyPartialSolution(RigidBone bone, BonePartialSolution partialSolution, RigidTransform[] boneTransforms, Vector3 figureCenterOverride, RigidBoneSystemInputs inputs, float time) {
 		var twistAxis = bone.RotationOrder.TwistAxis;
 		var originalRotationQ = inputs.Rotations[bone.Index].AsQuaternion(twistAxis);
 		var rotationDelta = QuaternionExtensions.FromRotationVector(time * partialSolution.angularVelocity);
@@ -144,7 +144,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		}
 	}
 	
-	private Vector3[] GetCentersOfMass(DualQuaternion[] totalTransforms) {
+	private Vector3[] GetCentersOfMass(RigidTransform[] totalTransforms) {
 		float[] descendantMasses = new float[boneSystem.Bones.Length];
 		Vector3[] descendantMassPositions = new Vector3[boneSystem.Bones.Length];
 		Vector3[] centersOfMass = new Vector3[boneSystem.Bones.Length];
@@ -169,7 +169,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		return centersOfMass;
 	}
 
-	private MassMoment[] GetMassMoments(DualQuaternion[] totalTransforms, RigidBone[] boneChain) {
+	private MassMoment[] GetMassMoments(RigidTransform[] totalTransforms, RigidBone[] boneChain) {
 		MassMoment[] accumulators = new MassMoment[boneSystem.Bones.Length];
 
 		bool[] areOnChain = new bool[boneSystem.Bones.Length];
@@ -203,15 +203,15 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		return accumulators;
 	}
 
-	private void CountertransformOffChainBones(DualQuaternion[] preTotalTransforms, Vector3[] preCentersOfMass, RigidBoneSystemInputs inputs, RigidBone[] boneChain) {
+	private void CountertransformOffChainBones(RigidTransform[] preTotalTransforms, Vector3[] preCentersOfMass, RigidBoneSystemInputs inputs, RigidBone[] boneChain) {
 		bool[] areOnChain = new bool[boneSystem.Bones.Length];
 		areOnChain[0] = true; //root bone is always on the chain
 		foreach (var bone in boneChain) {
 			areOnChain[bone.Index] = true;
 		}
 		
-		var rootTransform = DualQuaternion.FromTranslation(inputs.RootTranslation);
-		DualQuaternion[] postTotalTransforms = new DualQuaternion[preTotalTransforms.Length];
+		var rootTransform = RigidTransform.FromTranslation(inputs.RootTranslation);
+		RigidTransform[] postTotalTransforms = new RigidTransform[preTotalTransforms.Length];
 
 		foreach (var bone in boneSystem.Bones) {
 			if (!boneAttributes[bone.Index].IsIkable) {

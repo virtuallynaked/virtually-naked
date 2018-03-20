@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 
 public class BasicInverseKinematicsSolver : IInverseKinematicsSolver {
-	private Vector3 GetCenterPosition(DualQuaternion[] boneTransforms, RigidBone bone) {
+	private Vector3 GetCenterPosition(RigidTransform[] boneTransforms, RigidBone bone) {
 		return boneTransforms[bone.Index].Transform(bone.CenterPoint);
 	}
 
-	private void ApplyCorrection(RigidBoneSystemInputs inputs, DualQuaternion[] boneTransforms, RigidBone bone, ref Vector3 sourcePosition, Vector3 targetPosition, float weight) {
+	private void ApplyCorrection(RigidBoneSystemInputs inputs, RigidTransform[] boneTransforms, RigidBone bone, ref Vector3 sourcePosition, Vector3 targetPosition, float weight) {
 		var centerPosition = GetCenterPosition(boneTransforms, bone);
 
 		var rotationCorrection = QuaternionExtensions.RotateBetween(
@@ -24,7 +24,7 @@ public class BasicInverseKinematicsSolver : IInverseKinematicsSolver {
 		
 		bone.SetRotation(inputs, lerpedRotation, true);
 
-		var newBoneTransform = bone.GetChainedTransform(inputs, bone.Parent != null ? boneTransforms[bone.Parent.Index] : DualQuaternion.Identity);
+		var newBoneTransform = bone.GetChainedTransform(inputs, bone.Parent != null ? boneTransforms[bone.Parent.Index] : RigidTransform.Identity);
 		var newSourcePosition = newBoneTransform.Transform(boneTransform.InverseTransform(sourcePosition));
 
 		sourcePosition = newSourcePosition;

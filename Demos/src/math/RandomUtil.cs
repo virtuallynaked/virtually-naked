@@ -44,4 +44,10 @@ public static class RandomUtil {
 		q.Normalize();
 		return q;
 	}
+
+	public static RigidTransform RigidTransform(Random rnd) {
+		var rotation = UnitQuaternion(rnd);
+		var translation = Vector3(rnd);
+		return new RigidTransform(rotation, translation);
+	}
 }

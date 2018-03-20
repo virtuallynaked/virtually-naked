@@ -34,15 +34,15 @@ public class RigidBoneSystem {
 		}
 	}
 
-	public DualQuaternion[] GetBoneTransforms(RigidBoneSystemInputs inputs) {
-		DualQuaternion[] boneTransforms = new DualQuaternion[bones.Length];
+	public RigidTransform[] GetBoneTransforms(RigidBoneSystemInputs inputs) {
+		RigidTransform[] boneTransforms = new RigidTransform[bones.Length];
 
-		DualQuaternion rootTransform = DualQuaternion.FromTranslation(inputs.RootTranslation);
+		RigidTransform rootTransform = RigidTransform.FromTranslation(inputs.RootTranslation);
 
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			RigidBone bone = bones[boneIdx];
 			RigidBone parent = bone.Parent;
-			DualQuaternion parentTransform = parent != null ? boneTransforms[parent.Source.Index] : rootTransform;
+			RigidTransform parentTransform = parent != null ? boneTransforms[parent.Source.Index] : rootTransform;
 			boneTransforms[boneIdx] = bone.GetChainedTransform(inputs, parentTransform);
 		}
 
@@ -80,15 +80,15 @@ public class RigidBoneSystem {
 	public RigidBoneSystemInputs ApplyDeltas(RigidBoneSystemInputs baseInputs, RigidBoneSystemInputs deltaInputs) {
 		var sumInputs = new RigidBoneSystemInputs(bones.Length) {};
 
-		DualQuaternion baseRootTransform = DualQuaternion.FromRotationTranslation(
+		RigidTransform baseRootTransform = RigidTransform.FromRotationTranslation(
 			RootBone.GetRotation(baseInputs),
 			baseInputs.RootTranslation);
 
-		DualQuaternion deltaRootTransform = DualQuaternion.FromRotationTranslation(
+		RigidTransform deltaRootTransform = RigidTransform.FromRotationTranslation(
 			RootBone.GetRotation(deltaInputs),
 			deltaInputs.RootTranslation);
 
-		DualQuaternion sumRootTransform = deltaRootTransform.Chain(baseRootTransform);
+		RigidTransform sumRootTransform = deltaRootTransform.Chain(baseRootTransform);
 
 		sumInputs.RootTranslation = sumRootTransform.Translation;
 		RootBone.SetRotation(sumInputs, sumRootTransform.Rotation);
@@ -104,15 +104,15 @@ public class RigidBoneSystem {
 	public RigidBoneSystemInputs CalculateDeltas(RigidBoneSystemInputs baseInputs, RigidBoneSystemInputs sumInputs) {
 		var deltaInputs = new RigidBoneSystemInputs(bones.Length) {};
 
-		DualQuaternion baseRootTransform = DualQuaternion.FromRotationTranslation(
+		RigidTransform baseRootTransform = RigidTransform.FromRotationTranslation(
 			RootBone.GetRotation(baseInputs),
 			baseInputs.RootTranslation);
 
-		DualQuaternion sumRootTransform = DualQuaternion.FromRotationTranslation(
+		RigidTransform sumRootTransform = RigidTransform.FromRotationTranslation(
 			RootBone.GetRotation(sumInputs),
 			sumInputs.RootTranslation);
 
-		DualQuaternion deltaRootTransform = sumRootTransform.Chain(baseRootTransform.Invert());
+		RigidTransform deltaRootTransform = sumRootTransform.Chain(baseRootTransform.Invert());
 
 		deltaInputs.RootTranslation = deltaRootTransform.Translation;
 		RootBone.SetRotation(deltaInputs, deltaRootTransform.Rotation);
