@@ -113,6 +113,18 @@ public class SwingTest {
 	}
 
 	[TestMethod]
+	public void TestTransform() {
+		var rnd = new Random(0);
+		var swing = RandomUtil.Swing(rnd);
+		var point = RandomUtil.Vector3(rnd);
+
+		var twistAxis = CartesianAxis.Y;
+		var expected = Vector3.Transform(point, swing.AsQuaternion(twistAxis));
+		var actual = swing.Transform(twistAxis, point);
+		MathAssert.AreEqual(expected, actual, Acc);
+	}
+
+	[TestMethod]
 	public void TestAddSubtractSymmetry() {
 		var swing1 = new Swing(0.2f, 0.1f);
 		var swing2 = new Swing(-0.3f, 0.4f);

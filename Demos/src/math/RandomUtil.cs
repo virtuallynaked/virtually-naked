@@ -4,16 +4,24 @@ using System;
 using static System.Math;
 
 public static class RandomUtil {
-	public static TwistSwing TwistSwing(Random rnd) {
-		var twistX = ContinuousUniform.Sample(rnd, -1, 1);
-		var twist = new Twist((float) twistX);
-
+	public static Swing Swing(Random rnd) {
 		var swingTheta = ContinuousUniform.Sample(rnd, -PI, PI);
 		var swingMagnitude = ContinuousUniform.Sample(rnd, 0, 1);
 		var swingY = swingMagnitude * Cos(swingTheta);
 		var swingZ = swingMagnitude * Sin(swingTheta);
 		var swing = new Swing((float) swingY, (float) swingZ);
+		return swing;
+	}
 
+	public static Twist Twist(Random rnd) {
+		var twistX = ContinuousUniform.Sample(rnd, -1, 1);
+		var twist = new Twist((float) twistX);
+		return twist;
+	}
+
+	public static TwistSwing TwistSwing(Random rnd) {
+		var twist = Twist(rnd);
+		var swing = Swing(rnd);
 		return new TwistSwing(twist, swing);
 	}
 

@@ -131,6 +131,25 @@ public struct Swing {
 		return v;
 	}
 
+	public Vector3 Transform(CartesianAxis twistAxis, Vector3 v) {
+		float vx = v[((int) twistAxis + 0) % 3];
+		float vy = v[((int) twistAxis + 1) % 3];
+		float vz = v[((int) twistAxis + 2) % 3];
+
+		float w = W;
+		
+		float c = 2 * (w*vx - z*vy + y*vz);
+		float rx = -vx + w*c;
+		float ry = +vy + z*c;
+		float rz = +vz - y*c;
+
+		Vector3 result = default(Vector3);
+		result[((int) twistAxis + 0) % 3] = rx;
+		result[((int) twistAxis + 1) % 3] = ry;
+		result[((int) twistAxis + 2) % 3] = rz;
+		return result;
+	}
+
 	public static Swing FromTo(CartesianAxis twistAxis, Vector3 from, Vector3 to) {
 		/*
 		 * This function is not optimized.
