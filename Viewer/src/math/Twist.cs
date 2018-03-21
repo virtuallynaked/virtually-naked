@@ -1,12 +1,21 @@
-﻿using SharpDX;
+﻿using System.Diagnostics;
+using SharpDX;
 using static System.Math;
 using static MathExtensions;
 
 public struct Twist {
 	private readonly float x; //expressed as Sin[angle/2]
 
-	public Twist(float z) {
-		this.x = z;
+	[Conditional("DEBUG")]
+	private static void AssertValid(float x) {
+		float lengthSquared = Sqr(x);
+		Debug.Assert(lengthSquared < 1 + 1e-2f);
+	}
+
+	public Twist(float x) {
+		AssertValid(x);
+
+		this.x = x;
 	}
 	
 	public float X => x;

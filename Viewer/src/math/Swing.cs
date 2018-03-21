@@ -1,4 +1,5 @@
-﻿using SharpDX;
+﻿using System.Diagnostics;
+using SharpDX;
 using static System.Math;
 using static MathExtensions;
 
@@ -6,7 +7,15 @@ public struct Swing {
 	private readonly float y;
 	private readonly float z;
 	
+	[Conditional("DEBUG")]
+	private static void AssertValid(float y, float z) {
+		float lengthSquared = Sqr(y) + Sqr(z);
+		Debug.Assert(lengthSquared < 1 + 1e-2f);
+	}
+
 	public Swing(float y, float z) {
+		AssertValid(y, z);
+
 		this.y = y;
 		this.z = z;
 	}
