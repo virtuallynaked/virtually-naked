@@ -180,19 +180,77 @@ public struct Swing {
 		
 		return Swing.AxisAngle(axis.X, axis.Y, angle);
 	}
-
+		
 	private static Swing Add(float y1, float z1, float y2, float z2) {
 		float ySum = HalfAngleUtil.Add(y1, y2);
 		float zSum = HalfAngleUtil.Add(z1, z2);
 		return new Swing(ySum, zSum);
 	}
-
+	
 	public static Swing operator+(Swing t1, Swing t2) {
 		return Add(t1.Y, t1.Z, t2.Y, t2.Z);
 	}
 
-
 	public static Swing operator-(Swing t1, Swing t2) {
 		return Add(t1.Y, t1.Z, -t2.Y, -t2.Z);
+	}
+
+	/**
+	 *  Returns a Swing delta such that:
+	 *		delta.Transform(twistAxis, initial.TransformTwistAxis(twistAxis)) == final.TransformTwistAxis(twistAxis)
+	 */
+	public static Swing CalculateDelta(Swing initial, Swing final) {
+		float iw = initial.W;
+		float iy = initial.Y;
+		float iz = initial.Z;
+
+		float fw = final.W;
+		float fy = final.Y;
+		float fz = final.Z;
+
+		float pw = fw * fw - 1;
+		float py = fy * fw;
+		float pz = fz * fw;
+
+		float dw = pw + iw * iw;
+		float dy = py - iw * iy;
+		float dz = pz - iw * iz;
+		float m = 1 / (float) Sqrt(dw * dw + dy * dy + dz * dz);
+		dw *= m;
+		dy *= m;
+		dz *= m;
+
+		if (dw < 0) {
+			dw *= -1;
+			dy *= -1;
+			dz *= -1;
+		}
+
+		return new Swing(dy, dz);
+	}
+
+	/**
+	 *  Returns a Swing final such that:
+	 *		delta.Transform(twistAxis, initial.TransformTwistAxis(twistAxis)) == final.TransformTwistAxis(twistAxis)
+	 */
+	public static Swing ApplyDelta(Swing initial, Swing delta) {
+		float iw = initial.W;
+		float iy = initial.Y;
+		float iz = initial.Z;
+
+		float dw = delta.W;
+		float dy = delta.Y;
+		float dz = delta.Z;
+		
+		float c = 2 * iw * (dw*iw - dz*iz - dy*iy) - dw;
+		float pw = dw*c - iw*iw;
+		float py = dy*c + iw*iy;
+		float pz = dz*c + iw*iz;
+		
+		float fw = (float) Sqrt(pw + 1);
+		float fy = +py / fw;
+		float fz = +pz / fw;
+
+		return new Swing(fy, fz);
 	}
 }

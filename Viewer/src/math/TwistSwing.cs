@@ -75,4 +75,16 @@ public struct TwistSwing {
 	public static TwistSwing operator-(TwistSwing ts1, TwistSwing ts2) {
 		return new TwistSwing(ts1.twist - ts2.twist, ts1.swing - ts2.swing);
 	}
+
+	public static TwistSwing CalculateDelta(TwistSwing initial, TwistSwing final) {
+		return new TwistSwing(
+			Twist.CalculateDelta(initial.Twist, final.Twist),
+			Swing.CalculateDelta(initial.Swing, final.Swing));
+	}
+
+	public static TwistSwing ApplyDelta(TwistSwing initial, TwistSwing delta) {
+		return new TwistSwing(
+			Twist.ApplyDelta(initial.Twist, delta.Twist),
+			Swing.ApplyDelta(initial.Swing, delta.Swing));
+	}
 }

@@ -40,6 +40,14 @@ public struct Twist {
 		return q;
 	}
 
+	public static Twist CalculateDelta(Twist initial, Twist final) {
+		return Add(final.W, final.X, initial.W, -initial.X);
+	}
+
+	public static Twist ApplyDelta(Twist initial, Twist delta) {
+		return Add(initial.W, initial.X, delta.W, delta.X);
+	}
+
 	private static Twist Add(float w1, float x1, float w2, float x2) {
 		float w = w1 * w2 - x1 * x2;
 		float x = w2 * x1 + w1 * x2;

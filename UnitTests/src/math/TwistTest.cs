@@ -34,7 +34,7 @@ public class TwistTest {
 		var q = twist.AsQuaternion(CartesianAxis.Z);
 		MathAssert.AreEqual(expectedQ, q, Acc);
 	}
-
+	
 	[TestMethod]
 	public void TestAdd() {
 		var twist1 = Twist.MakeFromAngle(0.5f);
@@ -47,5 +47,21 @@ public class TwistTest {
 		var twist1 = Twist.MakeFromAngle(0.8f);
 		var twist2 = Twist.MakeFromAngle(0.3f);
 		MathAssert.AreEqual(Twist.MakeFromAngle(0.5f), twist1 - twist2, Acc);
+	}
+
+	[TestMethod]
+	public void TestApplyDelta() {
+		var initialTwist = Twist.MakeFromAngle(0.5f);
+		var deltaTwist = Twist.MakeFromAngle(0.3f);
+		var finalTwist = Twist.ApplyDelta(initialTwist, deltaTwist);
+		MathAssert.AreEqual(Twist.MakeFromAngle(0.8f), finalTwist, Acc);
+	}
+
+	[TestMethod]
+	public void TestCalculateDelta() {
+		var initialTwist = Twist.MakeFromAngle(0.2f);
+		var finalTwist = Twist.MakeFromAngle(0.8f);
+		var deltaTwist = Twist.CalculateDelta(initialTwist, finalTwist);
+		MathAssert.AreEqual(Twist.MakeFromAngle(0.6f), deltaTwist, Acc);
 	}
 }

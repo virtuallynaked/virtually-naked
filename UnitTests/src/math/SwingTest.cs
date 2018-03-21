@@ -134,4 +134,47 @@ public class SwingTest {
 
 		MathAssert.AreEqual(swing2, sum, Acc);
 	}
+
+	[TestMethod]
+	public void FuzzCalculateDelta() {
+		var rnd = new Random(0);
+
+		for (int i = 0; i < 1000; ++i) {
+			var initial = RandomUtil.Swing(rnd);
+			var final = RandomUtil.Swing(rnd);
+			var delta = Swing.CalculateDelta(initial, final);
+
+			var twistAxis = CartesianAxis.X;
+			var initialAndDeltaPoint = delta.Transform(twistAxis, initial.TransformTwistAxis(twistAxis));
+			var finalPoint = final.TransformTwistAxis(twistAxis);
+			Assert.AreEqual(1, Vector3.Dot(initialAndDeltaPoint, finalPoint), 1e-3f);
+		}
+	}
+
+	[TestMethod]
+	public void FuzzApplyDelta() {
+		var rnd = new Random(0);
+
+		for (int i = 0; i < 1000; ++i) {
+			var initial = RandomUtil.Swing(rnd);
+			var delta = RandomUtil.Swing(rnd);
+			var final = Swing.ApplyDelta(initial, delta);
+
+			var twistAxis = CartesianAxis.X;
+			var initialAndDeltaPoint = delta.Transform(twistAxis, initial.TransformTwistAxis(twistAxis));
+			var finalPoint = final.TransformTwistAxis(twistAxis);
+			Assert.AreEqual(1, Vector3.Dot(initialAndDeltaPoint, finalPoint), 1e-3f);
+		}
+	}
+
+	[TestMethod]
+	public void TestCalculateApplyDeltaRoundtrip() {
+		var initial = new Swing(0.2f, 0.1f);
+		var final = new Swing(-0.3f, 0.4f);
+
+		var delta = Swing.CalculateDelta(initial, final);
+		var roundtripFinal = Swing.ApplyDelta(initial, delta);
+
+		MathAssert.AreEqual(final, roundtripFinal, Acc);
+	}
 }
