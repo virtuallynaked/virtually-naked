@@ -11,7 +11,13 @@ public struct Twist {
 	
 	public float X => x;
 	public float WSquared => 1 - Sqr(x);
-	public float W => (float) Sqrt(WSquared);
+
+	public float W {
+		get {
+			float wSquared = WSquared;
+			return wSquared > 0 ? (float) Sqrt(wSquared) : 0;
+		}
+	}
 
 	public float Angle => 2 * (float) Asin(x);
 

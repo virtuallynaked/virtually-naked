@@ -14,8 +14,14 @@ public struct Swing {
 	public float Y => y;
 	public float Z => z;
 	public float WSquared => 1 - Sqr(y) - Sqr(z);
-	public float W => (float) Sqrt(WSquared);
 		
+	public float W {
+		get {
+			float wSquared = WSquared;
+			return wSquared > 0 ? (float) Sqrt(wSquared) : 0;
+		}
+	}
+
 	public Vector2 Axis => Vector2.Normalize(new Vector2(y, z));
 	public float Angle => (float) Acos(2 * WSquared - 1);
 
