@@ -13,14 +13,14 @@ public class DemoInverseKinematicsGoalProvider : IInverseKinematicsGoalProvider 
 		var handBone = boneSystem.BonesByName["lHand"];
 		return new InverseKinematicsGoal(
 			forearmBone,
-			handBone.CenterPoint,
+			handBone.CenterPoint - forearmBone.CenterPoint,
 			forearmBone.CenterPoint + Vector3.Down * Vector3.Distance(handBone.CenterPoint, forearmBone.CenterPoint));
 	}
 
 	private InverseKinematicsGoal MakeKeepFootInPlaceGoal(RigidBoneSystemInputs inputs) {
 		return new InverseKinematicsGoal(
 			boneSystem.BonesByName["lShin"],
-			boneSystem.BonesByName["lFoot"].CenterPoint,
+			boneSystem.BonesByName["lFoot"].CenterPoint - boneSystem.BonesByName["lShin"].CenterPoint,
 			boneSystem.BonesByName["lFoot"].GetChainedTransform(inputs).Transform(boneSystem.BonesByName["lFoot"].CenterPoint));
 	}
 

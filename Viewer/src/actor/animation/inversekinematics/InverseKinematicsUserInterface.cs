@@ -57,7 +57,7 @@ public class InverseKinematicsUserInterface : IInverseKinematicsGoalProvider {
 
 			sourceBone = parentInstance.MapPositionToBone(worldSourcePosition, previousFrameControlVertexInfos);
 			var inverseSourceBoneTotalTransform = sourceBone.GetChainedTransform(inputs).Invert();
-			boneRelativeSourcePosition = inverseSourceBoneTotalTransform.Transform(worldSourcePosition);
+			boneRelativeSourcePosition = inverseSourceBoneTotalTransform.Transform(worldSourcePosition) - sourceBone.CenterPoint;
 			boneRelativeSourceOrientation = worldSourceOrientation.Chain(inverseSourceBoneTotalTransform.Rotation);
 		}
 

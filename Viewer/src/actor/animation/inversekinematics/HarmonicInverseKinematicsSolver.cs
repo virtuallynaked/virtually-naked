@@ -282,7 +282,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var centersOfMass = GetCentersOfMass(boneTransforms);
 		
-		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
+		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.SourceBone.CenterPoint + goal.UnposedSourcePosition);
 
 		var bones = GetBoneChain(goal.SourceBone, goal.HasOrientation).ToArray();
 		//var bones = new RigidBone[] { boneSystem.BonesByName["lForearmBend"], boneSystem.BonesByName["lShldrBend"] };

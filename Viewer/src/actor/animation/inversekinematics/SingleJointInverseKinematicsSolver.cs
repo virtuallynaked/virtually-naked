@@ -16,7 +16,7 @@ public class SingleJointInverseKinematicsSolver : IInverseKinematicsSolver {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
 		var boneTransform = boneTransforms[bone.Index];
 
-		var worldSourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
+		var worldSourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.SourceBone.CenterPoint + goal.UnposedSourcePosition);
 		var worldTargetPosition = goal.TargetPosition;
 		var worldCenterPosition = boneTransform.Transform(bone.CenterPoint);
 		var worldSourceDirection = Vector3.Normalize(worldSourcePosition - worldCenterPosition);

@@ -32,7 +32,7 @@ public class BasicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 	private void DoIteration(RigidBoneSystem boneSystem, InverseKinematicsGoal goal, RigidBoneSystemInputs inputs) {
 		var boneTransforms = boneSystem.GetBoneTransforms(inputs);
-		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.UnposedSourcePosition);
+		var sourcePosition = boneTransforms[goal.SourceBone.Index].Transform(goal.SourceBone.CenterPoint + goal.UnposedSourcePosition);
 
 		float weight = 0.5f;
 		for (var bone = goal.SourceBone; bone != boneSystem.RootBone && bone.Parent != boneSystem.RootBone; bone = bone.Parent) {
