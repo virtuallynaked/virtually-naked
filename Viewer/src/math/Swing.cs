@@ -180,20 +180,6 @@ public struct Swing {
 		
 		return Swing.AxisAngle(axis.X, axis.Y, angle);
 	}
-		
-	private static Swing Add(float y1, float z1, float y2, float z2) {
-		float ySum = HalfAngleUtil.Add(y1, y2);
-		float zSum = HalfAngleUtil.Add(z1, z2);
-		return new Swing(ySum, zSum);
-	}
-	
-	public static Swing operator+(Swing t1, Swing t2) {
-		return Add(t1.Y, t1.Z, t2.Y, t2.Z);
-	}
-
-	public static Swing operator-(Swing t1, Swing t2) {
-		return Add(t1.Y, t1.Z, -t2.Y, -t2.Z);
-	}
 
 	/**
 	 *  Returns a Swing delta such that:

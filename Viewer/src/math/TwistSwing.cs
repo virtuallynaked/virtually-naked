@@ -67,15 +67,7 @@ public struct TwistSwing {
 		var swing = new Swing(swingY, swingZ);
 		return new TwistSwing(twist, swing);
 	}
-
-	public static TwistSwing operator+(TwistSwing ts1, TwistSwing ts2) {
-		return new TwistSwing(ts1.twist + ts2.twist, ts1.swing + ts2.swing);
-	}
-
-	public static TwistSwing operator-(TwistSwing ts1, TwistSwing ts2) {
-		return new TwistSwing(ts1.twist - ts2.twist, ts1.swing - ts2.swing);
-	}
-
+	
 	public static TwistSwing CalculateDelta(TwistSwing initial, TwistSwing final) {
 		return new TwistSwing(
 			Twist.CalculateDelta(initial.Twist, final.Twist),

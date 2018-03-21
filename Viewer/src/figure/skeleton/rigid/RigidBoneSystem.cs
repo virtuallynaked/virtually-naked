@@ -95,7 +95,8 @@ public class RigidBoneSystem {
 		
 		for (int boneIdx = 1; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			sumInputs.Rotations[boneIdx] = bone.Constraint.Clamp(baseInputs.Rotations[boneIdx] + deltaInputs.Rotations[boneIdx]);
+			sumInputs.Rotations[boneIdx] = bone.Constraint.Clamp(
+				TwistSwing.ApplyDelta(baseInputs.Rotations[boneIdx], deltaInputs.Rotations[boneIdx]));
 		}
 
 		return sumInputs;
@@ -119,7 +120,7 @@ public class RigidBoneSystem {
 
 		for (int boneIdx = 1; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
-			deltaInputs.Rotations[boneIdx] = sumInputs.Rotations[boneIdx] - baseInputs.Rotations[boneIdx];
+			deltaInputs.Rotations[boneIdx] = TwistSwing.CalculateDelta(baseInputs.Rotations[boneIdx], sumInputs.Rotations[boneIdx]);
 		}
 
 		return deltaInputs;

@@ -87,32 +87,6 @@ public class SwingTest {
     }
 	
 	[TestMethod]
-	public void TestAdd() {
-		MathAssert.AreEqual(
-			Swing.MakeFromAxisAngleProduct(0.8f, 0),
-			Swing.MakeFromAxisAngleProduct(0.5f, 0) + Swing.MakeFromAxisAngleProduct(0.3f, 0),
-			Acc);
-
-		MathAssert.AreEqual(
-			Swing.MakeFromAxisAngleProduct(0, 0.8f),
-			Swing.MakeFromAxisAngleProduct(0, 0.5f) + Swing.MakeFromAxisAngleProduct(0, 0.3f),
-			Acc);
-	}
-
-	[TestMethod]
-	public void TestSubtract() {
-		MathAssert.AreEqual(
-			Swing.MakeFromAxisAngleProduct(0.5f, 0),
-			Swing.MakeFromAxisAngleProduct(0.8f, 0) - Swing.MakeFromAxisAngleProduct(0.3f, 0),
-			Acc);
-
-		MathAssert.AreEqual(
-			Swing.MakeFromAxisAngleProduct(0, 0.5f),
-			Swing.MakeFromAxisAngleProduct(0, 0.8f) - Swing.MakeFromAxisAngleProduct(0, 0.3f),
-			Acc);
-	}
-
-	[TestMethod]
 	public void TestTransform() {
 		var rnd = new Random(0);
 		var swing = RandomUtil.Swing(rnd);
@@ -123,18 +97,7 @@ public class SwingTest {
 		var actual = swing.Transform(twistAxis, point);
 		MathAssert.AreEqual(expected, actual, Acc);
 	}
-
-	[TestMethod]
-	public void TestAddSubtractSymmetry() {
-		var swing1 = new Swing(0.2f, 0.1f);
-		var swing2 = new Swing(-0.3f, 0.4f);
-
-		var diff = swing2 - swing1;
-		var sum = swing1 + diff;
-
-		MathAssert.AreEqual(swing2, sum, Acc);
-	}
-
+	
 	[TestMethod]
 	public void FuzzCalculateDelta() {
 		var rnd = new Random(0);

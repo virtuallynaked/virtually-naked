@@ -36,20 +36,6 @@ public class TwistTest {
 	}
 	
 	[TestMethod]
-	public void TestAdd() {
-		var twist1 = Twist.MakeFromAngle(0.5f);
-		var twist2 = Twist.MakeFromAngle(0.3f);
-		MathAssert.AreEqual(Twist.MakeFromAngle(0.8f), twist1 + twist2, Acc);
-	}
-
-	[TestMethod]
-	public void TestSubtract() {
-		var twist1 = Twist.MakeFromAngle(0.8f);
-		var twist2 = Twist.MakeFromAngle(0.3f);
-		MathAssert.AreEqual(Twist.MakeFromAngle(0.5f), twist1 - twist2, Acc);
-	}
-
-	[TestMethod]
 	public void TestApplyDelta() {
 		var initialTwist = Twist.MakeFromAngle(0.5f);
 		var deltaTwist = Twist.MakeFromAngle(0.3f);

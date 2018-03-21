@@ -59,12 +59,4 @@ public struct Twist {
 
 		return new Twist(x);
 	}
-
-	public static Twist operator+(Twist t1, Twist t2) {
-		return Add(t1.W, t1.X, t2.W, t2.X);
-	}
-
-	public static Twist operator-(Twist t1, Twist t2) {
-		return Add(t1.W, t1.X, -t2.W, t2.X);
-	}
 }
