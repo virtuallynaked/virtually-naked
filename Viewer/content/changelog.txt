@@ -1,4 +1,5 @@
 [0.6]
+	Major: Improved responsiveness and naturalness of posing
 
 [0.5]
 	Major: Figure's eyes follow player
