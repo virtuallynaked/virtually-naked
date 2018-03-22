@@ -1,4 +1,4 @@
-﻿using SharpDX.Direct3D11;
+using SharpDX.Direct3D11;
 using System.Runtime.InteropServices;
 
 public class BasicSpecularMaterial : IOpaqueMaterial {

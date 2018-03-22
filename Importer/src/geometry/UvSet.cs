@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class UvSet {
 	public string Name { get; }

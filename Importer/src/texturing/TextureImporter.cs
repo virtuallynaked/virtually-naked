@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 public class TextureImporter {
 	public static TextureImporter Make(TextureProcessor textureProcessor, Figure figure, string uvSetName, int surfaceIdx) {
 		var uvSet = figure.UvSets[uvSetName];

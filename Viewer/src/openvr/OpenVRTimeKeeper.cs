@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Valve.VR;
 
 public class OpenVRTimeKeeper {

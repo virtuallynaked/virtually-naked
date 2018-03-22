@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class Pose {
 	public Vector3 RootTranslation { get; }

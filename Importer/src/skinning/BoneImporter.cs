@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class BoneImporter {
 	private readonly List<BoneRecipe> boneRecipes = new List<BoneRecipe>();

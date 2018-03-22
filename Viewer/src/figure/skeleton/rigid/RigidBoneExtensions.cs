@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public static class RigidBoneExtensions {
 	/**

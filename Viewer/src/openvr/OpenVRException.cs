@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Valve.VR;
 
 public class OpenVRException : Exception {

@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public struct TexturedVertexInfo {
 	public int SpacialInfoIdx { get; }

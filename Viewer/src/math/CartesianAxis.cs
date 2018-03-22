@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public enum CartesianAxis {
 	X = 0,

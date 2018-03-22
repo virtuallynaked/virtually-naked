@@ -1,4 +1,4 @@
-﻿public class ChannelOutputsGroup {
+public class ChannelOutputsGroup {
 	public ChannelOutputs ParentOutputs { get; }
 	public ChannelOutputs[] ChildOutputs { get; }
 

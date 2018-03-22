@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 class DemoAppLauncher {
 	[STAThread]
@@ -30,4 +30,3 @@ class DemoAppLauncher {
 		}
 	}
 }
-

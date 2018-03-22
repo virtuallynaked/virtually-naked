@@ -1,3 +1,3 @@
-﻿interface IDemoApp {
+interface IDemoApp {
 	void Run();
 }

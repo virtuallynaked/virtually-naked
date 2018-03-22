@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class DualQuaternionBlender {
 	private Quaternion realAccumulator = Quaternion.Zero;

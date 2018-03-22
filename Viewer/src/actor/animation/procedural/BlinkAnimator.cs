@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public class BlinkAnimator : IProceduralAnimator {
 	private static readonly Random rnd = RandomProvider.Provide();

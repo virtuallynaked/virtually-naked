@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public static class CatmullRomSpline {
 	private static readonly Vector4 W0 = new Vector4(0, -1, 2, -1) / 2;

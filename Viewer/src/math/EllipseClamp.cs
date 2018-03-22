@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using static MathExtensions;
 
 public static class EllipseClamp {

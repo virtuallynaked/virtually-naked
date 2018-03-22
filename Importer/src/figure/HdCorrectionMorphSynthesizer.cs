@@ -1,4 +1,4 @@
-﻿using OpenSubdivFacade;
+using OpenSubdivFacade;
 using SharpDX;
 using System.Linq;
 
@@ -38,4 +38,3 @@ public class HdCorrectionMorphSynthesizer {
 		};
 	}
 }
-

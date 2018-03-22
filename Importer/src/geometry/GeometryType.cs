@@ -1,4 +1,4 @@
-﻿public enum GeometryType {
+public enum GeometryType {
 	PolygonMesh,
 	SubdivisionSurface
 };

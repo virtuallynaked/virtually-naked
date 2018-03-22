@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System.Diagnostics;
 using static MathExtensions;
 using static System.Math;

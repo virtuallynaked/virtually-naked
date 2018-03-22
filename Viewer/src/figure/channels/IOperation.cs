@@ -1,4 +1,4 @@
-﻿public interface IOperation {
+public interface IOperation {
 	void Accept(IOperationVisitor visitor);
 }
 

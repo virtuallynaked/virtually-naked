@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public class SubdivisionMesh {
 	public static readonly SubdivisionMesh Empty = new SubdivisionMesh(

@@ -1,4 +1,4 @@
-﻿public class StagedSkinningTransformBlender {
+public class StagedSkinningTransformBlender {
 	private ScalingTransformBlender scalingStageBlender = new ScalingTransformBlender();
 	private DualQuaternionBlender rotationStageBlender = new DualQuaternionBlender();
 

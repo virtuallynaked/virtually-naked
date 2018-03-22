@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 static class ActorMenuProvider {
 	public static IMenuLevel MakeHairMenuLevel(FigureFacade hairFigure) {

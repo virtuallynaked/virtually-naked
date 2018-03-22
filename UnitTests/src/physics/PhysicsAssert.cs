@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 public static class PhysicsAssert {
 	public static void AreEqual(MassMoment expected, MassMoment actual, float delta) {

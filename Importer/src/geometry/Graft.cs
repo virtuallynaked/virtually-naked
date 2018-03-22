@@ -1,4 +1,4 @@
-﻿public class Graft {
+public class Graft {
 	public struct VertexPair {
 		public int Source { get; }
 		public int Target { get; }

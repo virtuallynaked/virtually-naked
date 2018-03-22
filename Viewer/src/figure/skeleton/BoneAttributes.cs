@@ -1,4 +1,4 @@
-﻿public struct BoneAttributes {
+public struct BoneAttributes {
 	public bool IsIkable { get; }
 	public MassMoment MassMoment { get; }
 	public float MassIncludingDescendants { get; }

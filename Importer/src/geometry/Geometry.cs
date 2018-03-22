@@ -1,4 +1,4 @@
-﻿using OpenSubdivFacade;
+using OpenSubdivFacade;
 using SharpDX;
 
 public class Geometry {

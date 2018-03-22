@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class BoneSystemRecipe {
 	public List<BoneRecipe> Bones { get; }

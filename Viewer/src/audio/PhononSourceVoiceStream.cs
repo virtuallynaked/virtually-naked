@@ -1,4 +1,4 @@
-﻿using Phonon;
+using Phonon;
 using SharpDX;
 using SharpDX.XAudio2;
 using System;

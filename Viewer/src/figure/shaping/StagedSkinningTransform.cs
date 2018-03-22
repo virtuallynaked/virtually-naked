@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public struct StagedSkinningTransform {
 	public static readonly StagedSkinningTransform Identity = new StagedSkinningTransform(ScalingTransform.Identity, DualQuaternion.Identity);
@@ -19,4 +19,3 @@ public struct StagedSkinningTransform {
 		return ScalingStage.InverseTransform(RotationStage.InverseTransform(v));
 	}
 }
-

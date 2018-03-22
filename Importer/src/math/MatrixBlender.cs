@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class MatrixBlender {
 	private Matrix accumulator = Matrix.Zero;

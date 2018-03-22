@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public struct MorphDelta {
 	public int VertexIdx { get; }

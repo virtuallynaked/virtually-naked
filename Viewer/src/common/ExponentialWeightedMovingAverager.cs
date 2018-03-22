@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public class ExponentiallyWeightedMovingAverager<T, U> where U : struct, IVectorOperators<T>  {
 	private static readonly U operators = new U();

@@ -1,4 +1,4 @@
-﻿public class StandardProceduralAnimator : IProceduralAnimator {
+public class StandardProceduralAnimator : IProceduralAnimator {
 	private readonly IProceduralAnimator[] animators;
 	
 	public StandardProceduralAnimator(FigureDefinition definition, BehaviorModel behaviorModel) {

@@ -1,4 +1,4 @@
-﻿public class SurfaceProperties {
+public class SurfaceProperties {
 	public int SubdivisionLevel { get; }
 	public int[] RenderOrder { get; }
 	public float[] Opacities { get; }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SharpDX.Direct3D11;
 
 public class Menu : IDisposable {

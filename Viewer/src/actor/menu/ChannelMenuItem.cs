@@ -1,4 +1,4 @@
-﻿class ChannelMenuItem : IRangeMenuItem {
+class ChannelMenuItem : IRangeMenuItem {
 	private readonly string label;
 	private readonly ActorModel model;
 	private readonly Channel channel;

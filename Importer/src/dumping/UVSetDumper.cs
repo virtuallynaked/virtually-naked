@@ -1,4 +1,4 @@
-﻿using OpenSubdivFacade;
+using OpenSubdivFacade;
 using SharpDX;
 using System;
 using System.Collections.Generic;

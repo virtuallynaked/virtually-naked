@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System.IO;
 
 public class BumpToNormalDemo : IDemoApp {

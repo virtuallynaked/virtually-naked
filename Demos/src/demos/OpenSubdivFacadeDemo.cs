@@ -1,4 +1,4 @@
-﻿using OpenSubdivFacade;
+using OpenSubdivFacade;
 using System;
 
 public class OpenSubdivFacadeDemo :IDemoApp {

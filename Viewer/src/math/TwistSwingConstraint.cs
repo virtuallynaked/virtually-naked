@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public struct TwistSwingConstraint {
 	private readonly TwistConstraint twistConstraint;

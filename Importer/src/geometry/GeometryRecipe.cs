@@ -1,4 +1,4 @@
-﻿using ProtoBuf;
+using ProtoBuf;
 using SharpDX;
 using System.Collections.Generic;
 using System;

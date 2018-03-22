@@ -101,4 +101,3 @@ cbuffer cbuffer0 : register(b0) {
 	// Geometry/Cutout
 	float CutoutOpacity;
 };
-

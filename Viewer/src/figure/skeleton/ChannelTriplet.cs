@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System.Collections.Generic;
 
 public class ChannelTriplet {
@@ -68,4 +68,3 @@ public class ChannelTriplet {
 		ExtractMinMax(Z, 2, ref min, ref max);
 	}
 }
-

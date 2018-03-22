@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 class FigureImporter {
 	public static FigureRecipe ImportFor(DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue) {

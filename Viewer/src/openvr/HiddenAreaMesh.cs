@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using System;
@@ -49,4 +49,3 @@ public class HiddenAreaMesh : IDisposable {
 		context.Draw(vertexCount, 0);
 	}
 }
-

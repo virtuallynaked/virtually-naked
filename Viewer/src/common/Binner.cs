@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class Binner {
 	public enum Mode {

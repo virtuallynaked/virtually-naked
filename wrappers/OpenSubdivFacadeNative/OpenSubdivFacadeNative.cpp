@@ -238,4 +238,3 @@ namespace OpenSubdivFacadeNative {
 		return new RefinerFacadeImpl(vertexCount, faceCount, faces, refinementLevel);
 	}
 }
-

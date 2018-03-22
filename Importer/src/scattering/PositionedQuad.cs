@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SharpDX;
 
 public struct PositionedQuad {

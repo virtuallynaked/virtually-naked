@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using Valve.VR;
 
 public static class PlayerPositionUtils {

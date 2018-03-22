@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public static class ColorConversion {
 	public static Vector2 FromTemperatureToCIExy(double temperature) {

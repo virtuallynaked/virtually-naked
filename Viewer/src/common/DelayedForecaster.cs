@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class DelayedForecaster<T, U> where U : struct, IVectorOperators<T>  {
 	private static readonly U operators = new U();

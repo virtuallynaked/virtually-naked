@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 
 class AsyncFramePreparer {
 	private readonly FramePreparer framePreparer;

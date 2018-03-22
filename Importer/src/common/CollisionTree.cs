@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,5 +98,3 @@ public class CollisionTree {
 		return list;
 	}
 }
-
-

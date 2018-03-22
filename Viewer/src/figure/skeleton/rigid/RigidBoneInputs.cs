@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class RigidBoneSystemInputs {
 	public Vector3 RootTranslation;

@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public static class FormatForMathematicaExtensions {
 	public static string FormatForMathematica(this Vector3 v) {

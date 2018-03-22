@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SharpDX.Windows;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;

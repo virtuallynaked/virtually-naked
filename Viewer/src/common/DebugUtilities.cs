@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -129,4 +129,3 @@ static class DebugUtilities {
 		AssertSame(ts1.Swing, ts2.Swing);
 	}
 }
-

@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System;
 
 public class HairMaterialImporter : IMaterialImporter {

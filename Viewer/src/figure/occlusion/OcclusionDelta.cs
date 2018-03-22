@@ -1,4 +1,4 @@
-﻿public struct OcclusionDelta {
+public struct OcclusionDelta {
 	public int ChannelIdx { get; }
 	public uint PackedOcclusionInfo { get; }
 

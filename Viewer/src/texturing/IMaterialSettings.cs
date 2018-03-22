@@ -1,4 +1,4 @@
-﻿using ProtoBuf;
+using ProtoBuf;
 using SharpDX.Direct3D11;
 
 [ProtoContract]

@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public struct ScalingTransform {
 	public Matrix3x3 Scale { get; }

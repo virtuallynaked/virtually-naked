@@ -1,4 +1,4 @@
-﻿class RenderModelComponent {
+class RenderModelComponent {
 	public readonly string name;
 	public readonly RenderModel model;
 

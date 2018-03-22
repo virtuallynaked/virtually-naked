@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class OrientationSpace {
 	private readonly Quaternion orientation;

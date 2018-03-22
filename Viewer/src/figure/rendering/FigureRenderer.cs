@@ -1,4 +1,4 @@
-﻿using SharpDX.Direct3D11;
+using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using Device = SharpDX.Direct3D11.Device;
 using System.Collections.Generic;

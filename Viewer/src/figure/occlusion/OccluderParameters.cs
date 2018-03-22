@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class OccluderParameters {
 	public uint[] BaseOcclusion { get; }

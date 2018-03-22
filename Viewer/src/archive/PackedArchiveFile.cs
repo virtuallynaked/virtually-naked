@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;

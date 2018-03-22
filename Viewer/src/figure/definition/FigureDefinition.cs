@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class FigureDefinition {
 	public static FigureDefinition Load(IArchiveDirectory dataDir, string name, FigureDefinition parent) {

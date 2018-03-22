@@ -1,4 +1,4 @@
-﻿public class ConnectedComponentLabels {
+public class ConnectedComponentLabels {
 	public static ConnectedComponentLabels Make(int vertexCount, Quad[] faces) {
 		var labeller = new ConnectedComponentLabeller(vertexCount, faces);
 		labeller.Initialize();

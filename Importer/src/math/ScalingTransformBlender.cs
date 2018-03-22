@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class ScalingTransformBlender {
 	private Matrix3x3 scaleAccumulator = Matrix3x3.Zero;

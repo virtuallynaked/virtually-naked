@@ -1,4 +1,4 @@
-﻿public class FigureUris {
+public class FigureUris {
 	public string BasePath {get; }
 	public string DocumentName {get; }
 	public string GeometryId { get; }

@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public interface IVectorOperators<T> {
 	T Zero();

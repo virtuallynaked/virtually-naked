@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class RawUberMaterialSettings {
 	public string uvSet;
@@ -61,5 +61,3 @@ public class RawUberMaterialSettings {
 	//Geometry / Cutout
 	public RawFloatTexture cutoutOpacity;
 }
-
-

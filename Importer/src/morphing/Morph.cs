@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class Morph {
 	private readonly Channel channel;

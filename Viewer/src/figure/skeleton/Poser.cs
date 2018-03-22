@@ -1,4 +1,4 @@
-﻿public class Poser {
+public class Poser {
 	private readonly BoneSystem boneSystem;
 	private readonly ChannelOutputs orientationOutputs;
 

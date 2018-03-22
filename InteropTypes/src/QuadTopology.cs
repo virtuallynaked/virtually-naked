@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 public class QuadTopology {
 	public static readonly QuadTopology Empty = new QuadTopology(0, new Quad[0]);

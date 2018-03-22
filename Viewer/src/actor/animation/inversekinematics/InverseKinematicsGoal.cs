@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public class InverseKinematicsGoal {
 	public RigidBone SourceBone { get; }

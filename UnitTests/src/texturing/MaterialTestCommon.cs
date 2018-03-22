@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.D3DCompiler;
 using System.Reflection;
 using System.Runtime.InteropServices;

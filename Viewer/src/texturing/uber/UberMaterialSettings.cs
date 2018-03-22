@@ -1,4 +1,4 @@
-﻿using ProtoBuf;
+using ProtoBuf;
 using SharpDX;
 using System;
 using SharpDX.Direct3D11;
@@ -80,5 +80,3 @@ public class UberMaterialSettings : IMaterialSettings {
 		return UberMaterial.Load(device, shaderCache, textureLoader, this);
 	}
 }
-
-

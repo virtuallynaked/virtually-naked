@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public struct ShaderAndBytecode<T> {
 	public T Shader { get; }
@@ -13,4 +13,3 @@ public struct ShaderAndBytecode<T> {
 		return shaderAndBytecode.Shader;
 	}
 }
-

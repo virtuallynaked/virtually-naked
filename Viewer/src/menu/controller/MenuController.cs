@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using SharpDX;
 using Valve.VR;
 using System.Linq;

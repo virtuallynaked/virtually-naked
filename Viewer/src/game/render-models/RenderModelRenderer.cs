@@ -1,4 +1,4 @@
-﻿using SharpDX.Direct3D11;
+using SharpDX.Direct3D11;
 using Format = SharpDX.DXGI.Format;
 using System;
 using Valve.VR;

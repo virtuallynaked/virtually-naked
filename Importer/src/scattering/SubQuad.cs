@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 
 public struct SubQuad {
 	public Vector4 W0 { get; }

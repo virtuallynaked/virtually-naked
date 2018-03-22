@@ -1,4 +1,4 @@
-﻿public class MultiMaterialSettings {
+public class MultiMaterialSettings {
 	public IMaterialSettings[] PerMaterialSettings { get; }
 
 	public MultiMaterialSettings(IMaterialSettings[] perMaterialSettings) {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 public class MultisurfaceQuadTopology {
 	public GeometryType Type { get; }

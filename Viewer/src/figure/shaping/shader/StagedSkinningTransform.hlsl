@@ -35,4 +35,3 @@ float3 StagedSkinningTransform_Apply(StagedSkinningTransform transform, float3 p
 	p = DualQuaternion_Apply(transform.rotationStage, p);
 	return p;
 }
-
