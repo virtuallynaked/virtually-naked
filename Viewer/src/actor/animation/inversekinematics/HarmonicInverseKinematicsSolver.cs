@@ -29,11 +29,6 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 	private IEnumerable<RigidBone> GetBoneChain(RigidBone sourceBone, bool hasOrientationGoal) {
 		for (var bone = sourceBone; bone != null; bone = bone.Parent) {
-			if (bone.Parent == null) {
-				//omit root bone
-				continue;
-			}
-
 			if (areOrientable[bone.Index] && hasOrientationGoal) {
 				//omit orientable bones if there's a orientation goal since rotation for those bone is already set
 				continue;
@@ -66,18 +61,22 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 	}
 
 	private struct BonePartialSolution {
+		public static BonePartialSolution Zero => new BonePartialSolution { angularVelocity = Vector3.Zero, time = float.PositiveInfinity };
+
 		public Vector3 angularVelocity;
 		public float time;
 	}
 
-	private const int FigureCenterBoneIndex = 1;
-	
 	private BonePartialSolution SolveSingleBone(
 			RigidBone bone,
 			Vector3 worldSource, Vector3 worldTarget, MassMoment[] massMoments, Vector3 figureCenterOverride,
 			RigidBoneSystemInputs inputs, RigidTransform[] boneTransforms) {
-		
-		var center = bone.Index != FigureCenterBoneIndex ? boneTransforms[bone.Index].Transform(bone.CenterPoint) : figureCenterOverride;
+		if (bone.Parent == boneSystem.RootBone) {
+			//skip the hip bone because it's the same as the root bone but with a different center
+			return BonePartialSolution.Zero;
+		}
+
+		var center = bone != boneSystem.RootBone ? boneTransforms[bone.Index].Transform(bone.CenterPoint) : figureCenterOverride;
 		var parentTotalRotation = bone.Parent != null ? boneTransforms[bone.Parent.Index].Rotation : Quaternion.Identity;
 		var boneToWorldSpaceRotation = bone.OrientationSpace.Orientation.Chain(parentTotalRotation);
 		var worldToBoneSpaceRotation = Quaternion.Invert(boneToWorldSpaceRotation);
@@ -90,10 +89,7 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		Vector3 unnormalizedAxisOfRotation = Vector3.Cross(worldSource - center, worldTarget - center);
 		float unnormalizedAxisOfRotationLength = unnormalizedAxisOfRotation.Length();
 		if (MathUtil.IsZero(unnormalizedAxisOfRotationLength)) {
-			return new BonePartialSolution {
-				angularVelocity = Vector3.Zero,
-				time = float.PositiveInfinity
-			};
+			return BonePartialSolution.Zero;
 		}
 		Vector3 axisOfRotation = unnormalizedAxisOfRotation / unnormalizedAxisOfRotationLength;
 		float momentOfInertia = massMoments[bone.Index].GetMomentOfInertia(axisOfRotation, center);
@@ -133,9 +129,9 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 			
 		inputs.Rotations[bone.Index] = bone.Constraint.Clamp(newRotation);
 
-		if (bone.Index == FigureCenterBoneIndex) {
+		if (bone == boneSystem.RootBone) {
 			var preTotalTransform = boneTransforms[bone.Index];
-			var postTotalTransform = bone.GetChainedTransform(inputs, boneTransforms[bone.Parent.Index]);
+			var postTotalTransform = bone.GetChainedTransform(inputs);
 			var unposedFigureCenterOverride = preTotalTransform.InverseTransform(figureCenterOverride);
 			var postFigureCenterOverride = postTotalTransform.Transform(unposedFigureCenterOverride);
 
@@ -173,7 +169,6 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 		MassMoment[] accumulators = new MassMoment[boneSystem.Bones.Length];
 
 		bool[] areOnChain = new bool[boneSystem.Bones.Length];
-		areOnChain[0] = true; //root bone is always on the chain
 		foreach (var bone in boneChain) {
 			areOnChain[bone.Index] = true;
 		}
@@ -205,7 +200,6 @@ public class HarmonicInverseKinematicsSolver : IInverseKinematicsSolver {
 
 	private void CountertransformOffChainBones(RigidTransform[] preTotalTransforms, Vector3[] preCentersOfMass, RigidBoneSystemInputs inputs, RigidBone[] boneChain) {
 		bool[] areOnChain = new bool[boneSystem.Bones.Length];
-		areOnChain[0] = true; //root bone is always on the chain
 		foreach (var bone in boneChain) {
 			areOnChain[bone.Index] = true;
 		}
