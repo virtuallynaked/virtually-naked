@@ -7,6 +7,7 @@ public class ControllerStateTracker {
 
 	private bool active;
 	private bool menuOpen;
+	private VRControllerState_t groundState;
 	private VRControllerState_t secondPreviousState;
 	private VRControllerState_t previousState;
 	private VRControllerState_t currentState;
@@ -38,9 +39,11 @@ public class ControllerStateTracker {
 		if (!active) {
 			//activate
 			active = true;
+			groundState = controllerState;
 			secondPreviousState = default(VRControllerState_t);
 			previousState = default(VRControllerState_t);
 		} else {
+			groundState.ulButtonPressed &= currentState.ulButtonPressed;
 			secondPreviousState = previousState;
 			previousState = currentState;
 			previousStaleness = staleness;
@@ -62,7 +65,7 @@ public class ControllerStateTracker {
 	public uint DeviceIdx => deviceIdx;
 
 	public bool WasClicked(EVRButtonId buttonId) {
-		return staleness == 0 && previousState.IsPressed(buttonId) && !currentState.IsPressed(buttonId);
+		return staleness == 0 && !groundState.IsPressed(buttonId) && previousState.IsPressed(buttonId) && !currentState.IsPressed(buttonId);
 	}
 
 	public bool IsTouched(EVRButtonId buttonId) {
