@@ -1,5 +1,6 @@
 [0.6]
 	Major: Improved responsiveness and naturalness of posing
+	Fixed: Window could get stuck in minimized state
 
 [0.5]
 	Major: Figure's eyes follow player

@@ -14,12 +14,11 @@ class AsyncFramePreparer {
 
 	private readonly SemaphoreSlim updateParametersReadySemaphore = new SemaphoreSlim(0, 1);
 	private FrameUpdateParameters updateParameters;
-
-	private readonly SemaphoreSlim preparedFrameReadySemaphore = new SemaphoreSlim(0, 1);
-	private IPreparedFrame preparedFrame;
+	private volatile IPreparedFrame preparedFrame;
 
 	public void StartPreparingFrame(FrameUpdateParameters updateParameters) {
 		this.updateParameters = updateParameters;
+		this.preparedFrame = null;
 		updateParametersReadySemaphore.Release();
 	}
 
@@ -27,12 +26,11 @@ class AsyncFramePreparer {
 		while (true) {
 			updateParametersReadySemaphore.Wait();
 			preparedFrame = framePreparer.PrepareFrame(updateParameters);
-			preparedFrameReadySemaphore.Release();
 		}
 	}
 	
 	public IPreparedFrame FinishPreparingFrame() {
-		preparedFrameReadySemaphore.Wait();
+		SpinWait.SpinUntil(() => preparedFrame != null);
 		return preparedFrame;
 	}
 }
