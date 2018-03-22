@@ -1,6 +1,9 @@
 [0.6]
 	Major: Improved responsiveness and naturalness of posing
 	Fixed: Window could get stuck in minimized state
+	Fixed: Failure on systems with multiple graphics adapter when the adapter used by the OpenVR compositor is not
+	       the same one used by the main monitor (Thanks for Fauxex for reporting this)
+	Fixed: "Unrecognized option '-waitformonitor'" error when launching from Oculus Home
 
 [0.5]
 	Major: Figure's eyes follow player
