@@ -1,6 +1,9 @@
 [*]
 end_of_line = crlf
 tab_width = 4
+indent_size = 4
+insert_final_newline = true
+charset = utf-8
 
 [*.{cs,hlsl}]
 indent_style = tab
