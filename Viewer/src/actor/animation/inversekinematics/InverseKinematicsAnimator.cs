@@ -28,7 +28,7 @@ public class InverseKinematicsAnimator {
 	}
 
 	public void Reset() {
-		poseDeltas.ClearToZero();
+		poseDeltas.ClearNonRoot();
 		//SetInitialRotationAngles("lForearmBend", new Vector3(0, -75, 0));
 		//SetInitialRotationAngles("lShldrBend", new Vector3(0, 0, -85));
 		//SetInitialRotationAngles("lThighBend", new Vector3(0, 0, 85f));

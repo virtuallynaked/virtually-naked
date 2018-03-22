@@ -19,4 +19,10 @@ public class RigidBoneSystemInputs {
 			Rotations[i] = TwistSwing.Zero;
 		}
 	}
+
+	public void ClearNonRoot() {
+		for (int i = 1; i < Rotations.Length; ++i) {
+			Rotations[i] = TwistSwing.Zero;
+		}
+	}
 }
