@@ -50,6 +50,15 @@ public class SwingTest {
 		var swungTwistAxisUsingQV = Vector3.Transform(twistAxisV, q);
 		MathAssert.AreEqual(to, swungTwistAxisUsingQV, Acc);
 	}
+
+	[TestMethod]
+	public void TestToEdgeCase() {
+		Vector3 to = -Vector3.UnitZ;
+		var swing = Swing.To(CartesianAxis.Z, to);
+		
+		var swungTwistAxisV = swing.TransformTwistAxis(CartesianAxis.Z);
+		MathAssert.AreEqual(to, swungTwistAxisV, Acc);
+	}
 	
 	private static Vector3 MakeRandomUnitVector(Random rnd) {
 		return Vector3.Normalize(new Vector3(rnd.NextFloat(-1, 1), rnd.NextFloat(-1, 1), rnd.NextFloat(-1, 1)));
@@ -118,7 +127,7 @@ public class SwingTest {
 	public void FuzzApplyDelta() {
 		var rnd = new Random(0);
 
-		for (int i = 0; i < 1000; ++i) {
+		for (int i = 0; i < 100000; ++i) {
 			var initial = RandomUtil.Swing(rnd);
 			var delta = RandomUtil.Swing(rnd);
 			var final = Swing.ApplyDelta(initial, delta);
@@ -126,7 +135,7 @@ public class SwingTest {
 			var twistAxis = CartesianAxis.X;
 			var initialAndDeltaPoint = delta.Transform(twistAxis, initial.TransformTwistAxis(twistAxis));
 			var finalPoint = final.TransformTwistAxis(twistAxis);
-			Assert.AreEqual(1, Vector3.Dot(initialAndDeltaPoint, finalPoint), 1e-3f);
+			Assert.AreEqual(1, Vector3.Dot(initialAndDeltaPoint, finalPoint), Acc);
 		}
 	}
 
@@ -139,5 +148,40 @@ public class SwingTest {
 		var roundtripFinal = Swing.ApplyDelta(initial, delta);
 
 		MathAssert.AreEqual(final, roundtripFinal, Acc);
+	}
+	
+	[TestMethod]
+	public void TestApplyDeltaEdgeCases() {
+		var rnd = new Random(0);
+		var swing = RandomUtil.Swing(rnd);
+		var axis = swing.Axis;
+		var angle = swing.Angle;
+
+		var zero = Swing.Zero;
+		var full = new Swing(axis.X, axis.Y);
+		var complement = Swing.AxisAngle(axis.X, axis.Y, MathUtil.Pi - angle);
+		
+		MathAssert.AreEqual(full, Swing.ApplyDelta(zero, full), Acc);
+		MathAssert.AreEqual(full, Swing.ApplyDelta(full, zero), Acc);
+		MathAssert.AreEqual(full, Swing.ApplyDelta(swing, complement), Acc);
+		MathAssert.AreEqual(full, Swing.ApplyDelta(complement, swing), Acc);
+	}
+
+	[TestMethod]
+	public void TestCalculateDeltaEdgeCases() {
+		var rnd = new Random(1);
+		var swing = RandomUtil.Swing(rnd);
+		var axis = swing.Axis;
+		var angle = swing.Angle;
+
+		var zero = Swing.Zero;
+		var full = new Swing(axis.X, axis.Y);
+		var complement = Swing.AxisAngle(axis.X, axis.Y, MathUtil.Pi - angle);
+		
+		MathAssert.AreEqual(zero, Swing.CalculateDelta(zero, zero), 1e-3f);
+		MathAssert.AreEqual(full, Swing.CalculateDelta(zero, full), 1e-3f);
+		MathAssert.AreEqual(zero, Swing.CalculateDelta(full, full), 1e-3f);
+		MathAssert.AreEqual(complement, Swing.CalculateDelta(swing, full), 1e-3f);
+		MathAssert.AreEqual(swing, Swing.CalculateDelta(complement, full), 1e-3f);
 	}
 }

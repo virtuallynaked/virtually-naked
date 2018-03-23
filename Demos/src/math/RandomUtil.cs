@@ -33,12 +33,25 @@ public static class RandomUtil {
 		return v;
 	}
 
+	public static Vector2 Vector2(Random rnd) {
+		Vector2 v;
+		v.X = (float) Normal.Sample(rnd, 0, 1);
+		v.Y = (float) Normal.Sample(rnd, 0, 1);
+		return v;
+	}
+
 	public static float PositiveFloat(Random rnd) {
 		return (float) Gamma.Sample(rnd, 1, 1);
 	}
 	
 	public static Vector3 UnitVector3(Random rnd) {
 		Vector3 v = Vector3(rnd);
+		v.Normalize();
+		return v;
+	}
+
+	public static Vector2 UnitVector2(Random rnd) {
+		Vector2 v = Vector2(rnd);
 		v.Normalize();
 		return v;
 	}

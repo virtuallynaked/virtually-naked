@@ -64,6 +64,13 @@ public struct Swing {
 		return q;
 	}
 
+	public static Swing MakeUnitized(float w, float y, float z) {
+		double length = (double) w * w + (double) y * y + (double) z * z;
+		double m = Sqrt(1 / length);
+		m *= w < 0 ? -1 : +1;
+		return new Swing((float) m * y, (float) m * z);
+	}
+
 	public static Swing MakeFromAxisAngleProduct(float axisAngleY, float axisAngleZ) {
 		float angle = (float) IEEERemainder(Sqrt(Sqr(axisAngleY) + Sqr(axisAngleZ)), 2 * PI);
 		float m = angle == 0 ? 0 : (float) Sin(angle / 2) / angle;
@@ -120,12 +127,17 @@ public struct Swing {
 		 *      = Sqrt[1 / (2 * (1 + toX))] * <-toZ, toY>
 		 *      = 1 / (2 * w) * <-toZ, toY> 
 		 */
-		float wSquared = (1 + toX) / 2;
-		float w = (float) Sqrt(wSquared);
-		float y = -toZ / (2 * w);
-		float z = +toY / (2 * w);
-		
-		return new Swing(y, z);
+		float ww = (1 + toX);
+		float wy = -toZ;
+		float wz = +toY;
+
+		if (ww < MathUtil.ZeroTolerance) {
+			// This is a 180 degree swing (W = 0) so X and Y don't have a unique value
+			// I'll arbitrarily use:
+			return new Swing(1, 0);
+		}
+
+		return Swing.MakeUnitized(ww, wy, wz);
 	}
 
 	public Vector3 TransformTwistAxis(CartesianAxis twistAxis) {
@@ -203,30 +215,15 @@ public struct Swing {
 		float fy = final.Y;
 		float fz = final.Z;
 
-		float pw = fw * fw - 1;
-		float py = fy * fw;
-		float pz = fz * fw;
-
-		float dw = pw + iw * iw;
-		float dy = py - iw * iy;
-		float dz = pz - iw * iz;
-		float m = 1 / (float) Sqrt(dw * dw + dy * dy + dz * dz);
-		dw *= m;
-		dy *= m;
-		dz *= m;
-
-		if (dw < 0) {
-			dw *= -1;
-			dy *= -1;
-			dz *= -1;
-		}
-
-		return new Swing(dy, dz);
+		float dw = fw * fw + iw * iw - 1;
+		float dy = fw * fy - iw * iy;
+		float dz = fw * fz - iw * iz;
+		return MakeUnitized(dw, dy, dz);
 	}
-
+	
 	/**
 	 *  Returns a Swing final such that:
-	 *		delta.Transform(twistAxis, initial.TransformTwistAxis(twistAxis)) == final.TransformTwistAxis(twistAxis)
+	 *		delta.Transform(initial.TransformTwistAxis()) == final.TransformTwistAxis()
 	 */
 	public static Swing ApplyDelta(Swing initial, Swing delta) {
 		float iw = initial.W;
@@ -238,14 +235,18 @@ public struct Swing {
 		float dz = delta.Z;
 		
 		float c = 2 * iw * (dw*iw - dz*iz - dy*iy) - dw;
-		float pw = dw*c - iw*iw;
-		float py = dy*c + iw*iy;
-		float pz = dz*c + iw*iz;
-		
-		float fw = (float) Sqrt(pw + 1);
-		float fy = +py / fw;
-		float fz = +pz / fw;
+		float fww = dw*c - iw*iw + 1;
+		float fwy = dy*c + iw*iy;
+		float fwz = dz*c + iw*iz;
 
-		return new Swing(fy, fz);
+		if (fww < MathUtil.ZeroTolerance) {
+			// This happens when initial and delta sum to a half rotation (W = 0) in which case it's not
+			// possible to return the angle from fwy and fwz. Instead I combine the axis of initial+delta
+			// with a 180 angle:
+			return MakeUnitized(0, iy + dy, iz + dz);
+		} else {
+			// I could calculate {fy, fz} = {fwy,fwz}/Sqrt[fww] but this has higher precision:
+			return MakeUnitized(fww, fwy, fwz);
+		}
 	}
 }
