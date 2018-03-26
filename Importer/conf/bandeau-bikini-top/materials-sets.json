@@ -1,0 +1,66 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Bandeau Bikini Top.duf" ]
+	},
+	{
+		"name": "Classic",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Classic Top.duf" ]
+	},
+	{
+		"name": "Floral",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Floral Top.duf" ]
+	},
+	{
+		"name": "Mix n Match",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Mix n Match Top.duf" ]
+	},
+	{
+		"name": "Onyx",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Onyx Top.duf" ]
+	},
+	{
+		"name": "Paisley",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Paisley Top.duf" ]
+	},
+	{
+		"name": "Scarlet",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Scarlet Top.duf" ]
+	},
+	{
+		"name": "Teal",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Teal Top.duf" ]
+	},
+	{
+		"name": "White",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/White Top.duf" ]
+	},
+	{
+		"name": "Wild Side",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Wild Side Top.duf" ]
+	},
+	{
+		"name": "Charcoal",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Charcoal Top.duf" ]
+	},
+	{
+		"name": "Crimson",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Crimson Top.duf" ]
+	},
+	{
+		"name": "Mocha",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Mocha Top.duf" ]
+	},
+	{
+		"name": "Navy",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Navy Top.duf" ]
+	},
+	{
+		"name": "Rose",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Rose Top.duf" ]
+	},
+	{
+		"name": "Silver",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Bandeau Bikini/Materials/Silver Top.duf" ]
+	}
+]
