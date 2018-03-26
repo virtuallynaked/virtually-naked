@@ -27,10 +27,20 @@ public class ImportSettings {
 					MaterialSets = ReleaseCharacters
 				},
 
-				["liv-hair"] = new FigureImportSettings {
-					Shapes = null, //all
-					MaterialSets = null, //all
-				}
+				["liv-hair"] = FigureImportSettings.All,
+
+				["breakfast-in-bed-tank"] = FigureImportSettings.All,
+				["breakfast-in-bed-shorts"] = FigureImportSettings.All,
+
+				["bandeau-bikini-top"] = FigureImportSettings.All,
+				["bandeau-bikini-bottoms"] = FigureImportSettings.All,
+
+				["relaxed-sunday-tank"] = FigureImportSettings.All,
+				["relaxed-sunday-shorts"] = FigureImportSettings.All,
+				["relaxed-sunday-shoes"] = FigureImportSettings.All,
+
+				["summer-dress-dress"] = FigureImportSettings.All,
+				["summer-dress-shoes"] = FigureImportSettings.All
 			}
 		};
 	}
@@ -91,6 +101,11 @@ public class FigureImportSettings {
 			MaterialSets = { initialMaterialSet }
 		};
 	}
+
+	public static FigureImportSettings All => new FigureImportSettings {
+		Shapes = null,
+		MaterialSets = null
+	};
 
 	public HashSet<string> Shapes { get; set; } = new HashSet<string>(); // null means all except "Base"
 	public HashSet<string> MaterialSets { get; set; } = new HashSet<string>(); // null means all
