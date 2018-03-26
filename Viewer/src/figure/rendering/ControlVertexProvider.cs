@@ -41,12 +41,17 @@ public class ControlVertexProvider : IDisposable {
 			device, shaderCache,
 			definition,
 			shaperParameters,
-			occluder);
+			occluder,
+			model.IsVisible);
 
 		model.ShapeChanged += (oldShape, newShape) => {
 			var newOcclusionDirectory = model.Shape.Directory ?? unmorphedOcclusionDirectory;
 			var newOccluder = LoadOccluder(device, shaderCache, definition.ChannelSystem, isMainFigure, unmorphedOcclusionDirectory, newOcclusionDirectory);
 			provider.SetOccluder(newOccluder);
+		};
+
+		model.IsVisibleChanged += (oldVisibile, newVisible) => {
+			provider.SetIsVisible(newVisible);
 		};
 
 		return provider;
@@ -55,6 +60,7 @@ public class ControlVertexProvider : IDisposable {
 	private readonly FigureDefinition definition;
 	private IOccluder occluder;
 	private readonly GpuShaper shaper;
+	private bool isVisible;
 	
 	private readonly int vertexCount;
 
@@ -66,10 +72,12 @@ public class ControlVertexProvider : IDisposable {
 	public ControlVertexProvider(Device device, ShaderCache shaderCache,
 		FigureDefinition definition,
 		ShaperParameters shaperParameters,
-		IOccluder occluder) {
+		IOccluder occluder,
+		bool isVisible) {
 		this.definition = definition;
 		this.shaper = new GpuShaper(device, shaderCache, definition, shaperParameters);
 		this.occluder = occluder;
+		this.isVisible = isVisible;
 		
 		this.vertexCount = shaperParameters.InitialPositions.Length;
 		
@@ -102,6 +110,11 @@ public class ControlVertexProvider : IDisposable {
 		}
 	}
 	
+	private void SetIsVisible(bool newIsVisible) {
+		isVisible = newIsVisible;
+		OccluderChanged?.Invoke();
+	}
+
 	public int VertexCount => vertexCount;
 
 	public ShaderResourceView OcclusionInfos => occluder.OcclusionInfosView;
@@ -125,6 +138,7 @@ public class ControlVertexProvider : IDisposable {
 
 	private void RegisterChildOccluders() {
 		var childOccluders = children
+			.Where(child => child.isVisible)
 			.Select(child => child.occluder)
 			.ToList();
 		occluder.RegisterChildOccluders(childOccluders);

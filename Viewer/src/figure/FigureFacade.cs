@@ -72,6 +72,10 @@ public class FigureFacade : IDisposable {
 	}
 
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
+		if (!model.IsVisible) {
+			return;
+		}
+
 		renderer.RenderPass(context, pass);
 	}
 	
@@ -93,6 +97,10 @@ public class FigureFacade : IDisposable {
 	}
 
 	public void Update(DeviceContext context, ImageBasedLightingEnvironment lightingEnvironment) {
+		if (!model.IsVisible) {
+			return;
+		}
+
 		renderer.Update(context, lightingEnvironment, controlVertexProvider.ControlVertexInfosView);
 	}
 

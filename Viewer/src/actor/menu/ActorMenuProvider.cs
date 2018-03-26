@@ -26,9 +26,14 @@ static class ActorMenuProvider {
 		var compositeMaterialItems = CompositeToggleMenuItem.CombineByLabel(individualMaterialItems);
 		var materialsMenuLevel = new StaticMenuLevel(compositeMaterialItems.ToArray());
 		
-		var clothingMenuLevel = new StaticMenuLevel(
-			new SubLevelMenuItem("Fabrics", materialsMenuLevel)
-		);
+		var items = new List<IMenuItem> { };
+		items.Add(new SubLevelMenuItem("Fabrics", materialsMenuLevel));
+
+		foreach (var figure in clothingFigures) {
+			items.Add(new VisibilityToggleMenuItem(figure.Definition.Name, figure.Model));
+		}
+
+		var clothingMenuLevel = new StaticMenuLevel(items.ToArray());
 
 		return clothingMenuLevel;
 	}

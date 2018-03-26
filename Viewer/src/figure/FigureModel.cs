@@ -8,6 +8,19 @@ public class FigureModel {
 		this.definition = definition;
 	}
 
+	private bool isVisible = true;
+	public event Action<bool, bool> IsVisibleChanged;
+	public bool IsVisible {
+		get {
+			return isVisible;
+		}
+		set {
+			var old = isVisible;
+			isVisible = value;
+			IsVisibleChanged?.Invoke(old, value);
+		}
+	}
+
 	private Shape shape;
 	public event Action<Shape, Shape> ShapeChanged;
 	public Shape Shape {
