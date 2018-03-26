@@ -8,8 +8,7 @@ public class MaterialSet : IDisposable {
 			.Subdirectory("material-sets")
 			.Subdirectory(materialSetName);
 
-		bool hasSharedTextures = figureDir.Name.EndsWith("-hair"); //super hacky!
-		var texturesDirectory = hasSharedTextures ? figureDir.Subdirectory("textures") : materialsDirectory;
+		var texturesDirectory = figureDir.Subdirectory("textures") ?? materialsDirectory;
 		
 		var textureLoader = new TextureLoader(device, texturesDirectory);
 		var multiMaterialSettings = Persistance.Load<MultiMaterialSettings>(materialsDirectory.File("material-settings.dat"));
