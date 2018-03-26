@@ -66,6 +66,7 @@ public class Actor : IDisposable {
 	public ActorModel Model => model;
 	public FigureFacade Main => mainFigure;
 	public FigureFacade Hair => hairFigure;
+	public FigureFacade[] Clothing => clothingFigures;
 	public ActorBehavior Behavior => behavior;
 	
 	public IMenuLevel MenuLevel => ActorMenuProvider.MakeRootMenuLevel(this);

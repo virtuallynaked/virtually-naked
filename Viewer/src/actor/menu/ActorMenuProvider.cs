@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 static class ActorMenuProvider {
 	public static IMenuLevel MakeHairMenuLevel(FigureFacade hairFigure) {
@@ -15,6 +16,21 @@ static class ActorMenuProvider {
 		);
 
 		return hairMenuLevel;
+	}
+
+	public static IMenuLevel MakeClothingMenuLevel(FigureFacade[] clothingFigures) {
+		var individualMaterialItems = clothingFigures
+			.SelectMany(figure => figure.Definition.MaterialSetOptions
+				.Select(materialSet => new MaterialSetMenuItem(figure.Model, materialSet)))
+			.ToList<IToggleMenuItem>();
+		var compositeMaterialItems = CompositeToggleMenuItem.CombineByLabel(individualMaterialItems);
+		var materialsMenuLevel = new StaticMenuLevel(compositeMaterialItems.ToArray());
+		
+		var clothingMenuLevel = new StaticMenuLevel(
+			new SubLevelMenuItem("Fabrics", materialsMenuLevel)
+		);
+
+		return clothingMenuLevel;
 	}
 
 	public static IMenuLevel MakeRootMenuLevel(Actor actor) {
@@ -34,14 +50,16 @@ static class ActorMenuProvider {
 		
 		var animationsMenuLevel = new AnimationMenuLevel(model.Animation);
 		
+		var hairMenuLevel = MakeHairMenuLevel(actor.Hair);
+
+		var clothingMenuLevel = MakeClothingMenuLevel(actor.Clothing);
+
 		List<IMenuItem> items = new List<IMenuItem> { };
 		items.Add(new SubLevelMenuItem("Characters", charactersMenuLevel));
-		
-		var hairMenuLevel = MakeHairMenuLevel(actor.Hair);
+		items.Add(new SubLevelMenuItem("Clothing", clothingMenuLevel));
 		if (hairMenuLevel != null) {
 			items.Add(new SubLevelMenuItem("Hair", hairMenuLevel));
 		}
-
 		items.Add(new SubLevelMenuItem("Shaping", shapingMenuLevel));
 		items.Add(new SubLevelMenuItem("Behavior", behaviorMenuLevel));
 		items.Add(new SubLevelMenuItem("Expressions", expressionsMenuLevel));
