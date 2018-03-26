@@ -1,0 +1,46 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Relaxed Sunday Shoes.duf" ]
+	},
+	{
+		"name": "Paisley",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Paisley Shoes.duf" ]
+	},
+	{
+		"name": "Heart",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Heart Shoes.duf" ]
+	},
+	{
+		"name": "Ribcage",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Ribcage Shoes.duf" ]
+	},
+	{
+		"name": "Roses",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Roses Shoes.duf" ]
+	},
+	{
+		"name": "Swirls",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Swirls Shoes.duf" ]
+	},
+	{
+		"name": "Wings",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Wings Shoes.duf" ]
+	},
+	{
+		"name": "Angel",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Angel Shoes.duf" ]
+	},
+	{
+		"name": "Flowers",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Flowers Shoes.duf" ]
+	},
+	{
+		"name": "Skulls",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Skulls Shoes.duf" ]
+	},
+	{
+		"name": "Sunflower",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Relaxed Sunday/Iray Material/Sunflower Shoes.duf" ]
+	}
+]

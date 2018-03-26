@@ -53,7 +53,10 @@ public static class InitialSettings {
 		//"mercurial-guardian-shoulder-armor",
 		//"mercurial-guardian-sleeves",
 		//"bandeau-bikini-top",
-		//"bandeau-bikini-bottoms"
+		//"bandeau-bikini-bottoms",
+		//"relaxed-sunday-tank",
+		//"relaxed-sunday-shorts",
+		//"relaxed-sunday-shoes"
 	};
 
 	public static readonly Dictionary<string, string> Shapes = new Dictionary<string, string> {
@@ -103,6 +106,9 @@ public static class InitialSettings {
 		["mercurial-guardian-shoulder-armor"] = "Thalenia",
 		["mercurial-guardian-sleeves"] = "Thalenia",
 		["bandeau-bikini-top"] = "Teal",
-		["bandeau-bikini-bottoms"] = "Teal"
+		["bandeau-bikini-bottoms"] = "Teal",
+		["relaxed-sunday-tank"] = "Paisley",
+		["relaxed-sunday-shorts"] = "Paisley",
+		["relaxed-sunday-shoes"] = "Paisley"
 	};
 }
