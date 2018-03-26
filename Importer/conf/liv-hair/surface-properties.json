@@ -1,5 +1,6 @@
 {
 	"subdivision-level": 1,
 	"default-opacity": 0.1,
-	"render-order": [ "Cap" ]
+	"render-order": [ "Cap" ],
+	"share-textures": "liv-hair"
 }

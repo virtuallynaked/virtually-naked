@@ -23,7 +23,7 @@ public class TextureDilator : IDisposable {
 		maskRenderer.Dispose();
 	}
 	
-	public void Dilate(TextureMask mask, Size2 size, bool isLinear, DataBox imageData) {
+	public void Dilate(MultiUvTextureMask mask, Size2 size, bool isLinear, DataBox imageData) {
 		//set every alpha value to 0
 		for (int i = 0; i < imageData.SlicePitch; i += 4) {
 			var rgba = Utilities.Read<uint>(imageData.DataPointer + i);
@@ -73,7 +73,9 @@ public class TextureDilator : IDisposable {
 
 		context.UpdateSubresource(imageData, sourceTexture, 0);
 
-		maskRenderer.RenderMaskToAlpha(mask, size, sourceTexture);
+		foreach (var perUvMask in mask.PerUvMasks) {
+			maskRenderer.RenderMaskToAlpha(perUvMask, size, sourceTexture);
+		}
 		
 		context.ClearState();
 		context.ComputeShader.Set(alphaPremultiplerShader);

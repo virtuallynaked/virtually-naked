@@ -18,13 +18,13 @@ public class FigureFacade : IDisposable {
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition, model);
 
 		string materialSetName = model.MaterialSet.Label;
-		var renderer = FigureRenderer.Load(definition.Directory, device, shaderCache, materialSetName);
+		var renderer = FigureRenderer.Load(dataDir, definition.Directory, device, shaderCache, materialSetName);
 		
 		var facade = new FigureFacade(device, shaderCache, definition, model, controlVertexProvider, renderer);
 
 		model.MaterialSetChanged += (oldMaterialSet, newMaterialSet) => {
 			string newMaterialSetName = newMaterialSet.Label;
-			var newRenderer = FigureRenderer.Load(definition.Directory, device, shaderCache, newMaterialSetName);
+			var newRenderer = FigureRenderer.Load(dataDir, definition.Directory, device, shaderCache, newMaterialSetName);
 			facade.SetRenderer(newRenderer);
 		};
 

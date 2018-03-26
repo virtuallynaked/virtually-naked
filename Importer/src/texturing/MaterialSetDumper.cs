@@ -48,9 +48,12 @@ class MaterialSetDumper {
 
 		var multiMaterialSettings = new MultiMaterialSettings(perMaterialSettings);
 		
-		materialSetDirectory.CreateWithParents();
+		textureProcessor.RegisterAction(() => {
+			materialSetDirectory.CreateWithParents();
+			Persistance.Save(materialSettingsFileInfo, multiMaterialSettings);
+		});
+
 		localTextureProcessor?.ImportAll();
-		Persistance.Save(materialSettingsFileInfo, multiMaterialSettings);
 
 		return multiMaterialSettings;
 	}
@@ -61,20 +64,14 @@ class MaterialSetDumper {
 		ScatteringDumper.Dump(figure, materialSettings.PerMaterialSettings, configuration.name);
 	}
 
-	public static void DumpAllForFigure(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure) {
+	public static void DumpAllForFigure(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, TextureProcessorSharer textureProcessorSharer) {
 		MaterialSetImportConfiguration[] configurations = MaterialSetImportConfiguration.Load(figure.Name);
 
 		var baseConf = configurations.Single(conf => conf.name == "Base");
 		
-		TextureProcessor sharedTextureProcessor;
-		if (figure.Parent != null) {
-			DirectoryInfo figuresDirectory = CommonPaths.WorkDir.Subdirectory("figures");
-			DirectoryInfo figureDirectory = figuresDirectory.Subdirectory(figure.Name);
-			DirectoryInfo texturesDirectory = figureDirectory.Subdirectory("textures");
-			sharedTextureProcessor = new TextureProcessor(device, shaderCache, texturesDirectory, settings.CompressTextures);
-		} else {
-			sharedTextureProcessor = null;
-		}
+		var surfaceProperties = SurfacePropertiesJson.Load(figure);
+		TextureProcessor sharedTextureProcessor = surfaceProperties.ShareTextures != null ?
+			textureProcessorSharer.GetSharedProcessor(surfaceProperties.ShareTextures) : null;
 
 		foreach (var conf in configurations) {
 			if (conf == baseConf) {
@@ -87,7 +84,5 @@ class MaterialSetDumper {
 
 			DumpMaterialSetAndScattering(settings, device, shaderCache, fileLocator, objectLocator, figure, baseConf, conf, sharedTextureProcessor);
 		}
-
-		sharedTextureProcessor?.ImportAll();
 	}
 }

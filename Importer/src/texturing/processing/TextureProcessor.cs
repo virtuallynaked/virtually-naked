@@ -13,19 +13,19 @@ class TextureProcessingSettings {
 	private readonly FileInfo file;
 	private TextureProcessingType type;
 	private readonly bool isLinear;
-	private readonly TextureMask mask;
+	private readonly MultiUvTextureMask mask = new MultiUvTextureMask();
 
 	public TextureProcessingSettings(FileInfo file, TextureProcessingType type, bool isLinear, TextureMask mask) {
 		this.file = file;
 		this.type = type;
 		this.isLinear = isLinear;
-		this.mask = mask;
+		this.mask.Merge(mask);
 	}
 
 	public FileInfo File => file;
 	public TextureProcessingType Type => type;
 	public bool IsLinear => isLinear;
-	public TextureMask Mask => mask;
+	public MultiUvTextureMask Mask => mask;
 
 	public static bool CanUpgrade(TextureProcessingType fromType, TextureProcessingType toType) {
 		if (fromType == toType) {
@@ -72,6 +72,7 @@ public class TextureProcessor {
 	private readonly bool compress;
 	
 	private readonly Dictionary<string, TextureProcessingSettings> settingsByName = new Dictionary<string, TextureProcessingSettings>();
+	private readonly List<Action> actions = new List<Action>();
 
 	public TextureProcessor(Device device, ShaderCache shaderCache, DirectoryInfo destinationFolder, bool compress) {
 		this.device = device;
@@ -108,6 +109,10 @@ public class TextureProcessor {
 		if (process.ExitCode != 0) {
 			throw new InvalidOperationException("texconv failed");
 		}
+	}
+
+	public void RegisterAction(Action action) {
+		actions.Add(action);
 	}
 
 	private void ImportTexture(string name, TextureProcessingSettings settings) {
@@ -187,6 +192,9 @@ public class TextureProcessor {
 	public void ImportAll() {
 		foreach (var entry in settingsByName) {
 			ImportTexture(entry.Key, entry.Value);
+		}
+		foreach (var action in actions) {
+			action.Invoke();
 		}
 	}
 }

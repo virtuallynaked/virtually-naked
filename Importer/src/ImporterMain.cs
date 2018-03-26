@@ -64,6 +64,8 @@ public class ImporterMain : IDisposable {
 		Console.WriteLine($"Dumping parent...");
 		AnimationDumper.DumpAllAnimations(parentFigure);
 
+		var textureProcessorSharer = new TextureProcessorSharer(device, shaderCache, settings.CompressTextures);
+
 		foreach (Figure figure in figuresToDump) {
 			bool[] channelsToInclude = figure != parentFigure ? ChannelShaker.MakeChannelsToIncludeFromShapes(figure) : null;
 
@@ -74,8 +76,9 @@ public class ImporterMain : IDisposable {
 			
 			ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, parentFigure, figure);
 
-			MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, figure);
+			MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, figure, textureProcessorSharer);
 		}
 
+		textureProcessorSharer.Finish();
 	}
 }

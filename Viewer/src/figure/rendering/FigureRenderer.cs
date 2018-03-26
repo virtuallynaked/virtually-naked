@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class FigureRenderer {
-	public static FigureRenderer Load(IArchiveDirectory figureDir, Device device, ShaderCache shaderCache, string materialSetName) {
+	public static FigureRenderer Load(IArchiveDirectory dataDir, IArchiveDirectory figureDir, Device device, ShaderCache shaderCache, string materialSetName) {
 		SurfaceProperties surfaceProperties = Persistance.Load<SurfaceProperties>(figureDir.File("surface-properties.dat"));
 
 		var meshDirectory = figureDir.Subdirectory("refinement").Subdirectory("level-" + surfaceProperties.SubdivisionLevel);
 		SubdivisionMesh mesh = SubdivisionMeshPersistance.Load(meshDirectory);
 		int[] surfaceMap = meshDirectory.File("surface-map.array").ReadArray<int>();
 		
-		var materialSet = MaterialSet.LoadActive(device, shaderCache, figureDir, materialSetName);
+		var materialSet = MaterialSet.LoadActive(device, shaderCache, dataDir, figureDir, materialSetName, surfaceProperties);
 		var materials = materialSet.Materials;
 		
 		Scatterer scatterer = surfaceProperties.PrecomputeScattering ? Scatterer.Load(device, shaderCache, figureDir, materialSetName) : null;

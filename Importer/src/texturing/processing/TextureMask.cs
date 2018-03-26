@@ -16,6 +16,8 @@ public class TextureMask {
 		this.surfaceMap = surfaceMap;
 		surfaceIdxs.Add(surfaceIdx);
 	}
+
+	public UvSet UvSet => uvSet;
 	
 	public List<int> GetMaskTriangleIndices() {
 		List<int> triangleIndices = new List<int>();

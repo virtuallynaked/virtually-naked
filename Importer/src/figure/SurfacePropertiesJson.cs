@@ -24,6 +24,10 @@ public class SurfacePropertiesJson {
 		[JsonProperty(PropertyName = "precompute-scattering", DefaultValueHandling = DefaultValueHandling.Populate)]
 		[DefaultValue(false)]
 		public bool precomputeScattering;
+
+		[JsonProperty(PropertyName = "share-textures")]
+		[DefaultValue(null)]
+		public string shareTextures;
 	}
 
 	public static SurfaceProperties Load(Figure figure) {
@@ -55,6 +59,8 @@ public class SurfacePropertiesJson {
 
 		bool precomputeScattering = proxy.precomputeScattering;
 
-		return new SurfaceProperties(subdivisionLevel, renderOrder, opacities, precomputeScattering);
+		string shareTextures = proxy.shareTextures;
+
+		return new SurfaceProperties(subdivisionLevel, renderOrder, opacities, precomputeScattering, shareTextures);
 	}
 }
