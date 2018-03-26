@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class FigureFacade : IDisposable {
-	public static FigureFacade Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager, string figureName, FigureFacade parent) {
+	public static FigureFacade Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, string figureName, FigureFacade parent) {
 		FigureDefinition definition = FigureDefinition.Load(dataDir, figureName, parent?.definition);
 
 		InitialSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
