@@ -39,8 +39,8 @@ public static class InitialSettings {
 		//"red-lilies-dress",
 		//"red-lilies-robe",
 		//"red-lilies-shorts"
-		//"breakfast-in-bed-tank",
-		//"breakfast-in-bed-shorts"
+		"breakfast-in-bed-tank",
+		"breakfast-in-bed-shorts"
 		//"trend-setter-shirt",
 		//"trend-setter-pants",
 		//"urban-edgy-top",
