@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 
 public class Shape {
+	public const string DefaultLabel = "Default";
+
 	public static List<Shape> LoadAllForFigure(IArchiveDirectory figureDir, ChannelSystem channelSystem) {
 		List<Shape> shapes = new List<Shape>();
 		
@@ -32,7 +34,7 @@ public class Shape {
 	}
 
 	public static Shape MakeDefault(ChannelSystem channelSystem) {
-		return new Shape("Default", null, channelSystem.MakeDefaultChannelInputs());
+		return new Shape(DefaultLabel, null, channelSystem.MakeDefaultChannelInputs());
 	}
 
 	public string Label { get; }

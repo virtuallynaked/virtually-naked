@@ -1,4 +1,4 @@
-﻿using SharpDX.Direct3D11;
+using SharpDX.Direct3D11;
 
 public class FigureLoader {
 	private readonly IArchiveDirectory dataDir;
@@ -14,13 +14,26 @@ public class FigureLoader {
 	}
 
 	public FigureFacade Load(string figureName, FigureDefinition parentDefinition) {
-		FigureDefinition definition = FigureDefinition.Load(dataDir, figureName, parentDefinition);
-
 		InitialSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
 		InitialSettings.MaterialSets.TryGetValue(figureName, out string initialMaterialSetName);
+
+		var recipe = new FigureFacade.Recipe {
+			name = figureName,
+			isVisible = true,
+			shape = initialShapeName,
+			materialSet = initialMaterialSetName
+		};
+
+		return Load(recipe, parentDefinition);
+	}
+
+	public FigureFacade Load(FigureFacade.Recipe recipe, FigureDefinition parentDefinition) {
+		FigureDefinition definition = FigureDefinition.Load(dataDir, recipe.name, parentDefinition);
+
 		var model = new FigureModel(definition) {
-			ShapeName = initialShapeName,
-			MaterialSetName = initialMaterialSetName
+			IsVisible = recipe.isVisible,
+			ShapeName = recipe.shape,
+			MaterialSetName = recipe.materialSet
 		};
 		
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition, model);

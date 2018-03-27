@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 public class FigureFacade : IDisposable {
@@ -94,13 +95,20 @@ public class FigureFacade : IDisposable {
 		[JsonProperty("name")]
 		public string name;
 
-		[JsonProperty("shape")]
+		[JsonProperty("visible", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+		[DefaultValue(true)]
+		public bool isVisible;
+
+		[JsonProperty("shape", DefaultValueHandling = DefaultValueHandling.Ignore)]
+		[DefaultValue(Shape.DefaultLabel)]
 		public string shape;
 		
 		[JsonProperty("material-set")]
 		public string materialSet;
 
 		public void Merge(FigureFacade figure) {
+			figure.Model.IsVisible = isVisible;
+
 			if (shape != null) {
 				figure.Model.ShapeName = shape;
 			}
@@ -114,6 +122,7 @@ public class FigureFacade : IDisposable {
 	public Recipe Recipize() {
 		return new Recipe {
 			name = definition.Name,
+			isVisible = model.IsVisible,
 			shape = model.ShapeName,
 			materialSet = model.MaterialSetName
 		};

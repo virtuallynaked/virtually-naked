@@ -82,6 +82,13 @@ public class Actor : IDisposable {
 		SetClothingFigures(newClothingFigures);
 	}
 
+	private void SetClothing(FigureFacade.Recipe[] recipes) {
+		var newClothingFigures = recipes
+			.Select(recipe => figureLoader.Load(recipe, mainFigure.Definition))
+			.ToArray();
+		SetClothingFigures(newClothingFigures);
+	}
+
 	private void SetClothingFigures(FigureFacade[] newClothingFigures) {
 		foreach (var clothingFigure in clothingFigures) {
 			clothingFigure.Dispose();
@@ -116,6 +123,9 @@ public class Actor : IDisposable {
 
 		[JsonProperty("hair")]
 		public FigureFacade.Recipe hair;
+
+		[JsonProperty("clothing")]
+		public FigureFacade.Recipe[] clothing;
 		
 		[JsonProperty("animation")]
 		public string animation;
@@ -139,6 +149,7 @@ public class Actor : IDisposable {
 			if (channelValues != null) {
 				actor.model.UserValues = channelValues;
 			}
+			actor.SetClothing(clothing ?? new FigureFacade.Recipe[0]);
 			pose?.Merge(actor.Behavior);
 		}
 	}
@@ -147,6 +158,7 @@ public class Actor : IDisposable {
 		return new Recipe {
 			main = Main.Recipize(),
 			hair = Hair?.Recipize(),
+			clothing = Clothing.Select(figure => figure.Recipize()).ToArray(),
 			animation = model.Animation.ActiveName,
 			behaviour = model.Behavior.Recipize(),
 			channelValues = model.UserValues,
