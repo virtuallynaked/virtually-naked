@@ -89,6 +89,10 @@ public class ControlVertexProvider : IDisposable {
 	}
 	
 	public void Dispose() {
+		foreach (var child in children) {
+			child.OccluderChanged -= RegisterChildOccluders;
+		}
+
 		shaper.Dispose();
 		occluder.Dispose();
 		controlVertexInfosBufferManager.Dispose();
@@ -119,12 +123,12 @@ public class ControlVertexProvider : IDisposable {
 
 	public ShaderResourceView OcclusionInfos => occluder.OcclusionInfosView;
 	public ShaderResourceView ControlVertexInfosView => controlVertexInfosBufferManager.InView;
-	
-	private List<ControlVertexProvider> children;
+	private List<ControlVertexProvider> children = new List<ControlVertexProvider>();
 
 	public void RegisterChildren(List<ControlVertexProvider> children) {
-		if (this.children != null) {
-			throw new NotImplementedException("changing children is not implemented yet");
+		var oldChildren = this.children;
+		foreach (var oldChild in oldChildren) {
+			oldChild.OccluderChanged -= RegisterChildOccluders;
 		}
 
 		this.children = children;
@@ -132,7 +136,6 @@ public class ControlVertexProvider : IDisposable {
 		foreach (var child in children) {
 			child.OccluderChanged += RegisterChildOccluders;
 		}
-		
 		RegisterChildOccluders();
 	}
 

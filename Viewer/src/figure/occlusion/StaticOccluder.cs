@@ -28,7 +28,9 @@ public class StaticOccluder : IOccluder {
 	public ShaderResourceView OcclusionInfosView => occlusionInfosBufferManager.View;
 	
 	public void RegisterChildOccluders(List<IOccluder> childOccluders) {
-		throw new InvalidOperationException("static occluders cannot have children");
+		if (childOccluders.Count > 0) {
+			throw new InvalidOperationException("static occluders cannot have children");
+		}
 	}
 
 	public void SetValues(DeviceContext context, ChannelOutputs channelOutputs) {

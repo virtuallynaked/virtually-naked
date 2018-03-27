@@ -5,7 +5,7 @@ using System.Linq;
 
 class FigureGroup : IDisposable {
 	private readonly FigureFacade parentFigure;
-	private readonly FigureFacade[] childFigures;
+	private FigureFacade[] childFigures;
 
 	private readonly CoordinateNormalMatrixPairConstantBufferManager modelToWorldTransform;
 	private readonly InOutStructuredBufferManager<Vector3> parentDeltas;
@@ -25,13 +25,13 @@ class FigureGroup : IDisposable {
 		
 	public void Dispose() {
 		modelToWorldTransform.Dispose();
-
-		parentFigure.Dispose();
-		foreach (var figure in childFigures) {
-			figure.Dispose();
-		}
-
 		parentDeltas.Dispose();
+		//don't dispose figures because they are not owned by the figure group
+	}
+
+	public void SetChildFigures(FigureFacade[] childFigures) {
+		this.childFigures = childFigures;
+		parentFigure.RegisterChildren(childFigures.ToList());
 	}
 
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters, ImageBasedLightingEnvironment lightingEnvironment) {

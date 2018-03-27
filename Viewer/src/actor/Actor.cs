@@ -11,16 +11,15 @@ public class Actor : IDisposable {
 		var actorModel = ActorModel.Load(mainFigure.Definition, InitialSettings.Animation);
 
 		var hairFigure = InitialSettings.Hair != null ? figureLoader.Load(InitialSettings.Hair, mainFigure.Definition) : null;
-
-		var clothingFigures = InitialSettings.Clothing
-			.Select(figureName => figureLoader.Load(figureName, mainFigure.Definition))
-			.ToArray();
-		
+				
 		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Definition.Directory, actorModel);
 
-		return new Actor(device, actorModel, mainFigure, hairFigure, clothingFigures, behavior);
-	}
+		var actor = new Actor(device, actorModel, figureLoader, mainFigure, hairFigure, behavior);
+		actor.SetClothing(InitialSettings.Clothing);
 
+		return actor;
+	}
+	
 	class MainFigureAnimator : IFigureAnimator {
 		private readonly Actor actor;
 
@@ -34,33 +33,36 @@ public class Actor : IDisposable {
 	}
 	
 	private readonly ActorModel model;
-
+	private readonly FigureLoader figureLoader;
 	private readonly FigureFacade mainFigure;
 	private readonly FigureFacade hairFigure;
-	private readonly FigureFacade[] clothingFigures;
-
-	private readonly FigureGroup figureGroup;
-
 	private readonly ActorBehavior behavior;
+
+	private FigureFacade[] clothingFigures;
+	private readonly FigureGroup figureGroup;
 	
-	public Actor(Device device, ActorModel model, FigureFacade mainFigure, FigureFacade hairFigure, FigureFacade[] clothingFigures, ActorBehavior behavior) {
+	public Actor(Device device, ActorModel model, FigureLoader figureLoader, FigureFacade mainFigure, FigureFacade hairFigure, ActorBehavior behavior) {
 		this.model = model;
+		this.figureLoader = figureLoader;
 		this.mainFigure = mainFigure;
 		this.hairFigure = hairFigure;
-		this.clothingFigures = clothingFigures;
-
-		var childFigures = Enumerable.Repeat(hairFigure, hairFigure == null ? 0 : 1)
-			.Concat(clothingFigures)
-			.ToArray();
-		figureGroup = new FigureGroup(device, mainFigure, childFigures);
-
 		this.behavior = behavior;
 
+		clothingFigures = new FigureFacade[0];
+		
 		mainFigure.Animator = new MainFigureAnimator(this);
+
+		figureGroup = new FigureGroup(device, mainFigure, new FigureFacade[0]);
+		SyncFigureGroup();
 	}
 
 	public void Dispose() {
 		figureGroup.Dispose();
+		mainFigure.Dispose();
+		hairFigure?.Dispose();
+		foreach (var clothingFigure in clothingFigures) {
+			clothingFigure.Dispose();
+		}
 	}
 	
 	public ActorModel Model => model;
@@ -71,6 +73,28 @@ public class Actor : IDisposable {
 	
 	public IMenuLevel MenuLevel => ActorMenuProvider.MakeRootMenuLevel(this);
 	
+	private void SetClothing(List<string> clothingFigureNames) {
+		var newClothingFigures = clothingFigureNames
+			.Select(figureName => figureLoader.Load(figureName, mainFigure.Definition))
+			.ToArray();
+		SetClothingFigures(newClothingFigures);
+	}
+
+	private void SetClothingFigures(FigureFacade[] newClothingFigures) {
+		foreach (var clothingFigure in clothingFigures) {
+			clothingFigure.Dispose();
+		}
+		clothingFigures = newClothingFigures;
+		SyncFigureGroup();
+	}
+
+	private void SyncFigureGroup() {
+		var childFigures = Enumerable.Repeat(hairFigure, hairFigure == null ? 0 : 1)
+			.Concat(clothingFigures)
+			.ToArray();
+		figureGroup.SetChildFigures(childFigures);
+	}
+
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters, ImageBasedLightingEnvironment iblEnvironment) {
 		figureGroup.Update(context, updateParameters, iblEnvironment);
 	}
