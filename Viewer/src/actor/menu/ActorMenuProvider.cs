@@ -17,27 +17,7 @@ static class ActorMenuProvider {
 
 		return hairMenuLevel;
 	}
-
-	public static IMenuLevel MakeClothingMenuLevel(FigureFacade[] clothingFigures) {
-		var individualMaterialItems = clothingFigures
-			.SelectMany(figure => figure.Definition.MaterialSetOptions
-				.Select(materialSet => new MaterialSetMenuItem(figure.Model, materialSet)))
-			.ToList<IToggleMenuItem>();
-		var compositeMaterialItems = CompositeToggleMenuItem.CombineByLabel(individualMaterialItems);
-		var materialsMenuLevel = new StaticMenuLevel(compositeMaterialItems.ToArray());
-		
-		var items = new List<IMenuItem> { };
-		items.Add(new SubLevelMenuItem("Fabrics", materialsMenuLevel));
-
-		foreach (var figure in clothingFigures) {
-			items.Add(new VisibilityToggleMenuItem(figure.Definition.Name, figure.Model));
-		}
-
-		var clothingMenuLevel = new StaticMenuLevel(items.ToArray());
-
-		return clothingMenuLevel;
-	}
-
+	
 	public static IMenuLevel MakeRootMenuLevel(Actor actor) {
 		var model = actor.Model;
 		var channelMenuLevel = ChannelMenuLevel.MakeRootLevelForFigure(model);
@@ -57,7 +37,7 @@ static class ActorMenuProvider {
 		
 		var hairMenuLevel = MakeHairMenuLevel(actor.Hair);
 
-		var clothingMenuLevel = MakeClothingMenuLevel(actor.Clothing);
+		var clothingMenuLevel = ClothingMenuLevel.Make(actor);
 
 		List<IMenuItem> items = new List<IMenuItem> { };
 		items.Add(new SubLevelMenuItem("Characters", charactersMenuLevel));

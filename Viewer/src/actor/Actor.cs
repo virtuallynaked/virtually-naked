@@ -72,8 +72,10 @@ public class Actor : IDisposable {
 	public ActorBehavior Behavior => behavior;
 	
 	public IMenuLevel MenuLevel => ActorMenuProvider.MakeRootMenuLevel(this);
-	
-	private void SetClothing(List<string> clothingFigureNames) {
+
+	public event Action ClothingChanged;
+
+	public void SetClothing(List<string> clothingFigureNames) {
 		var newClothingFigures = clothingFigureNames
 			.Select(figureName => figureLoader.Load(figureName, mainFigure.Definition))
 			.ToArray();
@@ -86,6 +88,7 @@ public class Actor : IDisposable {
 		}
 		clothingFigures = newClothingFigures;
 		SyncFigureGroup();
+		ClothingChanged?.Invoke();
 	}
 
 	private void SyncFigureGroup() {
