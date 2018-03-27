@@ -5,47 +5,27 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class FigureFacade : IDisposable {
-	public static FigureFacade Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, string figureName, FigureFacade parent) {
-		FigureDefinition definition = FigureDefinition.Load(dataDir, figureName, parent?.definition);
-
-		InitialSettings.Shapes.TryGetValue(figureName, out string initialShapeName);
-		InitialSettings.MaterialSets.TryGetValue(figureName, out string initialMaterialSetName);
-		var model = new FigureModel(definition) {
-			ShapeName = initialShapeName,
-			MaterialSetName = initialMaterialSetName
-		};
-		
-		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition, model);
-
-		string materialSetName = model.MaterialSet.Label;
-		var renderer = FigureRenderer.Load(dataDir, definition.Directory, device, shaderCache, materialSetName);
-		
-		var facade = new FigureFacade(device, shaderCache, definition, model, controlVertexProvider, renderer);
-
-		model.MaterialSetChanged += (oldMaterialSet, newMaterialSet) => {
-			string newMaterialSetName = newMaterialSet.Label;
-			var newRenderer = FigureRenderer.Load(dataDir, definition.Directory, device, shaderCache, newMaterialSetName);
-			facade.SetRenderer(newRenderer);
-		};
-
-		return facade;
-	}
-	
 	private readonly FigureDefinition definition;
 	private readonly FigureModel model;
 	private readonly ControlVertexProvider controlVertexProvider;
+	private readonly FigureRendererLoader figureRendererLoader;
+
 	private FigureRenderer renderer;
 	
 	public IFigureAnimator Animator { get; set; } = null;
 
-	public FigureFacade(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRenderer renderer) {
+	public FigureFacade(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRendererLoader figureRendererLoader) {
 		this.definition = definition;
 		this.model = model;
 		this.controlVertexProvider = controlVertexProvider;
-		this.renderer = renderer;
+		this.figureRendererLoader = figureRendererLoader;
+
+		model.MaterialSetChanged += Model_MaterialSetChanged;
+		SyncMaterialSet();
 	}
 	
 	public void Dispose() {
+		model.MaterialSetChanged -= Model_MaterialSetChanged;
 		controlVertexProvider.Dispose();
 		renderer.Dispose();
 	}
@@ -54,11 +34,17 @@ public class FigureFacade : IDisposable {
 	public FigureModel Model => model;
 	public int VertexCount => controlVertexProvider.VertexCount;
 	
-	private void SetRenderer(FigureRenderer newRenderer) {
-		renderer.Dispose();
-		renderer = newRenderer;
+	private void Model_MaterialSetChanged(MaterialSetOption oldMaterialSet, MaterialSetOption newMaterialSet) {
+		SyncMaterialSet();
 	}
 
+	private void SyncMaterialSet() {
+		string materialSetName = model.MaterialSet.Label;
+		var newRenderer = figureRendererLoader.Load(definition.Directory, materialSetName);
+		renderer?.Dispose();
+		renderer = newRenderer;
+	}
+	
 	public void ReadbackPosedControlVertices(DeviceContext context) {
 		controlVertexProvider.ReadbackPosedControlVertices(context);
 	}

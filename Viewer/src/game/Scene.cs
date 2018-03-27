@@ -22,7 +22,10 @@ class Scene : IDisposable {
 		floor = new PlayspaceFloor(device, shaderCache);
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, trackedDeviceBufferManager);
 		primitiveRenderer = new MeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100).AsTriMesh());
-		actor = Actor.Load(dataDir, device, shaderCache, controllerManager);
+
+		var figureRendererLoader = new FigureRendererLoader(dataDir, device, shaderCache);
+		var figureLoader = new FigureLoader(dataDir, device, shaderCache, figureRendererLoader);
+		actor = Actor.Load(dataDir, device, shaderCache, controllerManager, figureLoader);
 		
 		var iblMenu = LightingEnvironmentMenu.MakeMenuLevel(dataDir, iblEnvironment);
 		var toneMappingMenuLevel = new ToneMappingMenuLevel(toneMappingSettings);

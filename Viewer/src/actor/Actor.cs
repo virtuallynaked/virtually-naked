@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class Actor : IDisposable {
-	public static Actor Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager) {
-		var mainFigure = FigureFacade.Load(dataDir, device, shaderCache, InitialSettings.Main, null);
+	public static Actor Load(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ControllerManager controllerManager, FigureLoader figureLoader) {
+		var mainFigure = figureLoader.Load(InitialSettings.Main, null);
 
 		var actorModel = ActorModel.Load(mainFigure.Definition, InitialSettings.Animation);
 
-		var hairFigure = InitialSettings.Hair != null ? FigureFacade.Load(dataDir, device, shaderCache, InitialSettings.Hair, mainFigure) : null;
+		var hairFigure = InitialSettings.Hair != null ? figureLoader.Load(InitialSettings.Hair, mainFigure.Definition) : null;
 
 		var clothingFigures = InitialSettings.Clothing
-			.Select(figureName => FigureFacade.Load(dataDir, device, shaderCache, figureName, mainFigure))
+			.Select(figureName => figureLoader.Load(figureName, mainFigure.Definition))
 			.ToArray();
 		
 		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Definition.Directory, actorModel);
