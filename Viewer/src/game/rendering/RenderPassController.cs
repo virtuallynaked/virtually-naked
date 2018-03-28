@@ -10,7 +10,8 @@ public class RenderPassController : IDisposable {
 	private OitBlendTarget oitBlendTarget;
 	private readonly PostProcessor postProcessor;
 	
-	private readonly States opaquePassStates;
+	private readonly States oneSidedOpaquePassStates;
+	private readonly States twoSidedOpaquePassStates;
 	private readonly States backToFrontTransparencyPassStates;
 	private readonly States unorderedTransparencyPassStates;
 
@@ -27,7 +28,9 @@ public class RenderPassController : IDisposable {
 		StateDescriptions opaquePassStateDesc = StateDescriptions.Common.Clone();
 		opaquePassStateDesc.rasterizer.IsMultisampleEnabled = true;
 		opaquePassStateDesc.rasterizer.CullMode = CullMode.Back;
-		this.opaquePassStates = new States(device, opaquePassStateDesc);
+		this.oneSidedOpaquePassStates = new States(device, opaquePassStateDesc);
+		opaquePassStateDesc.rasterizer.CullMode = CullMode.None;
+		this.twoSidedOpaquePassStates = new States(device, opaquePassStateDesc);
 
 		StateDescriptions backToFrontTransparencyPassStateDesc = StateDescriptions.Common.Clone();
 		backToFrontTransparencyPassStateDesc.rasterizer.IsMultisampleEnabled = true;
@@ -61,7 +64,8 @@ public class RenderPassController : IDisposable {
 		oitBlendTarget.Dispose();
 		postProcessor.Dispose();
 
-		opaquePassStates.Dispose();
+		oneSidedOpaquePassStates.Dispose();
+		twoSidedOpaquePassStates.Dispose();
 		backToFrontTransparencyPassStates.Dispose();
 		unorderedTransparencyPassStates.Dispose();
 	}
@@ -87,8 +91,10 @@ public class RenderPassController : IDisposable {
 		standardTarget.SetAsTarget(context);
 		
 		//Opaque Pass
-		opaquePassStates.Apply(context);
-		render(new RenderingPass(RenderingLayer.Opaque, OutputMode.Standard));
+		oneSidedOpaquePassStates.Apply(context);
+		render(new RenderingPass(RenderingLayer.OneSidedOpaque, OutputMode.Standard));
+		twoSidedOpaquePassStates.Apply(context);
+		render(new RenderingPass(RenderingLayer.TwoSidedOpaque, OutputMode.Standard));
 
 		//Back-to-Front-Transparency Pass
 		backToFrontTransparencyPassStates.Apply(context);

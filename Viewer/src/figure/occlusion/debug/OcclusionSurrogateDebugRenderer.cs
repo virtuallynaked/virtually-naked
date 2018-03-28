@@ -48,7 +48,7 @@ public class OcclusionSurrogateDebugRenderer : IDisposable {
 	}
 
 	public void RenderPass(DeviceContext context, RenderingPass pass, ShaderResourceView occlusionInfosView) {
-		if (pass.Layer == RenderingLayer.Opaque) {
+		if (pass.Layer == RenderingLayer.TwoSidedOpaque) {
 			Render(context, occlusionInfosView);
 		}
 	}

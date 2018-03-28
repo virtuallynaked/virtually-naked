@@ -66,7 +66,7 @@ class Scene : IDisposable {
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		iblEnvironment.Apply(context.PixelShader);
 
-		if (pass.Layer == RenderingLayer.Opaque) {
+		if (pass.Layer == RenderingLayer.OneSidedOpaque) {
 			//backdrop.Render(context);
 			floor.Render(context);
 			renderModelRenderer.Render(context);

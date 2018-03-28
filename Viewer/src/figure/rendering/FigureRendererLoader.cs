@@ -57,8 +57,11 @@ public class FigureRendererLoader {
 			}
 		}
 		
+		var isOneSided = figureDir.Name == "genesis-3-female"; //hack
+		RenderingLayer opaqueLayer = isOneSided ? RenderingLayer.OneSidedOpaque : RenderingLayer.TwoSidedOpaque;
+
 		int[][] surfaceRenderOrderByLayer = new int[RenderingPass.Layers.Length][];
-		surfaceRenderOrderByLayer[(int) RenderingLayer.Opaque] = opaqueSurfaces.ToArray();
+		surfaceRenderOrderByLayer[(int) opaqueLayer] = opaqueSurfaces.ToArray();
 		surfaceRenderOrderByLayer[(int) RenderingLayer.BackToFrontTransparent] = orderedTransparentSurfaces.ToArray();
 		surfaceRenderOrderByLayer[(int) RenderingLayer.UnorderedTransparent] = unorderedTransparentSurfaces.ToArray();
 		

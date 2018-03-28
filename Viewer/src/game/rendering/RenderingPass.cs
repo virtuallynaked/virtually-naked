@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 
 public enum RenderingLayer {
-	Opaque, BackToFrontTransparent, UnorderedTransparent, UiElements
+	OneSidedOpaque, TwoSidedOpaque, BackToFrontTransparent, UnorderedTransparent, UiElements
 }
 
 public enum OutputMode {
