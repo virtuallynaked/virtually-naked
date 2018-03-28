@@ -20,7 +20,7 @@ public class ImporterMain : IDisposable {
 	public static void Main(string[] args) {
 		using (var app = Make(args)) {
 			Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-			app.Run();
+			app.Run(args);
 			Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
 		}
 	}
@@ -37,8 +37,13 @@ public class ImporterMain : IDisposable {
 		shaderCache.Dispose();
 	}
 			
-	private void Run() {
-		var settings = ImportSettings.MakeFromViewerInitialSettings();
+	private void Run(string[] args) {
+		ImportSettings settings;
+		if (args.Length > 0 && args[0] == "release") {
+			settings = ImportSettings.MakeReleaseSettings();
+		} else {
+			settings = ImportSettings.MakeFromViewerInitialSettings();
+		}
 
 		new UiImporter().Run();
 		new EnvironmentCubeGenerator().Run(settings);

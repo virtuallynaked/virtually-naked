@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Importer-ViewerInitialSettings": {
+      "commandName": "Project"
+    },
+    "Import-ReleaseSettings": {
+      "commandName": "Project",
+      "commandLineArgs": "release"
+    }
+  }
+}
