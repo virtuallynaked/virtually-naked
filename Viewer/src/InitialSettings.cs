@@ -56,7 +56,9 @@ public static class InitialSettings {
 		//"bandeau-bikini-bottoms",
 		//"relaxed-sunday-tank",
 		//"relaxed-sunday-shorts",
-		//"relaxed-sunday-shoes"
+		//"relaxed-sunday-shoes",
+		//"summer-dress-dress",
+		//"summer-dress-shoes"
 	};
 
 	public static readonly Dictionary<string, string> Shapes = new Dictionary<string, string> {
@@ -109,6 +111,8 @@ public static class InitialSettings {
 		["bandeau-bikini-bottoms"] = "Teal",
 		["relaxed-sunday-tank"] = "Paisley",
 		["relaxed-sunday-shorts"] = "Paisley",
-		["relaxed-sunday-shoes"] = "Paisley"
+		["relaxed-sunday-shoes"] = "Paisley",
+		["summer-dress-dress"] = "Cream",
+		["summer-dress-shoes"] = "Cream"
 	};
 }

@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Summer Dress/Summer Dress Set Dress.duf" ]
+	},
+	{
+		"name": "Black",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Summer Dress/Iray/SDS Black Dress.duf" ]
+	},
+	{
+		"name": "Blue",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Summer Dress/Iray/SDS Blue Dress.duf" ]
+	},
+	{
+		"name": "Cream",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Summer Dress/Iray/SDS Cream Dress.duf" ]
+	},
+	{
+		"name": "Red",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Summer Dress/Iray/SDS Red Dress.duf" ]
+	},
+	{
+		"name": "Yellow",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Summer Dress/Iray/SDS Yellow Dress.duf" ]
+	}
+]

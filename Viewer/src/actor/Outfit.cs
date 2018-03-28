@@ -13,6 +13,9 @@ public class Outfit {
 			"relaxed-sunday-tank",
 			"relaxed-sunday-shorts",
 			"relaxed-sunday-shoes" }),
+		new Outfit("Summer Dress Set", new List<string> {
+			"summer-dress-dress",
+			"summer-dress-shoes" }),
 	};
 
 	public bool IsMatch(FigureFacade[] figures) {
