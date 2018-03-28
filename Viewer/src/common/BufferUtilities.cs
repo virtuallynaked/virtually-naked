@@ -5,6 +5,14 @@ using Device = SharpDX.Direct3D11.Device;
 
 public class BufferUtilities {
 	public static ShaderResourceView ToStructuredBufferView<T>(Device device, T[] array) where T : struct {
+		if (array == null) {
+			return null;
+		}
+
+		if (array.Length == 0) {
+			return null; //buffers cannot have size zero
+		}
+
 		using (Buffer buffer = Buffer.Create(device, BindFlags.ShaderResource, array, usage: ResourceUsage.Immutable, optionFlags: ResourceOptionFlags.BufferStructured, structureByteStride: Marshal.SizeOf<T>())) {
 			return new ShaderResourceView(device, buffer);
 		}

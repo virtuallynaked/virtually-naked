@@ -66,7 +66,7 @@ public class GpuShaper : IDisposable {
 	public void Dispose() {
 		initialPositionsView.Dispose();
 		deltaSegmentsView.Dispose();
-		deltaElemsView.Dispose();
+		deltaElemsView?.Dispose();
 		morphWeightsBufferManager.Dispose();
 		baseDeltaWeightSegmentsView?.Dispose();
 		baseDeltaWeightElemsView?.Dispose();
