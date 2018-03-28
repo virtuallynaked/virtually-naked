@@ -103,7 +103,7 @@ class DsonMaterialAggregator {
 				continue;
 			}
 
-			string materialName = url.Substring(0, materialNameSeparatorIdx);
+			string materialName = Uri.UnescapeDataString(url.Substring(0, materialNameSeparatorIdx));
 			url = url.Substring(materialNameSeparatorIdx + materialNameSeparator.Length);
 			
 			var bag = MakeBag(materialName);
