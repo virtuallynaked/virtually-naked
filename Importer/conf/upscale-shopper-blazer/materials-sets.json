@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Upscale Shopper Blazer.duf" ]
+	},
+	{
+		"name": "Black",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blazer Black.duf" ]
+	},
+	{
+		"name": "Blue",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blazer Blue.duf" ]
+	},
+	{
+		"name": "Grey Stripes",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blazer Grey Stripes.duf" ]
+	},
+	{
+		"name": "Grey",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blazer Grey.duf" ]
+	},
+	{
+		"name": "Light",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blazer Light.duf" ]
+	}
+]

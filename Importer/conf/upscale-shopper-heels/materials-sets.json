@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Upscale Shopper Heels.duf" ]
+	},
+	{
+		"name": "Black",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Heels Black.duf" ]
+	},
+	{
+		"name": "Brown",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Heels Brown.duf" ]
+	},
+	{
+		"name": "Grey",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Heels Grey.duf" ]
+	},
+	{
+		"name": "Light",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Heels Light.duf" ]
+	},
+	{
+		"name": "Mustard",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Heels Mustard.duf" ]
+	}
+]

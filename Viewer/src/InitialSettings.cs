@@ -40,7 +40,7 @@ public static class InitialSettings {
 		//"red-lilies-robe",
 		//"red-lilies-shorts"
 		"breakfast-in-bed-tank",
-		"breakfast-in-bed-shorts"
+		"breakfast-in-bed-shorts",
 		//"trend-setter-shirt",
 		//"trend-setter-pants",
 		//"urban-edgy-top",
@@ -58,7 +58,11 @@ public static class InitialSettings {
 		//"relaxed-sunday-shorts",
 		//"relaxed-sunday-shoes",
 		//"summer-dress-dress",
-		//"summer-dress-shoes"
+		//"summer-dress-shoes",
+		//"upscale-shopper-blazer",
+		//"upscale-shopper-blouse",
+		//"upscale-shopper-pants",
+		//"upscale-shopper-heels"
 	};
 
 	public static readonly Dictionary<string, string> Shapes = new Dictionary<string, string> {
@@ -113,6 +117,10 @@ public static class InitialSettings {
 		["relaxed-sunday-shorts"] = "Paisley",
 		["relaxed-sunday-shoes"] = "Paisley",
 		["summer-dress-dress"] = "Cream",
-		["summer-dress-shoes"] = "Cream"
+		["summer-dress-shoes"] = "Cream",
+		["upscale-shopper-blazer"] = "Black",
+		["upscale-shopper-blouse"] = "White Skull",
+		["upscale-shopper-pants"] = "Black",
+		["upscale-shopper-heels"] = "Black",
 	};
 }

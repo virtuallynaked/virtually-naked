@@ -40,7 +40,12 @@ public class ImportSettings {
 				["relaxed-sunday-shoes"] = FigureImportSettings.All,
 
 				["summer-dress-dress"] = FigureImportSettings.All,
-				["summer-dress-shoes"] = FigureImportSettings.All
+				["summer-dress-shoes"] = FigureImportSettings.All,
+
+				["upscale-shopper-blazer"] = FigureImportSettings.All,
+				["upscale-shopper-blouse"] = FigureImportSettings.All,
+				["upscale-shopper-pants"] = FigureImportSettings.All,
+				["upscale-shopper-heels"] = FigureImportSettings.All,
 			}
 		};
 	}

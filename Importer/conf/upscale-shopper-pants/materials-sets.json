@@ -1,0 +1,30 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Upscale Shopper Pants.duf" ]
+	},
+	{
+		"name": "Black",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Black.duf" ]
+	},
+	{
+		"name": "Denim Broken",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Denim Broken.duf" ]
+	},
+	{
+		"name": "Denim",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Denim.duf" ]
+	},
+	{
+		"name": "Mustard",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Mustard.duf" ]
+	},
+	{
+		"name": "Red",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Red.duf" ]
+	},
+	{
+		"name": "White",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants White.duf" ]
+	}
+]

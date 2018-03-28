@@ -16,6 +16,11 @@ public class Outfit {
 		new Outfit("Summer Dress Set", new List<string> {
 			"summer-dress-dress",
 			"summer-dress-shoes" }),
+		new Outfit("Upscale Shopper", new List<string> {
+			"upscale-shopper-blazer",
+			"upscale-shopper-blouse",
+			"upscale-shopper-pants",
+			"upscale-shopper-heels" }),
 	};
 
 	public bool IsMatch(FigureFacade[] figures) {
