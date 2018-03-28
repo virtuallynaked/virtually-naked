@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Sweet Home Ankle Socks.duf" ]
+	},
+	{
+		"name": "Chantly",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Chantly Ankle Socks Iray.duf" ]
+	},
+	{
+		"name": "Fabe",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Fabe Ankle Socks Iray.duf" ]
+	},
+	{
+		"name": "Glimm",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Glimm Ankle Socks Iray.duf" ]
+	},
+	{
+		"name": "Sparkle",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Sparkle Ankle Socks Iray.duf" ]
+	},
+	{
+		"name": "Sprye",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Sprye Ankle Socks Iray.duf" ]
+	}
+]

@@ -46,6 +46,13 @@ public class ImportSettings {
 				["upscale-shopper-blouse"] = FigureImportSettings.All,
 				["upscale-shopper-pants"] = FigureImportSettings.All,
 				["upscale-shopper-heels"] = FigureImportSettings.All,
+
+				["sweet-home-tshirt"] = FigureImportSettings.All,
+				["sweet-home-panties"] = FigureImportSettings.All,
+				["sweet-home-shorts"] = FigureImportSettings.All,
+				["sweet-home-thigh-socks"] = FigureImportSettings.All,
+				["sweet-home-shin-socks"] = FigureImportSettings.All,
+				["sweet-home-ankle-socks"] = FigureImportSettings.All,
 			}
 		};
 	}

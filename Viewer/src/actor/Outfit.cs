@@ -21,6 +21,13 @@ public class Outfit {
 			"upscale-shopper-blouse",
 			"upscale-shopper-pants",
 			"upscale-shopper-heels" }),
+		new Outfit("Sweet Home", new List<string> {
+			"sweet-home-tshirt",
+			"sweet-home-panties",
+			"sweet-home-shorts",
+			"sweet-home-thigh-socks",
+			"sweet-home-shin-socks",
+			"sweet-home-ankle-socks" }),
 	};
 
 	public bool IsMatch(FigureFacade[] figures) {

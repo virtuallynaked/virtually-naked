@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Base",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Sweet Home TShirt.duf" ]
+	},
+	{
+		"name": "Chantly",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Chantly Shirt Iray.duf" ]
+	},
+	{
+		"name": "Fabe",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Fabe Shirt Iray.duf" ]
+	},
+	{
+		"name": "Glimm",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Glimm Shirt Iray.duf" ]
+	},
+	{
+		"name": "Sparkle",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Sparkle Shirt Iray.duf" ]
+	},
+	{
+		"name": "Sprye",
+		"paths": [ "/People/Genesis 3 Female/Clothing/Sweet Home/Materials/Iray/Sprye Shirt Iray.duf" ]
+	}
+]

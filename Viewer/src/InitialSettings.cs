@@ -63,6 +63,12 @@ public static class InitialSettings {
 		//"upscale-shopper-blouse",
 		//"upscale-shopper-pants",
 		//"upscale-shopper-heels"
+		//"sweet-home-tshirt",
+		//"sweet-home-panties",
+		//"sweet-home-shorts",
+		//"sweet-home-thigh-socks",
+		//"sweet-home-shin-socks",
+		//"sweet-home-ankle-socks"
 	};
 
 	public static readonly Dictionary<string, string> Shapes = new Dictionary<string, string> {
@@ -122,5 +128,11 @@ public static class InitialSettings {
 		["upscale-shopper-blouse"] = "White Skull",
 		["upscale-shopper-pants"] = "Black",
 		["upscale-shopper-heels"] = "Black",
+		["sweet-home-tshirt"] = "Chantly",
+		["sweet-home-panties"] = "Chantly",
+		["sweet-home-shorts"] = "Chantly",
+		["sweet-home-thigh-socks"] = "Chantly",
+		["sweet-home-shin-socks"] = "Chantly",
+		["sweet-home-ankle-socks"] = "Chantly",
 	};
 }
