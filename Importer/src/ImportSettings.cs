@@ -88,7 +88,12 @@ public class ImportSettings {
 
 	public bool ShouldImportShape(string figureName, string shapeName) {
 		var figureSettings = Figures[figureName];
-		return (figureSettings.Shapes == null && shapeName != "Base") || figureSettings.Shapes.Contains(shapeName);
+		var shapes = figureSettings.Shapes;
+		if (shapes == null) {
+			return shapeName != "Base";
+		} else {
+			return figureSettings.Shapes.Contains(shapeName);
+		}
 	}
 
 	public bool ShouldImportMaterialSet(string figureName, string materialSetName) {

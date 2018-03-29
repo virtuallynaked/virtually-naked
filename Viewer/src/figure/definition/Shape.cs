@@ -13,15 +13,14 @@ public class Shape {
 				shapes.Add(shape);
 			}
 		} else {
-			var defaultShape = Shape.MakeDefault(channelSystem);
+			var defaultShape = Shape.LoadDefault(channelSystem, figureDir);
 			shapes.Add(defaultShape);
 		}
 		
 		return shapes;
 	}
 
-	public static Shape Load(ChannelSystem channelSystem, IArchiveDirectory shapeDirectory) {
-		var channelInputsFile = shapeDirectory.File("channel-inputs.dat");
+	private static ChannelInputs LoadChannelInputs(ChannelSystem channelSystem, IArchiveFile channelInputsFile) {
 		var shapeInputsByName = Persistance.Load<Dictionary<string, double>>(channelInputsFile);
 
 		ChannelInputs channelInputs = channelSystem.MakeDefaultChannelInputs();
@@ -30,11 +29,21 @@ public class Shape {
 			channel.SetValue(channelInputs, entry.Value);
 		}
 		
+		return channelInputs;
+	}
+
+	public static Shape Load(ChannelSystem channelSystem, IArchiveDirectory shapeDirectory) {
+		var channelInputsFile = shapeDirectory.File("channel-inputs.dat");
+		var channelInputs = LoadChannelInputs(channelSystem, channelInputsFile);
 		return new Shape(shapeDirectory.Name, shapeDirectory, channelInputs);
 	}
 
-	public static Shape MakeDefault(ChannelSystem channelSystem) {
-		return new Shape(DefaultLabel, null, channelSystem.MakeDefaultChannelInputs());
+	public static Shape LoadDefault(ChannelSystem channelSystem, IArchiveDirectory figureDirectory) {
+		var channelInputsFile = figureDirectory.File("channel-inputs.dat");
+		var channelInputs = channelInputsFile != null ?
+			LoadChannelInputs(channelSystem, channelInputsFile) :
+			channelSystem.MakeDefaultChannelInputs();
+		return new Shape(DefaultLabel, null, channelInputs);
 	}
 
 	public string Label { get; }

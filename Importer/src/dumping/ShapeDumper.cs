@@ -83,6 +83,10 @@ class ShapeDumper {
 		DirectoryInfo directory = figureDirectory.Subdirectory("occlusion");
 		var shapeInputs = figure.MakeDefaultChannelInputs();
 		DumpSimpleOcclusion(directory, shapeInputs);
+
+		if (baseConfiguration != null) {
+			DumpInputs(figureDirectory, MakeShapeInputs(null));
+		}
 	}
 
 	private void DumpInputs(DirectoryInfo shapeDirectory, ChannelInputs shapeInputs) {
