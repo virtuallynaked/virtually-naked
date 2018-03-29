@@ -1,3 +1,5 @@
+[0.7]
+
 [0.6]
 	Major: Improved responsiveness and naturalness of posing
 	Fixed: Window could get stuck in minimized state
