@@ -1,4 +1,6 @@
 [0.7]
+	Major: Added clothing
+		Still a work in progress with known bugs, rendering problems.
 
 [0.6]
 	Major: Improved responsiveness and naturalness of posing
