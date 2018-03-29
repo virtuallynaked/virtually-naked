@@ -11,20 +11,7 @@ public class FigureGroup {
 	
 	public Figure Parent => parent;
 	public Figure[] Children => children;
-
-	public ChannelInputsGroup MakeDefaultChannelInputs() {
-		var parentInputs = Parent.MakeDefaultChannelInputs();
-		return MakeDefaultChannelInputs(parentInputs);
-	}
-
-	public ChannelInputsGroup MakeDefaultChannelInputs(ChannelInputs parentInputs) {
-		var childInputs = children
-			.Select(figure => figure.MakeDefaultChannelInputs())
-			.ToArray();
-
-		return new ChannelInputsGroup(parentInputs, childInputs);
-	}
-
+	
 	public ChannelOutputsGroup Evaluate(ChannelInputsGroup inputsGroup) {
 		var parentOutputs = Parent.Evaluate(null, inputsGroup.ParentInputs);
 
