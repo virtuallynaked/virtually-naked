@@ -4,6 +4,7 @@
     <TargetFramework>net452</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
+    <Configurations>Debug;Release;LeakTracking</Configurations>
   </PropertyGroup>
   <Import Project="..\CommonAssemblyAttributes.targets" />
   <Import Project="..\RunSettings.targets" />

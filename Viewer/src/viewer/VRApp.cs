@@ -14,25 +14,6 @@ using Microsoft.Extensions.CommandLineUtils;
 public class VRApp : IDisposable {
 	private const bool debugDevice = false;
 
-	private static String GetStackTrace() {
-		return new StackTrace(4, false).ToString();
-	}
-
-	[Conditional("DEBUG")]
-	private static void SetupDebug() {
-		Configuration.EnableObjectTracking = true;
-		ObjectTracker.StackTraceProvider = GetStackTrace;
-
-		HashSet<ComObject> trackedObjects = new HashSet<ComObject>();
-
-		ObjectTracker.Tracked += (sender, eventArgs) => {
-			trackedObjects.Add(eventArgs.Object);
-		};
-		ObjectTracker.UnTracked += (sender, eventArgs) => {
-			trackedObjects.Remove(eventArgs.Object);
-		};
-	}
-
 	private static void ReportUnhandledException(object sender, UnhandledExceptionEventArgs e) {
 		using (var dialog = new ThreadExceptionDialog(e.ExceptionObject as Exception)) {
 			dialog.ShowDialog();
@@ -66,7 +47,7 @@ public class VRApp : IDisposable {
 			dataDir = archive.Root;
 		}
 		
-		SetupDebug();
+		LeakTracking.Setup();
 		
 		string title = Application.ProductName + " " + Application.ProductVersion;
 		
@@ -82,12 +63,8 @@ public class VRApp : IDisposable {
 			
 			MessageBox.Show(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
-		
-		if (ObjectTracker.FindActiveObjects().Count > 0) {
-			Debug.WriteLine(ObjectTracker.ReportActiveObjects());
-		} else {
-			Debug.WriteLine("Zero leaked objects.");
-		}
+
+		LeakTracking.Finish();
 	}
 		
 	private readonly CompanionWindow companionWindow;
