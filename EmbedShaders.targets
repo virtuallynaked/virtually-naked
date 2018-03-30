@@ -16,6 +16,7 @@
 			<EnableDebuggingInfo>True</EnableDebuggingInfo>
 			<AdditionalIncludeDirectories>src</AdditionalIncludeDirectories>
 		</ComputeShader>
+		<UpToDateCheckInput Include="src\**\*.hlsl" />
 	</ItemGroup>
 	
 	<Target Name="EmbedCompiledShaders" DependsOnTargets="FxCompile" AfterTargets="AfterResGen">
