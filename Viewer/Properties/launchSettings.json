@@ -2,7 +2,8 @@
   "profiles": {
     "Viewer": {
       "commandName": "Project",
-      "commandLineArgs": "--data=$(SolutionDir)work"
+      "commandLineArgs": "--data=$(SolutionDir)work",
+	  "nativeDebugging": true
     }
   }
 }
