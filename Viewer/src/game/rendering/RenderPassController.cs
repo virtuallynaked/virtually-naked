@@ -87,18 +87,29 @@ public class RenderPassController : IDisposable {
 	public void RenderAllPases(DeviceContext context, Action<RenderingPass> render) {
 		context.Rasterizer.SetViewport(viewport);
 
-		//Switch to standard target
+		//One-sided Opaque pass
 		standardTarget.SetAsTarget(context);
-		
-		//Opaque Pass
 		oneSidedOpaquePassStates.Apply(context);
 		render(new RenderingPass(RenderingLayer.OneSidedOpaque, OutputMode.Standard));
+
+		//One-sided Back-to-Front-Transparency Pass
+		backToFrontTransparencyPassStates.Apply(context);
+		render(new RenderingPass(RenderingLayer.OneSidedBackToFrontTransparent, OutputMode.Standard));
+
+		//One-sided False-Depth Pass
+		standardTarget.ClearDepth(context);
+		standardTarget.SetAsDepthOnlyTarget(context);
+		oneSidedOpaquePassStates.Apply(context);
+		render(new RenderingPass(RenderingLayer.OneSidedOpaque, OutputMode.FalseDepth));
+
+		//Two-sided Opaque Pass
+		standardTarget.SetAsTarget(context);
 		twoSidedOpaquePassStates.Apply(context);
 		render(new RenderingPass(RenderingLayer.TwoSidedOpaque, OutputMode.Standard));
 
-		//Back-to-Front-Transparency Pass
+		//Two-sided Back-to-Front-Transparency Pass
 		backToFrontTransparencyPassStates.Apply(context);
-		render(new RenderingPass(RenderingLayer.BackToFrontTransparent, OutputMode.Standard));
+		render(new RenderingPass(RenderingLayer.TwoSidedBackToFrontTransparent, OutputMode.Standard));
 
 		//Switch to oit-blend target
 		oitBlendTarget.CopyStandardDepthToBlendDepth(context, standardTarget.DepthResourceView);

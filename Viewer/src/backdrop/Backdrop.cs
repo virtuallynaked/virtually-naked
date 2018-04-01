@@ -35,7 +35,7 @@ class Backdrop {
 		inputLayout.Dispose();
 	}
 	
-	public void Render(DeviceContext context) {
+	public void Render(DeviceContext context, bool depthOnly) {
 		modelToWorldTransform.Update(context, transform);
 
 		context.InputAssembler.InputLayout = inputLayout;
@@ -44,7 +44,7 @@ class Backdrop {
 		context.VertexShader.Set(vertexShader);
 		context.VertexShader.SetConstantBuffer(1, modelToWorldTransform.Buffer);
 
-		context.PixelShader.Set(pixelShader);
+		context.PixelShader.Set(depthOnly ? null : pixelShader);
 
 		meshBuffers.Draw(context);
 	}

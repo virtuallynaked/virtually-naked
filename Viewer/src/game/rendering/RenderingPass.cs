@@ -2,12 +2,16 @@ using System;
 using System.Linq;
 
 public enum RenderingLayer {
-	OneSidedOpaque, TwoSidedOpaque, BackToFrontTransparent, UnorderedTransparent, UiElements
+	OneSidedOpaque, OneSidedBackToFrontTransparent,
+	TwoSidedOpaque, TwoSidedBackToFrontTransparent,
+	UnorderedTransparent,
+	UiElements
 }
 
 public enum OutputMode {
 	Standard,
-	WeightedBlendedOrderIndependent
+	WeightedBlendedOrderIndependent,
+	FalseDepth
 }
 
 public struct RenderingPass {

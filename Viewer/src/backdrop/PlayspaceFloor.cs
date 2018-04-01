@@ -53,10 +53,10 @@ class PlayspaceFloor {
 		playAreaRectBuffer.Update(context, value);
 	}
 
-	public void Render(DeviceContext context) {
+	public void Render(DeviceContext context, bool depthOnly) {
 		context.VertexShader.Set(vertexShader);
 		context.VertexShader.SetConstantBuffer(1, playAreaRectBuffer.Buffer);
-		context.PixelShader.Set(pixelShader);
+		context.PixelShader.Set(depthOnly ? null : pixelShader);
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 		context.Draw(4, 0);
 	}

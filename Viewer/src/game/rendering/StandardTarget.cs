@@ -98,6 +98,10 @@ public class StandardTarget : IDisposable {
 		context.OutputMerger.SetRenderTargets(DepthTargetView, RenderTargetView);
 	}
 
+	public void SetAsDepthOnlyTarget(DeviceContext context) {
+		context.OutputMerger.SetRenderTargets(DepthTargetView, (RenderTargetView) null);
+	}
+
 	public void SetResolveAsTarget(DeviceContext context) {
 		context.OutputMerger.SetTargets(ResolveTargetView);
 	}
@@ -109,6 +113,10 @@ public class StandardTarget : IDisposable {
 		prepareMask();
 	}
 	
+	public void ClearDepth(DeviceContext context) {
+		context.ClearDepthStencilView(DepthTargetView, DepthStencilClearFlags.Depth, RenderingConstants.DepthClearValue, 0);
+	}
+
 	public void Resolve(DeviceContext context) {
 		context.ResolveSubresource(RenderTexture, 0, ResolveTexture, 0, ColorFormat);
 	}

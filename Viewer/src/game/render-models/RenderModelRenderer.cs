@@ -42,7 +42,7 @@ class RenderModelRenderer : IDisposable {
 		}
 	}
 	
-	public void Render(DeviceContext context) {
+	public void Render(DeviceContext context, bool depthOnly) {
 		context.InputAssembler.InputLayout = inputLayout;
 		context.VertexShader.Set(vertexShader);
 		context.VertexShader.SetConstantBuffer(2, componentSpaceToObjectTransformBufferManager.Buffer);
@@ -63,22 +63,22 @@ class RenderModelRenderer : IDisposable {
 			uint componentCount = OpenVR.RenderModels.GetComponentCount(renderModelName);
 			
 			if (componentCount == 0) {
-				RenderSingleComponentModel(context, renderModelName);
+				RenderSingleComponentModel(context, depthOnly, renderModelName);
 			} else {
-				RenderMultiComponentModel(context, trackedDeviceIdx, renderModelName);
+				RenderMultiComponentModel(context, depthOnly, trackedDeviceIdx, renderModelName);
 			}
 		}
 	}
 
-	private void RenderSingleComponentModel(DeviceContext context, string renderModelName) {
+	private void RenderSingleComponentModel(DeviceContext context, bool depthOnly, string renderModelName) {
 		var model = cache.LookupModel(context, renderModelName);
 		if (model != null) {
 			componentSpaceToObjectTransformBufferManager.Update(context, Matrix.Identity);
-			model.Render(context);
+			model.Render(context, depthOnly);
 		}
 	}
 
-	private void RenderMultiComponentModel(DeviceContext context, uint trackedDeviceIdx, string renderModelName) {
+	private void RenderMultiComponentModel(DeviceContext context, bool depthOnly, uint trackedDeviceIdx, string renderModelName) {
 		var components = cache.LookupComponents(context, renderModelName);
 		if (components == null) {
 			return;
@@ -105,7 +105,7 @@ class RenderModelRenderer : IDisposable {
 			if (isVisible) {
 				Matrix componentToObjectMatrix = componentState.mTrackingToComponentRenderModel.Convert();
 				componentSpaceToObjectTransformBufferManager.Update(context, componentToObjectMatrix);
-				component.model.Render(context);
+				component.model.Render(context, depthOnly);
 			}
 		}
 	}

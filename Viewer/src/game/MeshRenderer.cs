@@ -35,7 +35,7 @@ class MeshRenderer {
 		material.Dispose();
 	}
 	
-	public void Render(DeviceContext context) {
+	public void Render(DeviceContext context, bool depthOnly) {
 		modelToWorldTransform.Update(context, transform);
 
 		context.InputAssembler.InputLayout = inputLayout;
@@ -44,8 +44,12 @@ class MeshRenderer {
 		context.VertexShader.Set(vertexShader);
 		context.VertexShader.SetConstantBuffer(1, modelToWorldTransform.Buffer);
 
-		material.Apply(context);
-
+		if (depthOnly) {
+			context.PixelShader.Set(null);
+		} else {
+			material.Apply(context);
+		}
+		
 		meshBuffers.Draw(context);
 	}
 }

@@ -67,10 +67,11 @@ class Scene : IDisposable {
 		iblEnvironment.Apply(context.PixelShader);
 
 		if (pass.Layer == RenderingLayer.OneSidedOpaque) {
-			//backdrop.Render(context);
-			floor.Render(context);
-			renderModelRenderer.Render(context);
-			//primitiveRenderer.Render(context);
+			bool depthOnly = pass.OutputMode == OutputMode.FalseDepth;
+			//backdrop.Render(context, depthOnly);
+			floor.Render(context, depthOnly);
+			renderModelRenderer.Render(context, depthOnly);
+			//primitiveRenderer.Render(context, depthOnly);
 		}
 		
 		actor.RenderPass(context, pass);

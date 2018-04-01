@@ -20,11 +20,15 @@ class RenderModel {
 		this.material = material;
 	}
 	
-	public void Render(DeviceContext context) {
+	public void Render(DeviceContext context, bool depthOnly) {
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 		context.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
 		context.InputAssembler.SetIndexBuffer(indexBuffer, SharpDX.DXGI.Format.R16_UInt, 0);
-		material.Apply(context);
+		if (depthOnly) {
+			context.PixelShader.Set(null);
+		} else {
+			material.Apply(context);
+		}
 		context.DrawIndexed(indexCount, 0, 0);
 	}
 }

@@ -9,6 +9,7 @@ public class FigureRenderer : IDisposable {
 	private readonly FigureSurface[] surfaces;
 	private readonly MaterialSet materialSet;
 	private readonly VertexShader vertexShader;
+	private readonly VertexShader falseDepthVertexShader;
 	private readonly InputLayout inputLayout;
 	private readonly int[][] surfaceRenderOrderByLayer;
 
@@ -22,6 +23,7 @@ public class FigureRenderer : IDisposable {
 		var vertexShaderAndBytecode = shaderCache.GetVertexShader<FigureRenderer>("figure/rendering/Figure");
 		this.vertexShader = vertexShaderAndBytecode;
 		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, vertexRefiner.RefinedVertexBufferInputElements);
+		falseDepthVertexShader = shaderCache.GetVertexShader<FigureRenderer>("figure/rendering/Figure-FalseDepth");
 	}
 		
 	public void Dispose() {
@@ -49,8 +51,9 @@ public class FigureRenderer : IDisposable {
         context.InputAssembler.SetVertexBuffers(0, vertexRefiner.RefinedVertexBufferBinding);
 		context.InputAssembler.InputLayout = inputLayout;
 
-		context.VertexShader.Set(vertexShader);
-		
+		var vertexShaderForMode = pass.OutputMode == OutputMode.FalseDepth ? falseDepthVertexShader : vertexShader;
+		context.VertexShader.Set(vertexShaderForMode);
+
 		foreach (int surfaceIdx in orderedSurfaceIdxs) {
 			var surface = surfaces[surfaceIdx];
 			var material = materialSet.Materials[surfaceIdx];
