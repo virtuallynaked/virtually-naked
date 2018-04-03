@@ -6,24 +6,26 @@ using System.Linq;
 
 public class AutomorpherRecipe {
 	public static AutomorpherRecipe Make(Geometry parentGeometry, Geometry childGeometry) {
-		var baseLimit0Stencils = parentGeometry.MakeStencils(StencilKind.LimitStencils, 0);
+		var parentLimit0Stencils = parentGeometry.MakeStencils(StencilKind.LimitStencils, 0);
+		var subdivider = new Subdivider(parentLimit0Stencils);
+		var parentLimit0VertexPositions = subdivider.Refine(parentGeometry.VertexPositions, new Vector3Operators());
 
 		List<List<WeightedIndex>> baseDeltaWeights = 
 			Enumerable.Range(0, childGeometry.VertexCount)
 			.AsParallel().AsOrdered()
 			.Select(childVertexIdx => {
 				Vector3 graftVertex = childGeometry.VertexPositions[childVertexIdx];
-				ClosestPoint.PointOnMesh closestPointOnBaseMesh = ClosestPoint.FindClosestPointOnMesh(parentGeometry.Faces, parentGeometry.VertexPositions, graftVertex);
+				ClosestPoint.PointOnMesh closestPointOnBaseMesh = ClosestPoint.FindClosestPointOnMesh(parentGeometry.Faces, parentLimit0VertexPositions, graftVertex);
 			
 				var merger = new WeightedIndexMerger();
-				merger.Merge(baseLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxA), closestPointOnBaseMesh.BarycentricWeights.X);
-				merger.Merge(baseLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxB), closestPointOnBaseMesh.BarycentricWeights.Y);
-				merger.Merge(baseLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxC), closestPointOnBaseMesh.BarycentricWeights.Z);
-
+				merger.Merge(parentLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxA), closestPointOnBaseMesh.BarycentricWeights.X);
+				merger.Merge(parentLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxB), closestPointOnBaseMesh.BarycentricWeights.Y);
+				merger.Merge(parentLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxC), closestPointOnBaseMesh.BarycentricWeights.Z);
+				
 				return merger.GetResult();
 			})
 			.ToList();
-		
+
 		var packedBaseDeltaWeights = PackedLists<WeightedIndex>.Pack(baseDeltaWeights);
 		return new AutomorpherRecipe(packedBaseDeltaWeights);
     }
