@@ -18,6 +18,7 @@ public class FigureRecipeLoader {
 		if (!figureRecipeFile.Exists) {
 			Console.WriteLine($"Reimporting {figureName}...");
 			FigureRecipe recipeToPersist = FigureImporter.ImportFor(
+				figureName,
 				objectLocator,
 				importProperties.Uris,
 				parentRecipe,

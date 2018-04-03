@@ -1,10 +1,11 @@
 using System.Linq;
 
 class FigureImporter {
-	public static FigureRecipe ImportFor(DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue) {
+	public static FigureRecipe ImportFor(string figureName, DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue) {
 		var geometryRecipe = GeometryImporter.ImportForFigure(locator, figureUris);
 
 		FigureRecipe recipe = new FigureRecipe {
+			Name = figureName,
 			Geometry = geometryRecipe,
 			Channels = ChannelImporter.ImportForFigure(locator, figureUris).ToList(),
 			Formulas = FormulaImporter.ImportForFigure(locator, figureUris).ToList(),
@@ -16,7 +17,7 @@ class FigureImporter {
 
 		Geometry geometry = recipe.Geometry.Bake();
 
-		var correctionSynthesizer = new HdCorrectionMorphSynthesizer(figureUris.RootNodeId, geometry);
+		var correctionSynthesizer = new HdCorrectionMorphSynthesizer(figureName, geometry);
 		recipe.Channels.Add(correctionSynthesizer.SynthesizeChannel(hdCorrectionInitialValue));
 		recipe.Morphs.Add(correctionSynthesizer.SynthesizeMorph());
 		

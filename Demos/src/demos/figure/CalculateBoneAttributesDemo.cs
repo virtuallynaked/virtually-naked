@@ -6,7 +6,7 @@ public class CalculateBoneAttributesDemo : IDemoApp {
 		var objectLocator = new DsonObjectLocator(fileLocator);
 		var loader = new FigureRecipeLoader(objectLocator);
 		var figureRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
-		var figure = figureRecipe.Bake("genesis-3-female", null);
+		var figure = figureRecipe.Bake(null);
 
 		var calculator = new BoneAttributesCalculator(figure.ChannelSystem, figure.BoneSystem, figure.Geometry, figure.SkinBinding);
 		BoneAttributes[] boneAttributes = calculator.CalculateBoneAttributes();

@@ -228,6 +228,7 @@ public class FigureRecipeMerger {
 		List<UvSetRecipe> mergedUvSets = MergeUvSets();
 
 		return new FigureRecipe {
+			Name = parent.Name,
 			Geometry = mergedGeometry,
 			Channels = mergedChannels,
 			Formulas = mergedFormulas,

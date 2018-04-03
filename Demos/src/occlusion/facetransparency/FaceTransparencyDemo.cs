@@ -22,12 +22,12 @@ public class FaceTransparencyDemo : IDemoApp {
 		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
 		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
-		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake("genesis-3-female", null);
+		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(null);
 
 		Figure parentFigure = genesis3FemaleWithGenitalia;
 
 		FigureRecipe livHairRecipe = loader.LoadFigureRecipe("liv-hair", null);
-		var livHairFigure = livHairRecipe.Bake("liv-hair", parentFigure);
+		var livHairFigure = livHairRecipe.Bake(parentFigure);
 
 		var faceTransparencyCalculator = new FromTextureFaceTransparencyCalculator(fileLocator, device, shaderCache, livHairFigure);
 		

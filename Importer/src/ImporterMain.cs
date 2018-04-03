@@ -53,13 +53,13 @@ public class ImporterMain : IDisposable {
 		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
 		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
-		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake("genesis-3-female", null);
+		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(null);
 
 		Figure parentFigure = genesis3FemaleWithGenitalia;
 		
 		List<Figure> childFigures = settings.FiguresToImport
 			.Where(figureName => figureName != parentFigure.Name)
-			.Select(figureName => loader.LoadFigureRecipe(figureName, genesis3FemaleRecipe).Bake(figureName, parentFigure))
+			.Select(figureName => loader.LoadFigureRecipe(figureName, genesis3FemaleRecipe).Bake(parentFigure))
 			.ToList();
 
 		List<Figure> figuresToDump = Enumerable.Repeat(parentFigure, 1)

@@ -6,6 +6,7 @@ using System.Linq;
 
 [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
 public class FigureRecipe {
+	public String Name { get; set; }
 	public GeometryRecipe Geometry { get; set; }
 	public List<ChannelRecipe> Channels { get; set; } = new List<ChannelRecipe>();
 	public List<FormulaRecipe> Formulas { get; set; } = new List<FormulaRecipe>();
@@ -15,7 +16,7 @@ public class FigureRecipe {
 	public SkinBindingRecipe SkinBinding { get; set; }
 	public List<UvSetRecipe> UvSets { get; set; } = new List<UvSetRecipe>();
 
-	public Figure Bake(string name, Figure parentFigure) {
+	public Figure Bake(Figure parentFigure) {
 		if (Channels == null) {
 			Channels = new List<ChannelRecipe>();
 		}
@@ -47,8 +48,8 @@ public class FigureRecipe {
 				
 		SkinBinding skinBinding = SkinBinding.Bake(boneSystem.BonesByName, selfBoneSystem.BonesByName);
 
-		OcclusionBinding occlusionBinding = OcclusionBinding.MakeForFigure(name, geometry, boneSystem, skinBinding);
+		OcclusionBinding occlusionBinding = OcclusionBinding.MakeForFigure(Name, geometry, boneSystem, skinBinding);
 		
-		return new Figure(name, parentFigure, this, geometry, channelSystem, boneSystem, morpher, automorpher, skinBinding, uvSets, defaultUvSet, occlusionBinding);
+		return new Figure(Name, parentFigure, this, geometry, channelSystem, boneSystem, morpher, automorpher, skinBinding, uvSets, defaultUvSet, occlusionBinding);
 	}
 }
