@@ -38,7 +38,7 @@ public class GeometryRecipe {
 		return SurfaceNames.Length;
 	}
 	
-	public static GeometryRecipe Merge(FigureRecipeMerger.Reindexer reindexer, GeometryRecipe parent, GeometryRecipe[] children) {
+	public static GeometryRecipe Merge(FigureRecipeMerger.Reindexer reindexer, GeometryRecipe parent, GeometryRecipe[] children, AutomorpherRecipe[] childAutomorphers) {
 		List<Quad> mergedFaces = new List<Quad>();
 		List<int> mergedFaceGroupMap = new List<int>();
 		List<int> mergedSurfaceMap = new List<int>();
@@ -60,6 +60,7 @@ public class GeometryRecipe {
 		
 		for (int childIdx = 0; childIdx < children.Length; ++childIdx) {
 			GeometryRecipe child = children[childIdx];
+			AutomorpherRecipe automorpher = childAutomorphers[childIdx];
 
 			Dictionary<int, int> graftVertexMap = new Dictionary<int, int>();
 			if (child.Graft != null) {
@@ -75,7 +76,13 @@ public class GeometryRecipe {
 			}
 			
 			mergedSurfaceNames.AddRange(child.SurfaceNames);
-			mergedVertexPositions.AddRange(child.VertexPositions);
+
+			/*
+			 * Children start "turned off" so instead of adding the child's base vertex positions here, I add the
+			 * nearest positions on the parent's surface. Later I'll add a morph that moves the child vertices
+			 * into place.
+			 */
+			mergedVertexPositions.AddRange(automorpher.ParentSurfacePositions);
 			
 			foreach (Quad face in child.Faces) {
 				mergedFaces.Add(face.Map(idx => {

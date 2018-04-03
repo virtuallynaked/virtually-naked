@@ -90,4 +90,22 @@ public class AutomorpherRecipe {
 			})
 			.ToList();
 	}
+
+	/**
+	 *  Generates a morph that moves each vertex from the surface of the parent to its base position. Intended to be used to "turn on" grafts.
+	 */
+	public MorphRecipe GenerateGraftControlMorph(string channel, int childVertexOffset, GeometryRecipe childGeometry) {
+		var childVertexPositions = childGeometry.VertexPositions;
+
+		MorphDelta[] deltas = new MorphDelta[childVertexPositions.Length];
+		for (int childVertexIdx = 0; childVertexIdx < childVertexPositions.Length; ++childVertexIdx) {
+			var positionDelta = childVertexPositions[childVertexIdx] - ParentSurfacePositions[childVertexIdx];
+			deltas[childVertexIdx] = new MorphDelta(childVertexIdx + childVertexOffset, positionDelta);
+		}
+
+		return new MorphRecipe {
+			Channel = channel,
+			Deltas = deltas
+		};
+	}
 }

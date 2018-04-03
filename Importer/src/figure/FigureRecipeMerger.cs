@@ -112,18 +112,31 @@ public class FigureRecipeMerger {
 	private readonly FigureRecipe parent;
 	private readonly FigureRecipe[] children;
 	private readonly Reindexer reindexer;
+	private readonly ChannelRecipe[] childControlChannels;
 
 	public FigureRecipeMerger(FigureRecipe parent, params FigureRecipe[] children) {
 		this.parent = parent;
 		this.children = children;
 		this.reindexer = Reindexer.Make(parent, children);
+
+		childControlChannels = children
+			.Select(child => new ChannelRecipe {
+				Name = $"CTRL{child.Name}?value",
+				InitialValue = 0,
+				Min = 0,
+				Max = 1,
+				Clamped = true,
+			}).ToArray();
 	}
 	
 	private GeometryRecipe MergeGeometry() {
+		var childGeometries = children.Select(child => child.Geometry).ToArray();
+		var childAutomorphers = children.Select(child => child.Automorpher).ToArray();
+
 		return GeometryRecipe.Merge(
 			reindexer,
 			parent.Geometry,
-			children.Select(child => child.Geometry).ToArray());
+			childGeometries, childAutomorphers);
 	}
 
 	private List<ChannelRecipe> MergeChannels() {
@@ -141,6 +154,8 @@ public class FigureRecipeMerger {
 				}
 			}
 		}
+
+		mergedChannels.AddRange(childControlChannels);
 		
 		return mergedChannels;
 	}
@@ -160,7 +175,7 @@ public class FigureRecipeMerger {
 		return parent.Bones;
 	}
 
-	private List<MorphRecipe> MergeMorphs() {
+	private List<MorphRecipe> MergeMorphs(List<FormulaRecipe> mergedFormulas) {
 		var parentMorphsByName = parent.Morphs.ToDictionary(morph => morph.Channel, morph => morph);
 		var childMorphsByName = children.Select(child => child.Morphs.ToDictionary(morph => morph.Channel, morph => morph)).ToList();
 
@@ -179,6 +194,37 @@ public class FigureRecipeMerger {
 			
 			var mergedMorph = MorphRecipe.Merge(morphName, reindexer, parentMorph, childMorphs, childAutomorphers);
 			mergedMorphs.Add(mergedMorph);
+		}
+		
+		for (int childIdx = 0; childIdx < children.Length; ++childIdx) {
+			var child = children[childIdx];
+			int childVertexOffset = reindexer.ChildOffsets[childIdx].Vertex;
+			string childControlChannel = childControlChannels[childIdx].Name;
+
+			//Add a morph that moves each child vertex from the parent surface to its active position
+			mergedMorphs.Add(child.Automorpher.GenerateGraftControlMorph(childControlChannel, childVertexOffset, child.Geometry));
+
+			//Add a formula that disables each child morph when when the child control channel is 0 
+			foreach (var childMorph in child.Morphs) {
+				if (parentMorphsByName.ContainsKey(childMorph.Channel)) {
+					/*
+					 * Skip child morphs that are following a parent morph.
+					 * 
+					 * In principle, I should disable these to and replace them with automorpher-generated
+					 * morphs. But in practice, these morphs are already very similar to the automorphs so it's
+					 * OK to leave them as is.
+					 */
+					continue;
+				}
+				
+				mergedFormulas.Add(new FormulaRecipe {
+					Output = childMorph.Channel,
+					Stage = FormulaRecipe.FormulaStage.Multiply,
+					Operations = new List<OperationRecipe> {
+						OperationRecipe.MakePushChannel(childControlChannel)
+					}
+				});
+			}
 		}
 
 		return mergedMorphs;
@@ -222,7 +268,7 @@ public class FigureRecipeMerger {
 		List<ChannelRecipe> mergedChannels = MergeChannels();
 		List<FormulaRecipe> mergedFormulas = MergeFormulas();
 		List<BoneRecipe> mergedBones = MergeBones();
-		List<MorphRecipe> mergedMorphs = MergeMorphs();
+		List<MorphRecipe> mergedMorphs = MergeMorphs(mergedFormulas);
 		AutomorpherRecipe mergedAutomorpher = MergeAutomorpher();
 		SkinBindingRecipe mergedSkinBinding = MergeSkinBinding();
 		List<UvSetRecipe> mergedUvSets = MergeUvSets();
