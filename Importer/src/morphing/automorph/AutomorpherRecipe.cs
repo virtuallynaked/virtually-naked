@@ -10,7 +10,7 @@ public class AutomorpherRecipe {
 		var subdivider = new Subdivider(parentLimit0Stencils);
 		var parentLimit0VertexPositions = subdivider.Refine(parentGeometry.VertexPositions, new Vector3Operators());
 
-		List<List<WeightedIndex>> baseDeltaWeights = 
+		List<(List<WeightedIndex>, Vector3)> resultPairs = 
 			Enumerable.Range(0, childGeometry.VertexCount)
 			.AsParallel().AsOrdered()
 			.Select(childVertexIdx => {
@@ -21,19 +21,25 @@ public class AutomorpherRecipe {
 				merger.Merge(parentLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxA), closestPointOnBaseMesh.BarycentricWeights.X);
 				merger.Merge(parentLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxB), closestPointOnBaseMesh.BarycentricWeights.Y);
 				merger.Merge(parentLimit0Stencils.GetElements(closestPointOnBaseMesh.VertexIdxC), closestPointOnBaseMesh.BarycentricWeights.Z);
-				
-				return merger.GetResult();
+
+				var cloestPointAsVector = closestPointOnBaseMesh.AsPosition(parentLimit0VertexPositions);
+
+				return (merger.GetResult(), cloestPointAsVector);
 			})
 			.ToList();
+		List<List<WeightedIndex>> baseDeltaWeights = resultPairs.Select(t => t.Item1).ToList();
+		Vector3[] parentSurfacePositions = resultPairs.Select(t => t.Item2).ToArray();
 
 		var packedBaseDeltaWeights = PackedLists<WeightedIndex>.Pack(baseDeltaWeights);
-		return new AutomorpherRecipe(packedBaseDeltaWeights);
+		return new AutomorpherRecipe(packedBaseDeltaWeights, parentSurfacePositions);
     }
 
 	public PackedLists<WeightedIndex> BaseDeltaWeights { get; }
+	public Vector3[] ParentSurfacePositions { get; }
 
-	public AutomorpherRecipe(PackedLists<WeightedIndex> baseDeltaWeights) {
+	public AutomorpherRecipe(PackedLists<WeightedIndex> baseDeltaWeights, Vector3[] parentSurfacePositions) {
 		BaseDeltaWeights = baseDeltaWeights;
+		ParentSurfacePositions = parentSurfacePositions;
 	}
 
 	public Automorpher Bake() {
