@@ -32,9 +32,11 @@ public class TextureMask {
 			triangleIndices.Add(face.Index1);
 			triangleIndices.Add(face.Index2);
 			
-			triangleIndices.Add(face.Index2);
-			triangleIndices.Add(face.Index3);
-			triangleIndices.Add(face.Index0);
+			if (!face.IsDegeneratedIntoTriangle) {
+				triangleIndices.Add(face.Index2);
+				triangleIndices.Add(face.Index3);
+				triangleIndices.Add(face.Index0);
+			}
 		}
 
 		return triangleIndices;

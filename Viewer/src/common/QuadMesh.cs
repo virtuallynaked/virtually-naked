@@ -71,7 +71,10 @@ public class QuadMesh {
 		List<Tri> triFaces = new List<Tri>(Faces.Count * 6);
 		foreach (Quad face in Faces) {
 			triFaces.Add(new Tri(face.Index0, face.Index1, face.Index2));
-			triFaces.Add(new Tri(face.Index2, face.Index3, face.Index0));
+
+			if (!face.IsDegeneratedIntoTriangle) {
+				triFaces.Add(new Tri(face.Index2, face.Index3, face.Index0));
+			}
 		}
 		
 		return new TriMesh(triFaces, VertexPositions, VertexNormals);

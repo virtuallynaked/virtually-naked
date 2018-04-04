@@ -32,6 +32,10 @@ public class BoneAttributesCalculator {
 		MassMoment[] massMoments = new MassMoment[boneSystem.Bones.Count];
 
 		foreach (var quad in geometry.Faces) {
+			if (quad.IsDegeneratedIntoTriangle) {
+				throw new NotImplementedException("BoneAttributesCalculator only supports Quad faces");
+			}
+			
 			for (int cornerIdx = 0; cornerIdx < Quad.SideCount; ++cornerIdx) {
 				int vertexIdx = quad.GetCorner(cornerIdx);
 				foreach (var boneWeight in skinBinding.BoneWeights.GetElements(vertexIdx)) {

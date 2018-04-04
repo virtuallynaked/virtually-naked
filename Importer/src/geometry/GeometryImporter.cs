@@ -22,16 +22,13 @@ public class GeometryImporter {
 
 		Quad[] faces = geometry.polylist.values
 			.Select(values => {
-				if (values.Length != Quad.SideCount + 2) {
-					if (values.Length == Quad.SideCount + 2 - 1) {
-						//remap triangle
-						Console.WriteLine("warning: found triangle in geometry");
-						return new Quad(values[2], values[3], values[4], values[4]);
-					}
-
-					throw new InvalidOperationException("expected only quads");
+				if (values.Length == Quad.SideCount + 2) {
+					return new Quad(values[2], values[3], values[4], values[5]);
+				} else if (values.Length == Quad.SideCount + 2 - 1) {
+					return Quad.MakeDegeneratedIntoTriangle(values[2], values[3], values[4]);
+				} else {
+					throw new InvalidOperationException("expected only quads and tris");
 				}
-				return new Quad(values[2], values[3], values[4], values[5]);
 			}).ToArray();
 
 		string[] faceGroupNames = geometry.polygon_groups.values;

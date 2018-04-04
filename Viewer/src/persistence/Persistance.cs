@@ -11,6 +11,7 @@ public static class Persistance {
 		typeModel.Add(typeof(Vector3), false).Add("X", "Y", "Z");
 		typeModel.Add(typeof(Vector2), false).Add("X", "Y");
 		typeModel.Add(typeof(Quaternion), false).Add("X", "Y", "Z", "W");
+		typeModel.Add(typeof(Quad), false).Add("Index0", "Index1", "Index2", "Index3");
 	}
 
 	public static void Write<T>(Stream stream, T t) {

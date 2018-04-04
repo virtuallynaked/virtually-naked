@@ -32,6 +32,12 @@ public class ScatteringFormFactorCalculator {
 	private ConnectedComponentLabels connectedComponentLabels;
 	
 	private ScatteringFormFactorCalculator(Vector3[] vertexPositions, Quad[] faces, int[] surfaceMap) {
+		foreach (var face in faces) {
+			if (face.IsDegeneratedIntoTriangle) {
+				throw new NotImplementedException("ScatteringFormFactorCalculator only supports Quad faces");
+			}
+		}
+
 		this.vertexPositions = vertexPositions;
 		this.faces = faces;
 		this.surfaceMap = surfaceMap;

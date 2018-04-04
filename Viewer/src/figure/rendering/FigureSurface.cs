@@ -6,19 +6,21 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 
 public class FigureSurface : IDisposable {
 	private static int[] Triangularize(List<Quad> faces) {
-		int[] faceTriIndices = new int[faces.Count * 6];
+		List<int> faceTriIndices = new List<int>(faces.Count * 6);
 		for (int i = 0; i < faces.Count; ++i) {
 			Quad face = faces[i];
 
-			faceTriIndices[i * 6 + 0] = face.Index0;
-			faceTriIndices[i * 6 + 1] = face.Index1;
-			faceTriIndices[i * 6 + 2] = face.Index2;
+			faceTriIndices.Add(face.Index0);
+			faceTriIndices.Add(face.Index1);
+			faceTriIndices.Add(face.Index2);
 
-			faceTriIndices[i * 6 + 3] = face.Index2;
-			faceTriIndices[i * 6 + 4] = face.Index3;
-			faceTriIndices[i * 6 + 5] = face.Index0;
+			if (!face.IsDegeneratedIntoTriangle) {
+				faceTriIndices.Add(face.Index2);
+				faceTriIndices.Add(face.Index3);
+				faceTriIndices.Add(face.Index0);
+			}
 		}
-		return faceTriIndices;
+		return faceTriIndices.ToArray();
 	}
 
 	public static FigureSurface[] MakeSurfaces(Device device, int surfaceCount, Quad[] allFaces, int[] surfaceMap) {

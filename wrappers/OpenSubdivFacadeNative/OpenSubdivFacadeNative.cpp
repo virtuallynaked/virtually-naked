@@ -14,6 +14,8 @@
 using namespace OpenSubdiv;
 
 namespace OpenSubdivFacadeNative {
+	static const int QuadVertexCount = 4;
+
 	class Stencil {
 	public:
 		std::unordered_map<int, float> indexWeights;
@@ -108,13 +110,35 @@ namespace OpenSubdivFacadeNative {
 			options.SetVtxBoundaryInterpolation(Sdc::Options::VTX_BOUNDARY_EDGE_ONLY);
 			options.SetFVarLinearInterpolation(Sdc::Options::FVAR_LINEAR_NONE);
 
-			std::vector<int> vertsPerFace(faceCount, 4);
+			std::vector<int> numVertsPerFace;
+			std::vector<int> vertIndicesPerFace;
+			numVertsPerFace.reserve(faceCount);
+			vertIndicesPerFace.reserve(faceCount * QuadVertexCount);
+
+			for (int faceIdx = 0; faceIdx < faceCount; ++faceIdx) {
+				Quad face = faces[faceIdx];
+				if (face.index2 == face.index3) {
+					//this is actually a triangle
+					numVertsPerFace.push_back(QuadVertexCount - 1);
+					vertIndicesPerFace.push_back(face.index0);
+					vertIndicesPerFace.push_back(face.index1);
+					vertIndicesPerFace.push_back(face.index2);
+				}
+				else {
+					//truly a quad
+					numVertsPerFace.push_back(QuadVertexCount);
+					vertIndicesPerFace.push_back(face.index0);
+					vertIndicesPerFace.push_back(face.index1);
+					vertIndicesPerFace.push_back(face.index2);
+					vertIndicesPerFace.push_back(face.index3);
+				}
+			}
 
 			Far::TopologyDescriptor topologyDescriptor;
 			topologyDescriptor.numVertices = vertexCount;
 			topologyDescriptor.numFaces = faceCount;
-			topologyDescriptor.numVertsPerFace = &vertsPerFace[0];
-			topologyDescriptor.vertIndicesPerFace = (int*)faces;
+			topologyDescriptor.numVertsPerFace = &numVertsPerFace[0];
+			topologyDescriptor.vertIndicesPerFace = &vertIndicesPerFace[0];
 			topologyDescriptor.numFVarChannels = 0;
 
 			refiner = std::unique_ptr<Far::TopologyRefiner>(Far::TopologyRefinerFactory<Far::TopologyDescriptor>::Create(
@@ -146,10 +170,22 @@ namespace OpenSubdivFacadeNative {
 			int count = topology.GetNumFaces();
 			for (int faceIdx = 0; faceIdx < count; ++faceIdx) {
 				auto face = topology.GetFaceVertices(faceIdx);
-				quads[faceIdx].index0 = face[0];
-				quads[faceIdx].index1 = face[1];
-				quads[faceIdx].index2 = face[2];
-				quads[faceIdx].index3 = face[3];
+				int vertexCount = face.size();
+				if (vertexCount == QuadVertexCount) {
+					quads[faceIdx].index0 = face[0];
+					quads[faceIdx].index1 = face[1];
+					quads[faceIdx].index2 = face[2];
+					quads[faceIdx].index3 = face[3];
+				}
+				else if (vertexCount == QuadVertexCount - 1) {
+					quads[faceIdx].index0 = face[0];
+					quads[faceIdx].index1 = face[1];
+					quads[faceIdx].index2 = face[2];
+					quads[faceIdx].index3 = face[2]; //duplicate the last vertex to signal this is a triangle
+				}
+				else {
+					throw new std::exception("invalid vertex count: " + vertexCount);
+				}
 			}
 		}
 

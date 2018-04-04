@@ -16,6 +16,12 @@ public struct Quad {
 		this.Index2 = index2;
 		this.Index3 = index3;
 	}
+
+	public bool IsDegeneratedIntoTriangle => Index2 == Index3;
+
+	public static Quad MakeDegeneratedIntoTriangle(int index0, int index1, int index2) {
+		return new Quad(index0, index1, index2, index2);
+	}
 	
 	public int GetCorner(int idx) {
 		idx %= 4;
@@ -31,6 +37,10 @@ public struct Quad {
 	}
 	
 	public Quad Flip() {
+		if (IsDegeneratedIntoTriangle) {
+			return Quad.MakeDegeneratedIntoTriangle(Index2, Index1, Index0);
+		}
+
 		return new Quad(Index3, Index2, Index1, Index0);
 	}
 

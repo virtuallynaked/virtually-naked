@@ -114,9 +114,11 @@ private static InputElement[] InputElements = new[] {
 				triangleIndices.Add(face.Index1);
 				triangleIndices.Add(face.Index2);
 			
-				triangleIndices.Add(face.Index2);
-				triangleIndices.Add(face.Index3);
-				triangleIndices.Add(face.Index0);
+				if (!face.IsDegeneratedIntoTriangle) {
+					triangleIndices.Add(face.Index2);
+					triangleIndices.Add(face.Index3);
+					triangleIndices.Add(face.Index0);
+				}
 			}
 
 			var indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, triangleIndices.ToArray());
