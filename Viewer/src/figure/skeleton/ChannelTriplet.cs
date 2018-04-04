@@ -41,6 +41,12 @@ public class ChannelTriplet {
 		Z.SetValue(inputs, value.Z, mask);
 	}
 
+	public void AddValue(ChannelInputs inputs, Vector3 delta, SetMask mask = SetMask.Any) {
+		X.AddValue(inputs, delta.X, mask);
+		Y.AddValue(inputs, delta.Y, mask);
+		Z.AddValue(inputs, delta.Z, mask);
+	}
+
 	public void SetEffectiveValue(ChannelInputs inputs, ChannelOutputs outputsForDelta, Vector3 value, SetMask mask = SetMask.Any) {
 		X.SetEffectiveValue(inputs, outputsForDelta, value.X, mask);
 		Y.SetEffectiveValue(inputs, outputsForDelta, value.Y, mask);

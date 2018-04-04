@@ -1,0 +1,11 @@
+[
+	{
+		"name": "Base",
+		"parent-overrides": {
+			"lFoot?rotation/x": 45,
+			"rFoot?rotation/x": 45,
+			"lToe?rotation/x": -45,
+			"rToe?rotation/x": -45
+		}
+	}
+]

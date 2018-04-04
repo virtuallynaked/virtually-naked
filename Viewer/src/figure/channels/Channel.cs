@@ -53,6 +53,11 @@ public class Channel {
 		inputs.RawValues[this.Index] = value;
 	}
 
+	public void AddValue(ChannelInputs inputs, double delta, SetMask mask = SetMask.Any) {
+		double current = inputs.RawValues[Index];
+		SetValue(inputs, current + delta, mask);
+	}
+
 	public void SetEffectiveValue(ChannelInputs inputs, ChannelOutputs outputsForDelta, double value, SetMask mask = SetMask.Any) {
 		if (mask.HasFlag(SetMask.VisibleOnly) && !Visible) {
 			return;

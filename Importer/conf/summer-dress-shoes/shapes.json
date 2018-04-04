@@ -1,0 +1,14 @@
+[
+	{
+		"name": "Base",
+		"morphs": {
+			"FBMShoesPosed": 1
+		},
+		"parent-overrides": {
+			"lFoot?rotation/x": 15.90278,
+			"rFoot?rotation/x": 15.90278,
+			"lToe?rotation/x": -44.12037,
+			"rToe?rotation/x": -44.12037
+		}
+	}
+]

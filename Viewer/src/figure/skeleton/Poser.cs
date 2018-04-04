@@ -12,7 +12,7 @@ public class Poser {
 
 	public void Apply(ChannelInputs inputs, Pose pose, DualQuaternion rootTransform) {
 		foreach (Bone bone in boneSystem.Bones) {
-			bone.SetRotation(orientationOutputs, inputs, pose.BoneRotations[bone.Index]);
+			bone.AddRotation(orientationOutputs, inputs, pose.BoneRotations[bone.Index]);
 		}
 
 		var rescaledRootTransform = DualQuaternion.FromRotationTranslation(rootTransform.Rotation, rootTransform.Translation * 100);

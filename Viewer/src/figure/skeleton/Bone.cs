@@ -99,6 +99,11 @@ public class Bone {
 		Rotation.SetValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
 	}
 
+	public void AddRotation(ChannelOutputs orientationOutputs, ChannelInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
+		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(orientationOutputs, objectSpaceRotation, applyClamp);
+		Rotation.AddValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
+	}
+
 	public void SetEffectiveRotation(ChannelInputs inputs, ChannelOutputs outputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
 		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(outputs, objectSpaceRotation, applyClamp);
 		Rotation.SetEffectiveValue(inputs, outputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
