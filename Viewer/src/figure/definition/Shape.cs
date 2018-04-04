@@ -1,6 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 
 public class Shape {
+	public struct ParentOverride {
+		public Channel channel;
+		public double value;
+	}
+
 	public const string DefaultLabel = "Default";
 
 	public static List<Shape> LoadAllForFigure(IArchiveDirectory figureDir, ChannelSystem channelSystem) {
@@ -32,10 +38,29 @@ public class Shape {
 		return channelInputs;
 	}
 
+	private static ParentOverride[] LoadParentOverrides(ChannelSystem channelSystem, IArchiveFile parentOverridesFile) {
+		if (parentOverridesFile == null) {
+			return null;
+		}
+
+		var parentChannelSystem = channelSystem.Parent;
+		var parentOverridesByName = Persistance.Load<Dictionary<string, double>>(parentOverridesFile);
+		var parentOverrides = parentOverridesByName
+			.Select(entry => new ParentOverride {
+					channel = parentChannelSystem.ChannelsByName[entry.Key],
+					value = entry.Value
+			})
+			.ToArray();
+		return parentOverrides;
+	}
+
 	public static Shape Load(ChannelSystem channelSystem, IArchiveDirectory shapeDirectory) {
 		var channelInputsFile = shapeDirectory.File("channel-inputs.dat");
 		var channelInputs = LoadChannelInputs(channelSystem, channelInputsFile);
-		return new Shape(shapeDirectory.Name, shapeDirectory, channelInputs);
+
+		var parentOverridesFile = shapeDirectory.File("parent-overrides.dat");
+		var parentOverrides = LoadParentOverrides(channelSystem, parentOverridesFile);
+		return new Shape(shapeDirectory.Name, shapeDirectory, channelInputs, parentOverrides);
 	}
 
 	public static Shape LoadDefault(ChannelSystem channelSystem, IArchiveDirectory figureDirectory) {
@@ -43,16 +68,32 @@ public class Shape {
 		var channelInputs = channelInputsFile != null ?
 			LoadChannelInputs(channelSystem, channelInputsFile) :
 			channelSystem.MakeDefaultChannelInputs();
-		return new Shape(DefaultLabel, null, channelInputs);
+
+		var parentOverridesFile = figureDirectory.File("parent-overrides.dat");
+		var parentOverrides = LoadParentOverrides(channelSystem, parentOverridesFile);
+
+		return new Shape(DefaultLabel, null, channelInputs, parentOverrides);
 	}
 
 	public string Label { get; }
 	public ChannelInputs ChannelInputs { get; }
+	public ParentOverride[] ParentOverrides { get; }
 	public IArchiveDirectory Directory { get; }
 
-	public Shape(string label, IArchiveDirectory directory, ChannelInputs channelInputs) {
+	public Shape(string label, IArchiveDirectory directory, ChannelInputs channelInputs, ParentOverride[] parentOverrides) {
 		Label = label;
 		Directory = directory;
 		ChannelInputs = channelInputs;
+		ParentOverrides = parentOverrides;
+	}
+
+	public void ApplyOverrides(ChannelInputs parentInputs) {
+		if (ParentOverrides == null) {
+			return;
+		}
+
+		foreach (var parentOverride in ParentOverrides) {
+			parentOverride.channel.SetValue(parentInputs, parentOverride.value);
+		}
 	}
 }

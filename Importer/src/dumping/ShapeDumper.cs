@@ -71,6 +71,7 @@ class ShapeDumper {
 		var shapeInputs = MakeShapeInputs(shapeImportConfiguration);
 				
 		DumpInputs(shapeDirectory, shapeInputs);
+		DumpParentOverrides(shapeDirectory, shapeImportConfiguration);
 
 		if (figure == parentFigure) {
 			DumpOccluderParameters(shapeDirectory, shapeInputs);
@@ -86,6 +87,7 @@ class ShapeDumper {
 
 		if (baseConfiguration != null) {
 			DumpInputs(figureDirectory, MakeShapeInputs(null));
+			DumpParentOverrides(figureDirectory, baseConfiguration);
 		}
 	}
 
@@ -107,6 +109,30 @@ class ShapeDumper {
 		
 		shapeDirectory.CreateWithParents();
 		Persistance.Save(shapeFile, shapeInputsByName);
+	}
+
+	private void DumpParentOverrides(DirectoryInfo shapeDirectory, ShapeImportConfiguration configuration) {
+		if (configuration.parentOverrides.Count == 0) {
+			return;
+		}
+
+		FileInfo parentOverridesFile = shapeDirectory.File("parent-overrides.dat");
+		if (parentOverridesFile.Exists) {
+			return;
+		}
+
+		//persist
+		var parentChannelSystem = figure.Parent.ChannelSystem;
+		var parentOverridesByName = configuration.parentOverrides
+			.ToDictionary(entry => {
+				//look up the channel to confirm it exists
+				var channel = parentChannelSystem.ChannelsByName[entry.Key];
+				return channel.Name;
+			},
+			entry => entry.Value);
+		
+		shapeDirectory.CreateWithParents();
+		Persistance.Save(parentOverridesFile, parentOverridesByName);
 	}
 
 	private void DumpOccluderParameters(DirectoryInfo shapeDirectory, ChannelInputs shapeInputs) {

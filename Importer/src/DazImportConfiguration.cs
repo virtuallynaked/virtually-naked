@@ -32,4 +32,7 @@ public class ShapeImportConfiguration {
 
 	public string name;
 	public Dictionary<string, double> morphs = new Dictionary<string, double>();
+
+	[JsonProperty("parent-overrides")]
+	public Dictionary<string, double> parentOverrides = new Dictionary<string, double>();
 }

@@ -1,9 +1,6 @@
 [
 	{
 		"name": "Base",
-		"morphs": {
-			"Mov_FrontR2Up": 0.150838
-		},
 		"parent-overrides": {
 			"PBMNipples?value": 0,
 			"PBMNavel?value": 0

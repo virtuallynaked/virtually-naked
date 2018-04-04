@@ -1,10 +1,6 @@
 [
 	{
 		"name": "Base",
-		"morphs": {
-			"pJCMSplits": 1,
-			"pJCMSit": 1
-		},
 		"parent-overrides": {
 			"CTRLgenesis-3-female-genitalia?value": 0
 		}

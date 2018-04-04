@@ -12,7 +12,8 @@ public class FigureFacade : IDisposable {
 	private readonly FigureRendererLoader figureRendererLoader;
 
 	private FigureRenderer renderer;
-	
+	private List<FigureFacade> children = new List<FigureFacade>();
+
 	public IFigureAnimator Animator { get; set; } = null;
 
 	public FigureFacade(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRendererLoader figureRendererLoader) {
@@ -51,6 +52,8 @@ public class FigureFacade : IDisposable {
 	}
 
 	public void RegisterChildren(List<FigureFacade> children) {
+		this.children = children;
+
 		var childControlVertexProviders = children
 			.Select(child => child.controlVertexProvider)
 			.ToList();
@@ -69,7 +72,14 @@ public class FigureFacade : IDisposable {
 	public ChannelOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults(context);
 
-		ChannelInputs shapeInputs = model.Shape.ChannelInputs;
+		ChannelInputs shapeInputs = new ChannelInputs(model.Shape.ChannelInputs);
+
+		foreach (var child in children) {
+			if (child.Model.IsVisible) {
+				child.Model.Shape.ApplyOverrides(shapeInputs);
+			}
+		}
+
 		ChannelInputs inputs = Animator != null ? Animator.GetFrameInputs(shapeInputs, updateParameters, previousFrameResults) : shapeInputs;
 		
 		return controlVertexProvider.UpdateFrame(context, parentOutputs, inputs);
