@@ -9,6 +9,7 @@ public class Figure {
 	private readonly Geometry geometry;
 	private readonly ChannelSystem channelSystem;
 	private readonly BoneSystem boneSystem;
+	private readonly RigidTransform[] childToParentBindPoseTransforms;
 	private readonly Morpher morpher;
 	private readonly Automorpher automorpher;
 	private readonly SkinBinding skinBinding;
@@ -16,13 +17,14 @@ public class Figure {
 	private readonly UvSet defaultUvSet;
 	private readonly OcclusionBinding occlusionBinding;
 	
-	public Figure(string name, Figure parent, FigureRecipe recipe, Geometry geometry, ChannelSystem channelSystem, BoneSystem boneSystem, Morpher morpher, Automorpher automorpher, SkinBinding skinBinding, Dictionary<string, UvSet> uvSets, UvSet defaultUvSet, OcclusionBinding occlusionBinding) {
+	public Figure(string name, Figure parent, FigureRecipe recipe, Geometry geometry, ChannelSystem channelSystem, BoneSystem boneSystem, RigidTransform[] childToParentBindPoseTransforms, Morpher morpher, Automorpher automorpher, SkinBinding skinBinding, Dictionary<string, UvSet> uvSets, UvSet defaultUvSet, OcclusionBinding occlusionBinding) {
 		this.name = name;
 		this.parent = parent;
 		this.recipe = recipe;
 		this.geometry = geometry;
 		this.channelSystem = channelSystem;
 		this.boneSystem = boneSystem;
+		this.childToParentBindPoseTransforms = childToParentBindPoseTransforms;
 		this.morpher = morpher;
 		this.automorpher = automorpher;
 		this.skinBinding = skinBinding;
@@ -36,6 +38,7 @@ public class Figure {
 	public int VertexCount => geometry.VertexCount;
 	public ChannelSystem ChannelSystem => channelSystem;
 	public BoneSystem BoneSystem => boneSystem;
+	public RigidTransform[] ChildToParentBindPoseTransforms => childToParentBindPoseTransforms;
 	public Geometry Geometry => geometry;
 	public Morpher Morpher => morpher;
 	public Automorpher Automorpher => automorpher;
@@ -84,7 +87,11 @@ public class Figure {
 	public Bone RootBone => boneSystem.RootBone;
 	
 	public StagedSkinningTransform[] GetBoneTransforms(ChannelOutputs outputs) {
-		return boneSystem.GetBoneTransforms(outputs);
+		var boneTransforms = boneSystem.GetBoneTransforms(outputs);
+		if (childToParentBindPoseTransforms != null) {
+			BoneSystem.PrependChildToParentBindPoseTransforms(childToParentBindPoseTransforms, boneTransforms);
+		}
+		return boneTransforms;
 	}
 
 	/*
@@ -95,7 +102,7 @@ public class Figure {
 		Vector3[] controlVertices = Geometry.VertexPositions.Select(p => p).ToArray();
 		Morpher.Apply(channelOutputs, controlVertices);
 		automorpher?.Apply(baseDeltas, controlVertices);
-		StagedSkinningTransform[] boneTransforms = boneSystem.GetBoneTransforms(channelOutputs);
+		StagedSkinningTransform[] boneTransforms = GetBoneTransforms(channelOutputs);
 		SkinBinding.Apply(boneTransforms, controlVertices);
 		return controlVertices;
 	}

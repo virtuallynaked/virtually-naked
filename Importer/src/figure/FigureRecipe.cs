@@ -16,6 +16,29 @@ public class FigureRecipe {
 	public SkinBindingRecipe SkinBinding { get; set; }
 	public List<UvSetRecipe> UvSets { get; set; } = new List<UvSetRecipe>();
 
+	private static RigidTransform[] MakeChildToParentBindPoseTransforms(
+		ChannelSystem channelSystem,
+		BoneSystem selfBoneSystem,
+		BoneSystem parentBoneSystem) {
+		var childToParentBindPoseTransforms = parentBoneSystem.Bones
+			.Select(parentBone => {
+				selfBoneSystem.BonesByName.TryGetValue(parentBone.Name, out var childBone);
+				if (childBone == null) {
+					return RigidTransform.Identity;
+				}
+
+				var originToChildBindPoseTransform = childBone.GetOriginToBindPoseTransform(channelSystem.DefaultOutputs);
+				var originToParentBindPoseTransform = parentBone.GetOriginToBindPoseTransform(channelSystem.Parent.DefaultOutputs);
+				
+				var childBonePoseToParentBindPoseTransform = 
+					originToChildBindPoseTransform.Invert().Chain(originToParentBindPoseTransform);
+
+				return childBonePoseToParentBindPoseTransform;
+			})
+			.ToArray();
+		return childToParentBindPoseTransforms;
+	}
+
 	public Figure Bake(Figure parentFigure) {
 		if (Channels == null) {
 			Channels = new List<ChannelRecipe>();
@@ -44,12 +67,21 @@ public class FigureRecipe {
 		Automorpher automorpher = Automorpher?.Bake();
 
 		BoneSystem selfBoneSystem = new BoneSystemRecipe(Bones).Bake(channelSystem.ChannelsByName);
-		BoneSystem boneSystem = parentFigure?.BoneSystem ?? selfBoneSystem;
-				
+
+		BoneSystem boneSystem;
+		RigidTransform[] childToParentBindPoseTransforms;
+		if (parentFigure != null) {
+			boneSystem = parentFigure.BoneSystem;
+			childToParentBindPoseTransforms = MakeChildToParentBindPoseTransforms(channelSystem, selfBoneSystem, boneSystem);
+		} else {
+			boneSystem = selfBoneSystem;
+			childToParentBindPoseTransforms = null;
+		}
+		
 		SkinBinding skinBinding = SkinBinding.Bake(boneSystem.BonesByName, selfBoneSystem.BonesByName);
 
 		OcclusionBinding occlusionBinding = OcclusionBinding.MakeForFigure(Name, geometry, boneSystem, skinBinding);
 		
-		return new Figure(Name, parentFigure, this, geometry, channelSystem, boneSystem, morpher, automorpher, skinBinding, uvSets, defaultUvSet, occlusionBinding);
+		return new Figure(Name, parentFigure, this, geometry, channelSystem, boneSystem, childToParentBindPoseTransforms, morpher, automorpher, skinBinding, uvSets, defaultUvSet, occlusionBinding);
 	}
 }

@@ -66,6 +66,13 @@ public class Bone {
 		return new OrientationSpace(orientation);
 	}
 	
+	public RigidTransform GetOriginToBindPoseTransform(ChannelOutputs outputs) {
+		Vector3 orientationAngles = Orientation.GetValue(outputs);
+		Vector3 centerPoint  = CenterPoint.GetValue(outputs);
+		Quaternion orientation = RotationOrder.DazStandard.FromEulerAngles(MathExtensions.DegreesToRadians(orientationAngles));
+		return RigidTransform.FromRotationTranslation(orientation, centerPoint);
+	}
+
 	public Quaternion GetRotation(ChannelOutputs outputs) {
 		OrientationSpace orientationSpace = GetOrientationSpace(outputs);
 

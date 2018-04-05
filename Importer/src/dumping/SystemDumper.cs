@@ -63,6 +63,8 @@ public class SystemDumper {
 			ValidateBoneSystemAssumptions(figure);
 			Dump("bone-system-recipe.dat", () => figure.MakeBoneSystemRecipe());
 			Dump("inverter-parameters.dat", () => figure.MakeInverterParameters());
+		} else {
+			Dump("child-to-parent-bind-pose-transforms.dat", () => figure.ChildToParentBindPoseTransforms);
 		}
 	}
 

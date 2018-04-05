@@ -8,11 +8,14 @@ public class FigureDefinition {
 		var channelSystem = channelSystemRecipe.Bake(parent?.ChannelSystem);
 		
 		BoneSystem boneSystem;
+		RigidTransform[] childToParentBindPoseTransforms;
 		if (parent != null) {
 			boneSystem = parent.BoneSystem;
+			childToParentBindPoseTransforms = Persistance.Load<RigidTransform[]>(figureDir.File("child-to-parent-bind-pose-transforms.dat"));
 		} else {
 			var boneSystemRecipe = Persistance.Load<BoneSystemRecipe>(figureDir.File("bone-system-recipe.dat"));
 			boneSystem = boneSystemRecipe.Bake(channelSystem.ChannelsByName);
+			childToParentBindPoseTransforms = null;
 		}
 
 		var shapeOptions = Shape.LoadAllForFigure(figureDir, channelSystem);
@@ -20,6 +23,7 @@ public class FigureDefinition {
 
 		return new FigureDefinition(name, figureDir,
 			channelSystem, boneSystem,
+			childToParentBindPoseTransforms,
 			shapeOptions, materialSetOptions);
 	}
 	
@@ -27,16 +31,19 @@ public class FigureDefinition {
 	public IArchiveDirectory Directory { get; }
 	public ChannelSystem ChannelSystem { get; }
 	public BoneSystem BoneSystem { get; }
+	public RigidTransform[] ChildToParentBindPoseTransforms { get; }
 	public List<Shape> ShapeOptions { get; }
 	public List<MaterialSetOption> MaterialSetOptions { get; }
 
 	public FigureDefinition(string name, IArchiveDirectory directory,
 		ChannelSystem channelSystem, BoneSystem boneSystem,
+		RigidTransform[] childToParentBindPoseTransforms,
 		List<Shape> shapeOptions, List<MaterialSetOption> materialSetOptions) {
 		Name = name;
 		Directory = directory;
 		ChannelSystem = channelSystem;
 		BoneSystem = boneSystem;
+		ChildToParentBindPoseTransforms = childToParentBindPoseTransforms;
 		ShapeOptions = shapeOptions;
 		MaterialSetOptions = materialSetOptions;
 	}

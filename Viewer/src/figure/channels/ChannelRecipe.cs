@@ -16,7 +16,10 @@ public class ChannelRecipe {
 		int index = channels.Count;
 
 		Channel parentChannel;
-		if (parentChannels != null) {
+		if (Name.Contains("?center_point/") || Name.Contains("?orientation/")) {
+			//orientation and center_point channels never follow their parent
+			parentChannel = null;
+		} else if (parentChannels != null) {
 			parentChannels.TryGetValue(Name, out parentChannel);
 		} else {
 			parentChannel = null;

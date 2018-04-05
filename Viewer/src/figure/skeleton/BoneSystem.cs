@@ -1,3 +1,4 @@
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,5 +41,25 @@ public class BoneSystem {
 		}
 
 		return boneTransforms;
+	}
+
+	public static void PrependChildToParentBindPoseTransforms(RigidTransform[] childToParentBindPoseTransforms, StagedSkinningTransform[] boneTransforms) {
+		for (int i = 0; i < boneTransforms.Length; ++i) {
+			var childToParentBindPoseTransform = childToParentBindPoseTransforms[i];
+
+			/* 
+			 * Technically, I should be using a DualQuaternion for the ChildToParentBindPoseTransform in order to get
+			 * smooth blending. But I don't currently have t chain a DualQuaternion with a StaggedSkinningTransform.
+			 * 
+			 * Instead, I'll hack the ChildToParentBindPoseTransform into a ScalingTransform. Very few figures use
+			 * non-identity ChildToParentBindPoseTransforms so the difference with hardly ever matter.
+			 */
+			var childToParentBindPoseScalingTransform = new ScalingTransform(
+				Matrix3x3.RotationQuaternion(childToParentBindPoseTransform.Rotation),
+				childToParentBindPoseTransform.Translation);
+			boneTransforms[i] = new StagedSkinningTransform(
+				childToParentBindPoseScalingTransform.Chain(boneTransforms[i].ScalingStage),
+				boneTransforms[i].RotationStage);
+		}
 	}
 }

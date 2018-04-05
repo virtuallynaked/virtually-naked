@@ -150,6 +150,9 @@ public class ControlVertexProvider : IDisposable {
 	public ChannelOutputs UpdateFrame(DeviceContext context, ChannelOutputs parentOutputs, ChannelInputs inputs) {
 		var channelOutputs = definition.ChannelSystem.Evaluate(parentOutputs, inputs);
 		var boneTransforms = definition.BoneSystem.GetBoneTransforms(channelOutputs);
+		if (parentOutputs != null) {
+			BoneSystem.PrependChildToParentBindPoseTransforms(definition.ChildToParentBindPoseTransforms, boneTransforms);
+		}
 		occluder.SetValues(context, channelOutputs);
 		shaper.SetValues(context, channelOutputs, boneTransforms);
 		return channelOutputs;
