@@ -39,9 +39,12 @@ SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 	refinedVertexInfo.position = 0;
 	refinedVertexInfo.positionDu = 0;
 	refinedVertexInfo.positionDv = 0;
-	refinedVertexInfo.occlusion = 0;
+	//refinedVertexInfo.occlusion = 0;
+	float2 meanOcclusionF = 0;
 	refinedVertexInfo.scatteredIllumination = 0;
 	
+	float exponent = 4;
+
 	ArraySegment arraySegment = stencilSegments[spatialIdx];
 	for (uint i = 0; i < arraySegment.count; ++i) {
 		WeightedIndexWithDerivative stencil = stencilElems[arraySegment.offset + i];
@@ -52,10 +55,14 @@ SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 		refinedVertexInfo.positionDu += stencil.duWeight * controlVertexInfo.position;
 		refinedVertexInfo.positionDv += stencil.dvWeight * controlVertexInfo.position;
 
-		refinedVertexInfo.occlusion += stencil.weight * unpackOcclusion(controlVertexInfo.packedOcclusion);
+		float2 controlOcclusion = unpackOcclusion(controlVertexInfo.packedOcclusion);
+		meanOcclusionF += stencil.weight * pow(controlOcclusion, 1 / exponent);
+
 		refinedVertexInfo.scatteredIllumination += stencil.weight * controlScatteredIllumination;
 	}
 	
+	refinedVertexInfo.occlusion = pow(meanOcclusionF, exponent);
+
 	return refinedVertexInfo;
 }
 
