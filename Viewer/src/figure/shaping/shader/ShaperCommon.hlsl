@@ -97,18 +97,17 @@ void skin(int vertexIdx, inout float3 p) {
 	p = StagedSkinningTransform_Apply(transformAccumulator, p);
 }
 
-uint lookupOcclusion(uint vertexIdx, float3 unskinnedPosition) {
+float2 lookupOcclusion(uint vertexIdx, float3 unskinnedPosition) {
 	uint surrogateIdxPlusOne = surrogateMap[vertexIdx];
 	if (surrogateIdxPlusOne == 0) {
-
-		return packedOcclusions[vertexIdx];
+		return unpackOcclusion(packedOcclusions[vertexIdx]);
 	} else {
 		SurrogateInfo surrogateInfo = surrogateInfos[surrogateIdxPlusOne - 1];
 		float3 normal = Quaternion_Apply(
 			surrogateInfo.rotation,
 			normalize(unskinnedPosition - surrogateInfo.center));
 		float2 occlusion = occlusionFromNormal(surrogateFaces, packedOcclusions, surrogateInfo.offset, normal);
-		return packOcclusion(occlusion);
+		return occlusion;
 	}
 }
 
@@ -119,12 +118,12 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID) {
 	float3 position = initialPositions[vertexIdx];
 	morph(vertexIdx, position);
 	automorph(vertexIdx, position);
-	uint packedOcclusion = lookupOcclusion(vertexIdx, position);
+	float2 occlusion = lookupOcclusion(vertexIdx, position);
 	skin(vertexIdx, position);
 
 	ControlVertexInfo vertexInfo;
 	vertexInfo.position = position;
-	vertexInfo.packedOcclusion = packedOcclusion;
+	vertexInfo.packedFourthRootOcclusion = packFloat2toUInt(sqrt(sqrt(occlusion)));
 
 	vertexInfosOut[vertexIdx] = vertexInfo;
 }

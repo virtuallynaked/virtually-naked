@@ -31,10 +31,7 @@ SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 	refinedVertexInfo.position = 0;
 	refinedVertexInfo.positionDu = 0;
 	refinedVertexInfo.positionDv = 0;
-	refinedVertexInfo.occlusion = 0;
-	float2 meanOcclusionF = 0;
-
-	float exponent = 4;
+	float2 refinedFourthRootOcclusion = 0;
 
 	ArraySegment arraySegment = stencilSegments[spatialIdx];
 	for (uint i = 0; i < arraySegment.count; ++i) {
@@ -44,12 +41,13 @@ SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 		refinedVertexInfo.position += stencil.weight * controlVertexInfo.position;
 		refinedVertexInfo.positionDu += stencil.duWeight * controlVertexInfo.position;
 		refinedVertexInfo.positionDv += stencil.dvWeight * controlVertexInfo.position;
-
-		float2 controlOcclusion = unpackOcclusion(controlVertexInfo.packedOcclusion);
-		meanOcclusionF += stencil.weight * pow(controlOcclusion, 1 / exponent);
+		refinedFourthRootOcclusion += stencil.weight * unpackUIntToFloat2(controlVertexInfo.packedFourthRootOcclusion);
 	}
 
-	refinedVertexInfo.occlusion = pow(meanOcclusionF, exponent);
+	float2 refinedSquareRootOcclusion = refinedFourthRootOcclusion * refinedFourthRootOcclusion;
+	float2 refinedOcclusion = refinedSquareRootOcclusion * refinedSquareRootOcclusion;
+	refinedVertexInfo.occlusion = refinedOcclusion;
+
 	return refinedVertexInfo;
 }
 

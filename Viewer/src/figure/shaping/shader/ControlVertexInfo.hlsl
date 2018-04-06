@@ -1,7 +1,19 @@
 struct ControlVertexInfo {
 	float3 position;
-	uint packedOcclusion;
+	uint packedFourthRootOcclusion;
 };
+
+float2 unpackUIntToFloat2(uint packed) {
+	return float2(
+		f16tof32(packed >> 0),
+		f16tof32(packed >> 16));
+}
+
+uint packFloat2toUInt(float2 unpacked) {
+	uint lower = f32tof16(unpacked[0]);
+	uint upper = f32tof16(unpacked[1]);
+	return (upper << 16) | lower;
+}
 
 float2 unpackOcclusion(uint packedOcclusion) {
 	return float2(
