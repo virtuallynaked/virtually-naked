@@ -78,10 +78,10 @@ public class ImporterMain : IDisposable {
 			SystemDumper.DumpFigure(figure, channelsToInclude);
 			GeometryDumper.DumpFigure(figure);
 			UVSetDumper.DumpFigure(figure);
-			
-			ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, parentFigure, figure);
 
 			MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, figure, textureProcessorSharer);
+			
+			ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, parentFigure, figure);
 		}
 
 		textureProcessorSharer.Finish();

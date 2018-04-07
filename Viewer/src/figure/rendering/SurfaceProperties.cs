@@ -4,12 +4,14 @@ public class SurfaceProperties {
 	public float[] Opacities { get; }
 	public bool PrecomputeScattering { get; }
 	public string ShareTextures { get; }
+	public string MaterialSetForOpacities { get; }
 
-	public SurfaceProperties(int subdivisionLevel, int[] renderOrder, float[] opacities, bool precomputeScattering, string shareTextures) {
+	public SurfaceProperties(int subdivisionLevel, int[] renderOrder, float[] opacities, bool precomputeScattering, string shareTextures, string materialSetForOpacities) {
 		SubdivisionLevel = subdivisionLevel;
 		RenderOrder = renderOrder ?? new int[0];
 		Opacities = opacities ?? new float[0];
 		PrecomputeScattering = precomputeScattering;
 		ShareTextures = shareTextures;
+		MaterialSetForOpacities = materialSetForOpacities;
 	}
 }

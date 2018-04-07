@@ -28,6 +28,10 @@ public class SurfacePropertiesJson {
 		[JsonProperty(PropertyName = "share-textures")]
 		[DefaultValue(null)]
 		public string shareTextures;
+
+		[JsonProperty(PropertyName = "material-set-for-opacities")]
+		[DefaultValue(null)]
+		public string materialSetForOpacities;
 	}
 
 	public static SurfaceProperties Load(Figure figure) {
@@ -61,6 +65,8 @@ public class SurfacePropertiesJson {
 
 		string shareTextures = proxy.shareTextures;
 
-		return new SurfaceProperties(subdivisionLevel, renderOrder, opacities, precomputeScattering, shareTextures);
+		string materialSetForOpacities = proxy.materialSetForOpacities;
+
+		return new SurfaceProperties(subdivisionLevel, renderOrder, opacities, precomputeScattering, shareTextures, materialSetForOpacities);
 	}
 }
