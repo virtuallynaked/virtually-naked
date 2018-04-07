@@ -64,7 +64,9 @@ private static InputElement[] InputElements = new[] {
 		string contentFileName;
 		if (figure.Name == "liv-hair") {
 			string surfaceName = figure.Geometry.SurfaceNames[surfaceIdx];
-			if (surfaceName == "Cap") {
+			if (surfaceName == "Hairband") {
+				return null;
+			} else if (surfaceName == "Cap") {
 				contentFileName = "/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivCapT.jpg";
 			} else {
 				contentFileName = "/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivHairT.png";
@@ -98,6 +100,9 @@ private static InputElement[] InputElements = new[] {
 		
 		for (int surfaceIdx = 0; surfaceIdx < figure.Geometry.SurfaceCount; ++surfaceIdx) {
 			var opacityTexture = LoadOpacityTexture(surfaceIdx);
+			if (opacityTexture == null) {
+				continue;
+			}
 			var opacityTextureView = new ShaderResourceView(device, opacityTexture);
 
 			List<int> faceIdxMap = new List<int>();
