@@ -1,6 +1,7 @@
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using System;
+using System.IO;
 using System.Linq;
 
 public class FaceTransparencyDemo : IDemoApp {
@@ -29,9 +30,32 @@ public class FaceTransparencyDemo : IDemoApp {
 		FigureRecipe livHairRecipe = loader.LoadFigureRecipe("liv-hair", null);
 		var livHairFigure = livHairRecipe.Bake(parentFigure);
 
-		var faceTransparencyCalculator = new FromTextureFaceTransparencyCalculator(fileLocator, device, shaderCache, livHairFigure);
+		var processor = new FaceTransparencyProcessor(device, shaderCache, livHairFigure);
+
+		for (int surfaceIdx = 0; surfaceIdx < livHairFigure.Geometry.SurfaceCount; ++surfaceIdx) {
+			string surfaceName = livHairFigure.Geometry.SurfaceNames[surfaceIdx];
+
+			string textureFileName;
+			if (surfaceName == "Hairband") {
+				continue;
+			} else if (surfaceName == "Cap") {
+				textureFileName = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivCapT.jpg");
+			} else {
+				textureFileName = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivHairT.png");
+			}
+
+			RawFloatTexture opacityTexture = new RawFloatTexture {
+				value = 1,
+				image = new RawImageInfo {
+					file = new FileInfo(textureFileName),
+					gamma = 1
+				}
+			};
+
+			processor.ProcessSurface(surfaceIdx, livHairFigure.DefaultUvSet.Name, opacityTexture);
+		}
 		
-		var transparencies = faceTransparencyCalculator.CalculateSurfaceTransparencies();
+		var transparencies = processor.FaceTransparencies;
 		for (int i = 0; i < 10; ++i) {
 			int faceIdx = i * 3000;
 			int surfaceIdx  = livHairFigure.Geometry.SurfaceMap[faceIdx];

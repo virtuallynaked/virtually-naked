@@ -4,10 +4,12 @@ using System;
 public class HairMaterialImporter : IMaterialImporter {
 	private readonly Figure figure;
 	private readonly TextureProcessor textureProcessor;
+	private readonly FaceTransparencyProcessor faceTransparencyProcessor;
 	
-	public HairMaterialImporter(Figure figure, TextureProcessor textureProcessor) {
+	public HairMaterialImporter(Figure figure, TextureProcessor textureProcessor, FaceTransparencyProcessor faceTransparencyProcessor) {
 		this.figure = figure;
 		this.textureProcessor = textureProcessor;
+		this.faceTransparencyProcessor = faceTransparencyProcessor;
 	}
 
 	public IMaterialSettings Import(int surfaceIdx, MaterialBag bag) {
@@ -19,7 +21,9 @@ public class HairMaterialImporter : IMaterialImporter {
 		
 		FloatTexture opacityTexture;
 		if (bag.HasExtraType(MaterialBag.DazBrickType) || bag.HasExtraType(MaterialBag.IrayUberType)) {
-			opacityTexture = textureImporter.ImportFloatTexture(bag.ExtractFloatTexture("extra/studio_material_channels/channels/Cutout Opacity"));
+			var rawOpacityTexture = bag.ExtractFloatTexture("extra/studio_material_channels/channels/Cutout Opacity");
+			opacityTexture = textureImporter.ImportFloatTexture(rawOpacityTexture);
+			faceTransparencyProcessor.ProcessSurface(surfaceIdx, uvSet, rawOpacityTexture);
 		} else {
 			opacityTexture = new FloatTexture {
 				value = 1,

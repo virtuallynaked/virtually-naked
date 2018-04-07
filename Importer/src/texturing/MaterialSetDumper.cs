@@ -10,7 +10,8 @@ class MaterialSetDumper {
 		DirectoryInfo materialsSetsDirectory = figureDirectory.Subdirectory("material-sets");
 		DirectoryInfo materialSetDirectory = materialsSetsDirectory.Subdirectory(configuration.name);
 		FileInfo materialSettingsFileInfo = materialSetDirectory.File("material-settings.dat");
-		if (materialSettingsFileInfo.Exists) {
+		FileInfo faceTransparenciesFileInfo = materialSetDirectory.File("face-transparencies.array");
+		if (materialSettingsFileInfo.Exists && faceTransparenciesFileInfo.Exists) {
 			return Persistance.Load<MultiMaterialSettings>(UnpackedArchiveFile.Make(materialSettingsFileInfo));
 		}
 		
@@ -30,11 +31,13 @@ class MaterialSetDumper {
 	
 		var textureProcessor = sharedTextureProcessor ?? localTextureProcessor;
 
+		var faceTransparencyProcessor = new FaceTransparencyProcessor(device, shaderCache, figure);
+
 		IMaterialImporter materialImporter;
 		if (figure.Name.EndsWith("-hair")) {
-			materialImporter = new HairMaterialImporter(figure, textureProcessor);
+			materialImporter = new HairMaterialImporter(figure, textureProcessor, faceTransparencyProcessor);
 		} else {
-			materialImporter = new UberMaterialImporter(figure, textureProcessor);
+			materialImporter = new UberMaterialImporter(figure, textureProcessor, faceTransparencyProcessor);
 		}
 		
 		var perMaterialSettings = Enumerable.Range(0, figure.Geometry.SurfaceCount)
@@ -48,12 +51,18 @@ class MaterialSetDumper {
 
 		var multiMaterialSettings = new MultiMaterialSettings(perMaterialSettings);
 		
+		materialSetDirectory.CreateWithParents();
+
 		textureProcessor.RegisterAction(() => {
-			materialSetDirectory.CreateWithParents();
 			Persistance.Save(materialSettingsFileInfo, multiMaterialSettings);
 		});
 
 		localTextureProcessor?.ImportAll();
+
+		var faceTranparencies = faceTransparencyProcessor.FaceTransparencies;
+		faceTransparenciesFileInfo.WriteArray(faceTranparencies);
+
+		faceTransparencyProcessor.Dispose();
 
 		return multiMaterialSettings;
 	}

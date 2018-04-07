@@ -14,16 +14,21 @@ public class TextureImporter {
 		this.mask = mask;
 	}
 	
-	private string ExtractImage(RawImageInfo imageInfo, TextureProcessingType type) {
-		if (imageInfo == null) {
-			return null;
-		}
-
+	public static bool IsLinear(RawImageInfo imageInfo, TextureProcessingType type) {
 		if (imageInfo.gamma != 0 && imageInfo.gamma != 1 && imageInfo.gamma != 2.2f) {
 			throw new InvalidOperationException("expected image gamma to be 0, 1 or 2.2");
 		}
 
 		bool isLinear = imageInfo.gamma == 1 || type == TextureProcessingType.Normal || type == TextureProcessingType.Bump;
+		return isLinear;
+	}
+
+	private string ExtractImage(RawImageInfo imageInfo, TextureProcessingType type) {
+		if (imageInfo == null) {
+			return null;
+		}
+		bool isLinear = IsLinear(imageInfo, type);
+
 		return textureProcessor.RegisterForProcessing(imageInfo.file, type, isLinear, mask);
 	}
 

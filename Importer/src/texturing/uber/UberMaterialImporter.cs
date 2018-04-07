@@ -3,10 +3,12 @@ using System;
 public class UberMaterialImporter : IMaterialImporter {
 	private readonly Figure figure;
 	private readonly TextureProcessor textureProcessor;
-	
-	public UberMaterialImporter(Figure figure, TextureProcessor textureProcessor) {
+	private readonly FaceTransparencyProcessor faceTransparencyProcessor;
+
+	public UberMaterialImporter(Figure figure, TextureProcessor textureProcessor, FaceTransparencyProcessor faceTransparencyProcessor) {
 		this.figure = figure;
 		this.textureProcessor = textureProcessor;
+		this.faceTransparencyProcessor = faceTransparencyProcessor;
 	}
 	
 	private RawUberMaterialSettings ImportRaw(MaterialBag bag) {
@@ -145,6 +147,14 @@ public class UberMaterialImporter : IMaterialImporter {
 
 		//Geometry / Cutout
 		settings.cutoutOpacity = textureImporter.ImportFloatTexture(rawSettings.cutoutOpacity);
+
+		// process face transparencies
+		if (settings.thinWalled && settings.refractionWeight.value > 0) {
+			//HACK: assume refractive surfaces are fully transparent
+			faceTransparencyProcessor.ProcessConstantSurface(surfaceIdx, 0);
+		} else {
+			faceTransparencyProcessor.ProcessSurface(surfaceIdx, rawSettings.uvSet, rawSettings.cutoutOpacity);
+		}
 
 		return settings;
 	}
