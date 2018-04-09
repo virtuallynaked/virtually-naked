@@ -8,93 +8,51 @@ using System.Linq;
 public class ControlVertexProvider : IDisposable {
 	public static readonly int ControlVertex_SizeInBytes = Vector3.SizeInBytes + OcclusionInfo.PackedSizeInBytes;
 
-	private static IOccluder LoadOccluder(Device device, ShaderCache shaderCache, ChannelSystem channelSystem, bool isMainFigure, IArchiveDirectory unmorphedOcclusionDirectory, IArchiveDirectory occlusionDirectory) {
-		if (isMainFigure) {
-			IArchiveFile occluderParametersFile = occlusionDirectory.File("occluder-parameters.dat");
-			if (occluderParametersFile == null) {
-				throw new InvalidOperationException("expected main figure to have occlusion system");
-			}
-			
-			var occluderParameters = Persistance.Load<OccluderParameters>(occluderParametersFile);
-			OcclusionInfo[] unmorphedOcclusionInfos = OcclusionInfo.UnpackArray(unmorphedOcclusionDirectory.File("occlusion-infos.array").ReadArray<uint>());
-			var occluder = new DeformableOccluder(device, shaderCache, channelSystem, unmorphedOcclusionInfos, occluderParameters);
-			return occluder;
-		} else {
-			OcclusionInfo[] figureOcclusionInfos = OcclusionInfo.UnpackArray(occlusionDirectory.File("occlusion-infos.array").ReadArray<uint>());
-			OcclusionInfo[] parentOcclusionInfos = OcclusionInfo.UnpackArray(occlusionDirectory.File("parent-occlusion-infos.array").ReadArray<uint>());
-			var occluder = new StaticOccluder(device, figureOcclusionInfos, parentOcclusionInfos);
-			return occluder;
-		}
-	}
-
-	public static ControlVertexProvider Load(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model) {
+	public static ControlVertexProvider Load(Device device, ShaderCache shaderCache, FigureDefinition definition) {
 		var shaperParameters = Persistance.Load<ShaperParameters>(definition.Directory.File("shaper-parameters.dat"));
-								
-		var unmorphedOcclusionDirectory = definition.Directory.Subdirectory("occlusion");
-		var occlusionDirectory = model.Shape.Directory ?? unmorphedOcclusionDirectory;
 		
-		bool isMainFigure = definition.ChannelSystem.Parent == null;
-
-		var occluder = LoadOccluder(device, shaderCache, definition.ChannelSystem, isMainFigure, unmorphedOcclusionDirectory, occlusionDirectory);
+		var occluderLoader = new OccluderLoader(device, shaderCache, definition);
 
 		var provider = new ControlVertexProvider(
-			device, shaderCache,
+			device, shaderCache, occluderLoader,
 			definition,
-			shaperParameters,
-			occluder,
-			model.IsVisible);
-
-		model.ShapeChanged += (oldShape, newShape) => {
-			var newOcclusionDirectory = model.Shape.Directory ?? unmorphedOcclusionDirectory;
-			var newOccluder = LoadOccluder(device, shaderCache, definition.ChannelSystem, isMainFigure, unmorphedOcclusionDirectory, newOcclusionDirectory);
-			provider.SetOccluder(newOccluder);
-		};
-
-		model.IsVisibleChanged += (oldVisibile, newVisible) => {
-			provider.SetIsVisible(newVisible);
-		};
+			shaperParameters);
 
 		return provider;
 	}
 	
+	private readonly OccluderLoader occluderLoader;
 	private readonly FigureDefinition definition;
-	private IOccluder occluder;
 	private readonly GpuShaper shaper;
-	private bool isVisible;
-	
 	private readonly int vertexCount;
 
+	private IArchiveDirectory occlusionDirectory;
+	private IOccluder occluder;
+	private bool isVisible;
+	
 	private readonly InOutStructuredBufferManager<ControlVertexInfo> controlVertexInfosBufferManager;
 
 	private const int BackingArrayCount = 2;
 	private readonly StagingStructuredBufferManager<ControlVertexInfo> controlVertexInfoStagingBufferManager;
 
 	public ControlVertexProvider(Device device, ShaderCache shaderCache,
+		OccluderLoader occluderLoader,
 		FigureDefinition definition,
-		ShaperParameters shaperParameters,
-		IOccluder occluder,
-		bool isVisible) {
+		ShaperParameters shaperParameters) {
+		this.occluderLoader = occluderLoader;
 		this.definition = definition;
 		this.shaper = new GpuShaper(device, shaderCache, definition, shaperParameters);
-		this.occluder = occluder;
-		this.isVisible = isVisible;
-		
 		this.vertexCount = shaperParameters.InitialPositions.Length;
 		
 		controlVertexInfosBufferManager = new InOutStructuredBufferManager<ControlVertexInfo>(device, vertexCount);
-
 		if (definition.ChannelSystem.Parent == null) {
 			this.controlVertexInfoStagingBufferManager = new StagingStructuredBufferManager<ControlVertexInfo>(device, vertexCount, BackingArrayCount);
 		}
 	}
 	
 	public void Dispose() {
-		foreach (var child in children) {
-			child.OccluderChanged -= RegisterChildOccluders;
-		}
-
 		shaper.Dispose();
-		occluder.Dispose();
+		occluder?.Dispose();
 		controlVertexInfosBufferManager.Dispose();
 
 		if (controlVertexInfoStagingBufferManager != null) {
@@ -102,49 +60,36 @@ public class ControlVertexProvider : IDisposable {
 		}
 	}
 
-	private event Action OccluderChanged;
-
-	private void SetOccluder(IOccluder newOccluder) {
-		occluder.Dispose();
-		occluder = newOccluder;
-		OccluderChanged?.Invoke();
-
-		if (children != null) {
-			RegisterChildOccluders();
-		}
-	}
-	
-	private void SetIsVisible(bool newIsVisible) {
-		isVisible = newIsVisible;
-		OccluderChanged?.Invoke();
-	}
-
 	public int VertexCount => vertexCount;
 
-	public ShaderResourceView OcclusionInfos => occluder.OcclusionInfosView;
 	public ShaderResourceView ControlVertexInfosView => controlVertexInfosBufferManager.InView;
-	private List<ControlVertexProvider> children = new List<ControlVertexProvider>();
 
-	public void RegisterChildren(List<ControlVertexProvider> children) {
-		var oldChildren = this.children;
-		foreach (var oldChild in oldChildren) {
-			oldChild.OccluderChanged -= RegisterChildOccluders;
+	public void SyncWithModel(FigureModel model, List<ControlVertexProvider> children) {
+		//sync occluder
+		var newOcclusionDirectory = model.Shape.Directory ?? occluderLoader.DefaultDirectory;
+
+		if (newOcclusionDirectory != occlusionDirectory) {
+			var newOccluder = occluderLoader.Load(newOcclusionDirectory);
+
+			occluder?.Dispose();
+			
+			occlusionDirectory = newOcclusionDirectory;
+			occluder = newOccluder;
 		}
 
-		this.children = children;
+		//sync visible
+		isVisible = model.IsVisible;
 
-		foreach (var child in children) {
-			child.OccluderChanged += RegisterChildOccluders;
+		//register child occluders
+		if (children != null) {
+			//children are synced first so all children should have occluders by this point
+			var childOccluders = children
+				.Where(child => child.isVisible)
+				.Select(child => child.occluder)
+				.ToList();
+
+			occluder.SetChildOccluders(childOccluders);
 		}
-		RegisterChildOccluders();
-	}
-
-	private void RegisterChildOccluders() {
-		var childOccluders = children
-			.Where(child => child.isVisible)
-			.Select(child => child.occluder)
-			.ToList();
-		occluder.RegisterChildOccluders(childOccluders);
 	}
 
 	public ChannelOutputs UpdateFrame(DeviceContext context, ChannelOutputs parentOutputs, ChannelInputs inputs) {

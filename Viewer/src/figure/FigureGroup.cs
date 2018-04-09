@@ -37,6 +37,11 @@ class FigureGroup : IDisposable {
 	public void Update(DeviceContext context, FrameUpdateParameters updateParameters, ImageBasedLightingEnvironment lightingEnvironment) {
 		modelToWorldTransform.Update(context, Matrix.Scaling(0.01f));
 		
+		foreach (var figure in childFigures) {
+			figure.SyncWithModel();
+		}
+		parentFigure.SyncWithModel();
+
 		var parentOutputs = parentFigure.UpdateFrame(context, updateParameters, null);
 		foreach (var figure in childFigures) {
 			figure.UpdateFrame(context, updateParameters, parentOutputs);

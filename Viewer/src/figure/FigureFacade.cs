@@ -46,19 +46,20 @@ public class FigureFacade : IDisposable {
 		renderer?.Dispose();
 		renderer = newRenderer;
 	}
-	
+
+	public void SyncWithModel() {
+		var childControlVertexProviders = children
+			.Select(child => child.controlVertexProvider)
+			.ToList();
+		controlVertexProvider.SyncWithModel(model, childControlVertexProviders);
+	}
+
 	public void ReadbackPosedControlVertices(DeviceContext context) {
 		controlVertexProvider.ReadbackPosedControlVertices(context);
 	}
 
 	public void RegisterChildren(List<FigureFacade> children) {
 		this.children = children;
-
-		var childControlVertexProviders = children
-			.Select(child => child.controlVertexProvider)
-			.ToList();
-
-		controlVertexProvider.RegisterChildren(childControlVertexProviders);
 	}
 
 	public void RenderPass(DeviceContext context, RenderingPass pass) {

@@ -12,6 +12,7 @@ public class DeformableOccluder : IOccluder {
 
 	public readonly ShaderResourceView unmorphedWithoutChildrenOcclusionInfosView;
 
+	private List<IOccluder> childOccluders = new List<IOccluder>();
 	private readonly StructuredBufferManager<uint> unmorphedWithChildrenOcclusionInfosBufferManager;
 	private uint[] unmorphedWithChildrenOcclusionInfosToUpload;
 
@@ -25,7 +26,6 @@ public class DeformableOccluder : IOccluder {
 		
 		unmorphedWithoutChildrenOcclusionInfosView = BufferUtilities.ToStructuredBufferView(device, OcclusionInfo.PackArray(unmorphedOcclusionInfos));
 		unmorphedWithChildrenOcclusionInfosBufferManager = new StructuredBufferManager<uint>(device, unmorphedOcclusionInfos.Length);
-		RegisterChildOccluders(new List<IOccluder>() { });
 		
 		parametersResources = OccluderParametersResources.Make(device, parameters);
 		channelIndices = parameters.ChannelNames
@@ -43,7 +43,12 @@ public class DeformableOccluder : IOccluder {
 
 	public OcclusionInfo[] ParentOcclusionInfos => throw new InvalidOperationException("deformable occluders cannot be children");
 
-	public void RegisterChildOccluders(List<IOccluder> childOccluders) {
+	public void SetChildOccluders(List<IOccluder> newChildOccluders) {
+		if (Enumerable.SequenceEqual(childOccluders, newChildOccluders)) {
+			return;
+		}
+
+		childOccluders = newChildOccluders;
 		List<OcclusionInfo[]> childOcclusionContributions = childOccluders
 			.Select(occluder => occluder.ParentOcclusionInfos)
 			.ToList();

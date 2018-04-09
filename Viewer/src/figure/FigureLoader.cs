@@ -36,7 +36,7 @@ public class FigureLoader {
 			MaterialSetName = recipe.materialSet
 		};
 		
-		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition, model);
+		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition);
 				
 		var facade = new FigureFacade(device, shaderCache, definition, model, controlVertexProvider, figureRendererLoader);
 		return facade;
