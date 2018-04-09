@@ -13,7 +13,8 @@
 	},
 	{
 		"name": "Cherry Blossom",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Cherry Blossom Shorts.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Cherry Blossom Shorts.duf" ],
+		"use-custom-occlusion": true
 	},
 	{
 		"name": "Ebony Dusk",

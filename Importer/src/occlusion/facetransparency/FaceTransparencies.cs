@@ -1,8 +1,8 @@
 using SharpDX.Direct3D11;
 using System.Linq;
 
-public static class FaceTransparencyCalculator {
-	public static float[] Calculate(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure figure, int[] surfaceMap) {
+public static class FaceTransparencies {
+	public static float[] For(Figure figure) {
 		var surfaceProperties = SurfacePropertiesJson.Load(figure);
 
 		if (surfaceProperties.MaterialSetForOpacities != null) {
@@ -12,6 +12,7 @@ public static class FaceTransparencyCalculator {
 			return transparenciesFile.ReadArray<float>();
 		}
 		
+		var surfaceMap = figure.Geometry.SurfaceMap;
 		return surfaceMap
 			.Select(surfaceIdx => 1 - surfaceProperties.Opacities[surfaceIdx])
 			.ToArray();

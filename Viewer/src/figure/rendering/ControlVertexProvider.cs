@@ -66,8 +66,10 @@ public class ControlVertexProvider : IDisposable {
 
 	public void SyncWithModel(FigureModel model, List<ControlVertexProvider> children) {
 		//sync occluder
-		var newOcclusionDirectory = model.Shape.Directory ?? occluderLoader.DefaultDirectory;
-
+		var materialSetDirector = model.MaterialSet.Directory;
+		var newOcclusionDirectory = 
+			OccluderLoader.IsOcclusionDirectory(materialSetDirector) ? materialSetDirector : 
+			(model.Shape.Directory ?? occluderLoader.DefaultDirectory);
 		if (newOcclusionDirectory != occlusionDirectory) {
 			var newOccluder = occluderLoader.Load(newOcclusionDirectory);
 

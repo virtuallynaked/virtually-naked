@@ -9,7 +9,8 @@
 	},
 	{
 		"name": "Denim Broken",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Denim Broken.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Pants Denim Broken.duf" ],
+		"use-custom-occlusion": true
 	},
 	{
 		"name": "Denim",

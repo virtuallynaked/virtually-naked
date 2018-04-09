@@ -2,6 +2,11 @@ using System;
 using Device = SharpDX.Direct3D11.Device;
 
 public class OccluderLoader {
+	public static bool IsOcclusionDirectory(IArchiveDirectory dir) {
+		return dir.File("occluder-parameters.dat") != null ||
+			dir.File("occlusion-infos.array") != null;
+	}
+
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
 	private readonly ChannelSystem channelSystem;

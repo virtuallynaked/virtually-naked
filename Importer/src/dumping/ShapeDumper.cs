@@ -18,8 +18,21 @@ class ShapeDumper {
 
 			dumper.Dump(conf);
 		}
-
+		
 		dumper.DumpUnmorphed();
+
+		MaterialSetImportConfiguration[] materialSetImportConfigurations = MaterialSetImportConfiguration.Load(figure.Name);
+		foreach (var materialSetConf in materialSetImportConfigurations) {
+			if (!settings.ShouldImportMaterialSet(figure.Name, materialSetConf.name)) {
+				continue;
+			}
+
+			if (!materialSetConf.useCustomOcclusion) {
+				continue;
+			}
+
+			dumper.DumpOcclusionForMaterialSet(materialSetConf.name);
+		}
 	}
 	
 	private readonly ContentFileLocator fileLocator;
@@ -76,21 +89,28 @@ class ShapeDumper {
 		if (figure == parentFigure) {
 			DumpOccluderParameters(shapeDirectory, shapeInputs);
 		} else {
-			DumpSimpleOcclusion(shapeDirectory, shapeInputs);
+			DumpSimpleOcclusion(shapeDirectory, shapeInputs, null);
 		}
     }
 
 	public void DumpUnmorphed() {
 		DirectoryInfo directory = figureDirectory.Subdirectory("occlusion");
 		var shapeInputs = figure.MakeDefaultChannelInputs();
-		DumpSimpleOcclusion(directory, shapeInputs);
-
+		DumpSimpleOcclusion(directory, shapeInputs, null);
+		
 		if (baseConfiguration != null) {
 			DumpInputs(figureDirectory, MakeShapeInputs(null));
 			DumpParentOverrides(figureDirectory, baseConfiguration);
 		}
 	}
 
+	public void DumpOcclusionForMaterialSet(string materialSetName) {
+		DirectoryInfo directory = figureDirectory.Subdirectory("material-sets").Subdirectory(materialSetName);
+		float[] faceTransparencies = directory.File("face-transparencies.array").ReadArray<float>();
+		var shapeInputs = figure.MakeDefaultChannelInputs();
+		DumpSimpleOcclusion(directory, shapeInputs, faceTransparencies);
+	}
+	
 	private void DumpInputs(DirectoryInfo shapeDirectory, ChannelInputs shapeInputs) {
 		FileInfo shapeFile = shapeDirectory.File("channel-inputs.dat");
 		if (shapeFile.Exists) {
@@ -153,7 +173,7 @@ class ShapeDumper {
 		Persistance.Save(occluderParametersFile, parameters);
 	}
 	
-	private void DumpSimpleOcclusion(DirectoryInfo shapeDirectory, ChannelInputs shapeInputs) {
+	private void DumpSimpleOcclusion(DirectoryInfo shapeDirectory, ChannelInputs shapeInputs, float[] faceTransparencies) {
 		FileInfo occlusionInfosFile = shapeDirectory.File("occlusion-infos.array");
 		FileInfo parentOcclusionInfosFile = shapeDirectory.File("parent-occlusion-infos.array");
 
@@ -163,17 +183,26 @@ class ShapeDumper {
 		
 		Console.WriteLine("Calculating occlusion...");
 		
+		if (faceTransparencies == null) {
+			faceTransparencies = FaceTransparencies.For(figure);
+		}
+
 		FigureGroup figureGroup;
+		FaceTransparenciesGroup faceTransparenciesGroup;
 		if (figure == parentFigure) {
 			figureGroup = new FigureGroup(figure);
+			faceTransparenciesGroup = new FaceTransparenciesGroup(faceTransparencies);
 		} else {
+			var parentFaceTransparencies = FaceTransparencies.For(parentFigure);
+
 			figureGroup = new FigureGroup(parentFigure, figure);
+			faceTransparenciesGroup = new FaceTransparenciesGroup(parentFaceTransparencies, faceTransparencies);
 		}
-		
+
 		var inputs = new ChannelInputsGroup(parentFigure.MakeDefaultChannelInputs(), new ChannelInputs[] { shapeInputs });
 		var outputs = figureGroup.Evaluate(inputs);
 		FigureOcclusionCalculator.Result occlusionResult;
-		using (var occlusionCalculator = new FigureOcclusionCalculator(fileLocator, device, shaderCache, figureGroup)) {
+		using (var occlusionCalculator = new FigureOcclusionCalculator(fileLocator, device, shaderCache, figureGroup, faceTransparenciesGroup)) {
 			occlusionResult = occlusionCalculator.CalculateOcclusionInformation(outputs);
 		}
 		

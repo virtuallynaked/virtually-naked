@@ -15,6 +15,9 @@ public class MaterialSetImportConfiguration {
 
 	[JsonProperty("paths")]
 	public string[] materialsDufPaths;
+
+	[JsonProperty("use-custom-occlusion")]
+	public bool useCustomOcclusion;
 }
 
 [Serializable]

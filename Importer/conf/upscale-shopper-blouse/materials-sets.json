@@ -5,7 +5,8 @@
 	},
 	{
 		"name": "Blue",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blouse Blue.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Upscale Shopper/Materials/Iray/Upscale Shopper Blouse Blue.duf" ],
+		"use-custom-occlusion": true
 	},
 	{
 		"name": "Grey",

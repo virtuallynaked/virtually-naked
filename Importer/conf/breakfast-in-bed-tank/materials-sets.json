@@ -5,15 +5,18 @@
 	},
 	{
 		"name": "Shadow Rose",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Shadow Rose Top Iray.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Shadow Rose Top Iray.duf" ],
+		"use-custom-occlusion": true
 	},
 	{
 		"name": "Azure Dream",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Azure Dream Top.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Azure Dream Top.duf" ],
+		"use-custom-occlusion": true
 	},
 	{
 		"name": "Cherry Blossom",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Cherry Blossom Top.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Cherry Blossom Top.duf" ],
+		"use-custom-occlusion": true
 	},
 	{
 		"name": "Ebony Dusk",
@@ -21,6 +24,7 @@
 	},
 	{
 		"name": "Violet Sparkle",
-		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Violet Sparkle Top.duf" ]
+		"paths": [ "/People/Genesis 3 Female/Clothing/Breakfast In Bed Pajamas/Materials/Iray/Violet Sparkle Top.duf" ],
+		"use-custom-occlusion": true
 	}
 ]

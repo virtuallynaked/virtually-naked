@@ -9,6 +9,10 @@ public class OcclusionGeometryConcatenator {
 	private int nextMaskIdx = 0;
 
 	public ArraySegment Add(SubdivisionMesh mesh, float[] faceTransparencies) {
+		if (mesh.Topology.Faces.Length != faceTransparencies.Length) {
+			throw new ArgumentException("face count mismatch");
+		}
+
 		int startingOffset = combinedMesh.Topology.VertexCount;
 
 		combinedMesh = SubdivisionMesh.Combine(this.combinedMesh, mesh);

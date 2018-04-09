@@ -94,7 +94,8 @@ public class OccluderParametersCalculator : IDisposable {
 		this.figure = figure;
 		this.shapeInputs = shapeInputs;
 		figureGroup = new FigureGroup(figure);
-		occlusionCalculator = new FigureOcclusionCalculator(fileLocator, device, shaderCache, figureGroup);
+		var faceTransparenciesGroup = new FaceTransparenciesGroup(FaceTransparencies.For(figure));
+		occlusionCalculator = new FigureOcclusionCalculator(fileLocator, device, shaderCache, figureGroup, faceTransparenciesGroup);
 	}
 
 	public void Dispose() {

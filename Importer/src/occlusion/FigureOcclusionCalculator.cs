@@ -14,7 +14,6 @@ public class FigureOcclusionCalculator : IDisposable {
 			ChildOcclusions = childOcclusions;
 		}
 	}
-	
 	private readonly Device device;
 
 	private readonly FigureGroup figureGroup;
@@ -29,7 +28,7 @@ public class FigureOcclusionCalculator : IDisposable {
 
 	private readonly List<ArraySegment> childSegments = new List<ArraySegment>();
 	
-	public FigureOcclusionCalculator(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, FigureGroup figureGroup) {
+	public FigureOcclusionCalculator(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, FigureGroup figureGroup, FaceTransparenciesGroup faceTransparenciesGroup) {
 		this.device = device;
 		
 		this.figureGroup = figureGroup;
@@ -39,9 +38,9 @@ public class FigureOcclusionCalculator : IDisposable {
 		//parent
 		{
 			var figure = figureGroup.Parent;
+			var faceTransparencies = faceTransparenciesGroup.Parent;
 
 			var refinementResult = figure.Geometry.AsTopology().Refine(0);
-			var faceTransparencies = FaceTransparencyCalculator.Calculate(fileLocator, device, shaderCache, figure, refinementResult.SurfaceMap);
 
 			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
 			parentSegment = segment;
@@ -51,9 +50,11 @@ public class FigureOcclusionCalculator : IDisposable {
 		}
 		
 		//children
-		foreach (var figure in figureGroup.Children) {
+		for (int childIdx = 0; childIdx < figureGroup.Children.Length; ++childIdx) {
+			var figure = figureGroup.Children[childIdx];
+			var faceTransparencies = faceTransparenciesGroup.Children[childIdx];
+
 			var refinementResult = figure.Geometry.AsTopology().Refine(0);
-			float[] faceTransparencies = FaceTransparencyCalculator.Calculate(fileLocator, device, shaderCache, figure, refinementResult.SurfaceMap);
 
 			var segment = geometryConcatenator.Add(refinementResult.Mesh, faceTransparencies);
 			childSegments.Add(segment);
