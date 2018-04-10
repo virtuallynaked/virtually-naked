@@ -12,7 +12,9 @@ public class RenderPassController : IDisposable {
 	
 	private readonly States oneSidedOpaquePassStates;
 	private readonly States twoSidedOpaquePassStates;
-	private readonly States backToFrontTransparencyPassStates;
+	private readonly States backToFrontTransparencyBackFacesPassStates;
+	private readonly States backToFrontTransparencyFrontFacesPassStates;
+	private readonly States backToFrontTransparencyAllFacesPassStates;
 	private readonly States unorderedTransparencyPassStates;
 
 	public RenderPassController(Device device, ShaderCache shaderCache, Size2 targetSize) {
@@ -34,12 +36,16 @@ public class RenderPassController : IDisposable {
 
 		StateDescriptions backToFrontTransparencyPassStateDesc = StateDescriptions.Common.Clone();
 		backToFrontTransparencyPassStateDesc.rasterizer.IsMultisampleEnabled = true;
-		backToFrontTransparencyPassStateDesc.rasterizer.CullMode = CullMode.None;
 		backToFrontTransparencyPassStateDesc.depthStencil.DepthWriteMask = DepthWriteMask.Zero;
 		backToFrontTransparencyPassStateDesc.blend.RenderTarget[0].IsBlendEnabled = true;
 		backToFrontTransparencyPassStateDesc.blend.RenderTarget[0].SourceBlend = BlendOption.One;
 		backToFrontTransparencyPassStateDesc.blend.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
-		this.backToFrontTransparencyPassStates = new States(device, backToFrontTransparencyPassStateDesc);
+		backToFrontTransparencyPassStateDesc.rasterizer.CullMode = CullMode.Front;
+		this.backToFrontTransparencyBackFacesPassStates = new States(device, backToFrontTransparencyPassStateDesc);
+		backToFrontTransparencyPassStateDesc.rasterizer.CullMode = CullMode.Back;
+		this.backToFrontTransparencyFrontFacesPassStates = new States(device, backToFrontTransparencyPassStateDesc);
+		backToFrontTransparencyPassStateDesc.rasterizer.CullMode = CullMode.None;
+		this.backToFrontTransparencyAllFacesPassStates = new States(device, backToFrontTransparencyPassStateDesc);
 		
 		StateDescriptions unorderedTransparencyStateDesc = StateDescriptions.Common.Clone();
 		unorderedTransparencyStateDesc.rasterizer.IsMultisampleEnabled = false;
@@ -66,7 +72,9 @@ public class RenderPassController : IDisposable {
 
 		oneSidedOpaquePassStates.Dispose();
 		twoSidedOpaquePassStates.Dispose();
-		backToFrontTransparencyPassStates.Dispose();
+		backToFrontTransparencyBackFacesPassStates.Dispose();
+		backToFrontTransparencyFrontFacesPassStates.Dispose();
+		backToFrontTransparencyAllFacesPassStates.Dispose();
 		unorderedTransparencyPassStates.Dispose();
 	}
 
@@ -93,7 +101,7 @@ public class RenderPassController : IDisposable {
 		render(new RenderingPass(RenderingLayer.OneSidedOpaque, OutputMode.Standard));
 
 		//One-sided Back-to-Front-Transparency Pass
-		backToFrontTransparencyPassStates.Apply(context);
+		backToFrontTransparencyAllFacesPassStates.Apply(context);
 		render(new RenderingPass(RenderingLayer.OneSidedBackToFrontTransparent, OutputMode.Standard));
 
 		//One-sided False-Depth Pass
@@ -108,7 +116,9 @@ public class RenderPassController : IDisposable {
 		render(new RenderingPass(RenderingLayer.TwoSidedOpaque, OutputMode.Standard));
 
 		//Two-sided Back-to-Front-Transparency Pass
-		backToFrontTransparencyPassStates.Apply(context);
+		backToFrontTransparencyBackFacesPassStates.Apply(context);
+		render(new RenderingPass(RenderingLayer.TwoSidedBackToFrontTransparent, OutputMode.Standard));
+		backToFrontTransparencyFrontFacesPassStates.Apply(context);
 		render(new RenderingPass(RenderingLayer.TwoSidedBackToFrontTransparent, OutputMode.Standard));
 
 		//Switch to oit-blend target
@@ -126,7 +136,7 @@ public class RenderPassController : IDisposable {
 		postProcessor.PostProcess(context, standardTarget.ResolveSourceView);
 
 		//Render UI
-		backToFrontTransparencyPassStates.Apply(context);
+		backToFrontTransparencyAllFacesPassStates.Apply(context);
 		render(new RenderingPass(RenderingLayer.UiElements, OutputMode.Standard));
 	}
 }
