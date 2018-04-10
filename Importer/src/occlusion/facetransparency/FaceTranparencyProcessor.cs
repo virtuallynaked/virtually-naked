@@ -15,9 +15,9 @@ private static InputElement[] InputElements = new[] {
 	};
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct OpacityCounters {
+	private struct TransparencyCounters {
 		public uint pixelCount;
-		public uint opacityCount;
+		public uint transparencyCount;
 	}
 	
 	private readonly Device device;
@@ -38,11 +38,11 @@ private static InputElement[] InputElements = new[] {
 		faceCount = figure.Geometry.Faces.Length;
 		faceTransparencies = new float[faceCount];
 
-		var vertexShaderAndBytecode = shaderCache.GetVertexShader<TextureMaskRenderer>("occlusion/facetransparency/OpacityCounting");
+		var vertexShaderAndBytecode = shaderCache.GetVertexShader<TextureMaskRenderer>("occlusion/facetransparency/TransparencyCounting");
 		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 		vertexShader = vertexShaderAndBytecode;
 		
-		pixelShader = shaderCache.GetPixelShader<TextureMaskRenderer>("occlusion/facetransparency/OpacityCounting");
+		pixelShader = shaderCache.GetPixelShader<TextureMaskRenderer>("occlusion/facetransparency/TransparencyCounting");
 
 		var statesDesc = StateDescriptions.Default();
 		statesDesc.rasterizer.CullMode = CullMode.None;
@@ -108,7 +108,7 @@ private static InputElement[] InputElements = new[] {
 
 		var indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, triangleIndices.ToArray());
 			
-		var opacityCounterBufferManager = new InOutStructuredBufferManager<OpacityCounters>(device, faceIdxMap.Count);
+		var transparencyCounterBufferManager = new InOutStructuredBufferManager<TransparencyCounters>(device, faceIdxMap.Count);
 
 		context.ClearState();
 			
@@ -126,25 +126,24 @@ private static InputElement[] InputElements = new[] {
 		context.PixelShader.Set(pixelShader);
 		context.PixelShader.SetShaderResources(0, opacityTextureView);
 			
-		context.OutputMerger.SetUnorderedAccessView(0, opacityCounterBufferManager.OutView);
+		context.OutputMerger.SetUnorderedAccessView(0, transparencyCounterBufferManager.OutView);
 
 		context.DrawIndexed(triangleIndices.Count, 0, 0);
 
 		context.ClearState();
 						
-		var opacityCounterStagingBufferManager = new StagingStructuredBufferManager<OpacityCounters>(device, faceIdxMap.Count);
-		opacityCounterStagingBufferManager.CopyToStagingBuffer(context, opacityCounterBufferManager.Buffer);
-		var array = opacityCounterStagingBufferManager.FillArrayFromStagingBuffer(context);
+		var transparencyCounterStagingBufferManager = new StagingStructuredBufferManager<TransparencyCounters>(device, faceIdxMap.Count);
+		transparencyCounterStagingBufferManager.CopyToStagingBuffer(context, transparencyCounterBufferManager.Buffer);
+		var array = transparencyCounterStagingBufferManager.FillArrayFromStagingBuffer(context);
 			
 		for (int faceIdx = 0; faceIdx < faceIdxMap.Count; ++faceIdx) {
-			OpacityCounters opacityCounter = array[faceIdx];
+			TransparencyCounters transparencyCounter = array[faceIdx];
 			
-			if (opacityCounter.pixelCount > (1<<24)) {
+			if (transparencyCounter.pixelCount > (1<<24)) {
 				throw new Exception("pixel count overflow");
 			}
 
-			float opacity = opacityCounter.opacityCount == 0 ? 0 : (float) opacityCounter.opacityCount / opacityCounter.pixelCount / 0xff;
-			float transparency = 1 - opacity;
+			float transparency = transparencyCounter.transparencyCount == 0 ? 0 : (float) transparencyCounter.transparencyCount / transparencyCounter.pixelCount / 0xff;
 			faceTransparencies[faceIdxMap[faceIdx]] = transparency;
 		}
 			
@@ -152,8 +151,8 @@ private static InputElement[] InputElements = new[] {
 		opacityTexture.Dispose();
 		indexBuffer.Dispose();
 		vertexBuffer.Dispose();
-		opacityCounterBufferManager.Dispose();
-		opacityCounterStagingBufferManager.Dispose();
+		transparencyCounterBufferManager.Dispose();
+		transparencyCounterStagingBufferManager.Dispose();
 	}
 
 	public void ProcessConstantSurface(int surfaceIdx, float opacity) {
