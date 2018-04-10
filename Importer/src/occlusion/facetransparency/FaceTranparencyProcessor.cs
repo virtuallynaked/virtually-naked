@@ -8,6 +8,7 @@ using Device = SharpDX.Direct3D11.Device;
 using Buffer = SharpDX.Direct3D11.Buffer;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class FaceTransparencyProcessor: IDisposable {
 private static InputElement[] InputElements = new[] {
@@ -23,18 +24,21 @@ private static InputElement[] InputElements = new[] {
 	private readonly Device device;
 	private readonly Figure figure;
 
-	private int faceCount;
+	private readonly SurfaceProperties surfaceProperties;
+	private readonly int faceCount;
 	private readonly float[] faceTransparencies;
 
 	private readonly InputLayout inputLayout;
 	private readonly VertexShader vertexShader;
-	private readonly PixelShader pixelShader;
+	private readonly PixelShader addingPixelShader;
+	private readonly PixelShader maxingPixelShader;
 	private readonly States states;
 
 	public FaceTransparencyProcessor(Device device, ShaderCache shaderCache, Figure figure) {
 		this.device = device;
 		this.figure = figure;
 
+		surfaceProperties = SurfacePropertiesJson.Load(figure);
 		faceCount = figure.Geometry.Faces.Length;
 		faceTransparencies = new float[faceCount];
 
@@ -42,7 +46,8 @@ private static InputElement[] InputElements = new[] {
 		inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, MeshBuffers.InputElements);
 		vertexShader = vertexShaderAndBytecode;
 		
-		pixelShader = shaderCache.GetPixelShader<TextureMaskRenderer>("occlusion/facetransparency/TransparencyCounting");
+		addingPixelShader = shaderCache.GetPixelShader<TextureMaskRenderer>("occlusion/facetransparency/TransparencyCounting_Add");
+		maxingPixelShader = shaderCache.GetPixelShader<TextureMaskRenderer>("occlusion/facetransparency/TransparencyCounting_Max");
 
 		var statesDesc = StateDescriptions.Default();
 		statesDesc.rasterizer.CullMode = CullMode.None;
@@ -73,6 +78,9 @@ private static InputElement[] InputElements = new[] {
 	}
 
 	private void ProcessTexturedSurface(int surfaceIdx, string uvSetName, FileInfo file, bool isLinear) {
+		bool isOrderedTransparent = surfaceProperties.RenderOrder.Contains(surfaceIdx);
+		bool isMaxing = isOrderedTransparent;
+
 		var context = device.ImmediateContext;
 
 		var opacityTexture = LoadOpacityTexture(file, isLinear);
@@ -123,7 +131,7 @@ private static InputElement[] InputElements = new[] {
 			
 		context.Rasterizer.SetViewport(0, 0, opacityTexture.Description.Width, opacityTexture.Description.Height);
 
-		context.PixelShader.Set(pixelShader);
+		context.PixelShader.Set(isMaxing ? maxingPixelShader : addingPixelShader);
 		context.PixelShader.SetShaderResources(0, opacityTextureView);
 			
 		context.OutputMerger.SetUnorderedAccessView(0, transparencyCounterBufferManager.OutView);
@@ -143,7 +151,12 @@ private static InputElement[] InputElements = new[] {
 				throw new Exception("pixel count overflow");
 			}
 
-			float transparency = transparencyCounter.transparencyCount == 0 ? 0 : (float) transparencyCounter.transparencyCount / transparencyCounter.pixelCount / 0xff;
+			float transparency;
+			if (isMaxing) {
+				transparency = (float) transparencyCounter.transparencyCount / 0xff;
+			} else {
+				transparency = transparencyCounter.transparencyCount == 0 ? 0 : (float) transparencyCounter.transparencyCount / transparencyCounter.pixelCount / 0xff;
+			}
 			faceTransparencies[faceIdxMap[faceIdx]] = transparency;
 		}
 			

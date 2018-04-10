@@ -15,5 +15,5 @@ void main(float4 screenPosition : SV_POSITION, uint primitiveId : SV_PrimitiveID
 	float transparency = 1 - opacity;
 
 	InterlockedAdd(counterArray[faceIdx].pixelCount, 1);
-	InterlockedAdd(counterArray[faceIdx].transparencyCount, (uint) (0xff * transparency + 0.5));
+	ACCUM_OP(counterArray[faceIdx].transparencyCount, (uint) (0xff * transparency + 0.5));
 }
