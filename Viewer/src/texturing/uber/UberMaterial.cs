@@ -228,19 +228,7 @@ public class UberMaterial : IMaterial {
 	}
 
 	public UberMaterialSettings Settings => settings;
-
-	public bool IsTransparent {
-		get {
-			if (settings.cutoutOpacity.value != 1 || settings.cutoutOpacity.image != null) {
-				return true;
-			}
-			if (settings.thinWalled && settings.refractionWeight.value > 0) {
-				return true;
-			}
-			return false;
-		}
-	}
-
+	
 	public string UvSet => settings.uvSet;
 	
 	private PixelShader PickShader(OutputMode mode) {
@@ -254,8 +242,8 @@ public class UberMaterial : IMaterial {
 		}
 	} 
 	
-	public void Apply(DeviceContext context, RenderingPass pass) {
-		context.PixelShader.Set(PickShader(pass.OutputMode));
+	public void Apply(DeviceContext context, OutputMode outputMode) {
+		context.PixelShader.Set(PickShader(outputMode));
 		context.PixelShader.SetShaderResources(ShaderSlots.MaterialTextureStart, textureViews);
 		context.PixelShader.SetConstantBuffer(ShaderSlots.MaterialConstantBufferStart, constantBuffer);
 	}

@@ -6,19 +6,28 @@ using System;
 public class FigureRenderer : IDisposable {
 	private readonly Scatterer scatterer;
 	private readonly VertexRefiner vertexRefiner;
-	private readonly FigureSurface[] surfaces;
 	private readonly MaterialSet materialSet;
+	private readonly FigureSurface[] surfaces;
+
+	private readonly bool isOneSided;
+	private readonly int[] surfaceOrder;
+	private readonly bool[] areUnorderedTransparent;
+
 	private readonly VertexShader vertexShader;
 	private readonly VertexShader falseDepthVertexShader;
 	private readonly InputLayout inputLayout;
-	private readonly int[][] surfaceRenderOrderByLayer;
 
-	public FigureRenderer(Device device, ShaderCache shaderCache, Scatterer scatterer, VertexRefiner vertexRefiner, FigureSurface[] surfaces, MaterialSet materialSet, int[][] surfaceRenderOrderByLayer) {
+	public FigureRenderer(
+		Device device, ShaderCache shaderCache, Scatterer scatterer, VertexRefiner vertexRefiner, MaterialSet materialSet, FigureSurface[] surfaces,
+		bool isOneSided, int[] surfaceOrder, bool[] areUnorderedTranparent) {
 		this.scatterer = scatterer;
 		this.vertexRefiner = vertexRefiner;
-		this.surfaces = surfaces;
 		this.materialSet = materialSet;
-		this.surfaceRenderOrderByLayer = surfaceRenderOrderByLayer;
+		this.surfaces = surfaces;
+		
+		this.isOneSided = isOneSided;
+		this.surfaceOrder = surfaceOrder;
+		this.areUnorderedTransparent = areUnorderedTranparent;
 		
 		var vertexShaderAndBytecode = shaderCache.GetVertexShader<FigureRenderer>("figure/rendering/Figure");
 		this.vertexShader = vertexShaderAndBytecode;
@@ -42,25 +51,34 @@ public class FigureRenderer : IDisposable {
 	}
 	
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
-		var orderedSurfaceIdxs = surfaceRenderOrderByLayer[(int) pass.Layer];
-		if (orderedSurfaceIdxs == null || orderedSurfaceIdxs.Length == 0) {
-			return;
-		}
-
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
         context.InputAssembler.SetVertexBuffers(0, vertexRefiner.RefinedVertexBufferBinding);
 		context.InputAssembler.InputLayout = inputLayout;
 
 		var vertexShaderForMode = pass.OutputMode == OutputMode.FalseDepth ? falseDepthVertexShader : vertexShader;
 		context.VertexShader.Set(vertexShaderForMode);
-
-		foreach (int surfaceIdx in orderedSurfaceIdxs) {
+		
+		foreach (int surfaceIdx in surfaceOrder) {
 			var surface = surfaces[surfaceIdx];
 			var material = materialSet.Materials[surfaceIdx];
+			bool isUnorderedTransparent = areUnorderedTransparent[surfaceIdx];
 
-			material.Apply(context, pass);
-			surface.Draw(context);
-			material.Unapply(context);
+			var opaqueLayer = isOneSided ? RenderingLayer.OneSidedOpaque : RenderingLayer.TwoSidedOpaque;
+			var transparentLayer = isUnorderedTransparent ?
+				RenderingLayer.UnorderedTransparent :
+				(isOneSided ? RenderingLayer.OneSidedBackToFrontTransparent : RenderingLayer.TwoSidedBackToFrontTransparent);
+
+			if (pass.Layer == opaqueLayer) {
+				material.Apply(context, pass.OutputMode);
+				surface.DrawOpaque(context);
+				material.Unapply(context);
+			}
+
+			if (pass.Layer == transparentLayer) {
+				material.Apply(context, pass.OutputMode);
+				surface.DrawTransparent(context);
+				material.Unapply(context);
+			}
 		}
 	}
 }

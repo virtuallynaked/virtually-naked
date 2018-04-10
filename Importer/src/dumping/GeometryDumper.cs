@@ -22,6 +22,17 @@ public class GeometryDumper {
 		this.refinementDirectory = refinementDirectory;
 	}
 
+	private void DumpControl() {
+		var targetDirectory = refinementDirectory.Subdirectory("control");
+		if (targetDirectory.Exists) {
+			return;
+		}
+
+		targetDirectory.Create();
+		targetDirectory.File("surface-map.array").WriteArray(figure.Geometry.SurfaceMap);
+	}
+
+
 	private void DumpRefinementLevel(int level) {
 		var targetDirectory = refinementDirectory.Subdirectory("level-" + level);
 		if (targetDirectory.Exists) {
@@ -30,18 +41,20 @@ public class GeometryDumper {
 
 		Console.WriteLine("Dumping refined geometry level {0}...", level);
 
-		MultisurfaceQuadTopology mergedTopology = figure.Geometry.AsTopology();
+		MultisurfaceQuadTopology topology = figure.Geometry.AsTopology();
 		
-		var refinementResult = mergedTopology.Refine(level);
+		var refinementResult = topology.Refine(level);
 		
 		targetDirectory.Create();
 		Persistance.Save(targetDirectory.File("topology-info.dat"), refinementResult.TopologyInfo);
 		SubdivisionMeshPersistance.Save(targetDirectory, refinementResult.Mesh);
-		targetDirectory.File("surface-map.array").WriteArray(refinementResult.SurfaceMap);
+		targetDirectory.File("control-face-map.array").WriteArray(refinementResult.ControlFaceMap);
 	}
 	
 	private void DumpRefinement() {
 		var surfaceProperties = SurfacePropertiesJson.Load(figure);
+
+		DumpControl();
 
 		DumpRefinementLevel(0);
 

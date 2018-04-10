@@ -15,9 +15,14 @@ public class FigureRendererLoader {
 	public FigureRenderer Load(IArchiveDirectory figureDir, string materialSetName) {
 		SurfaceProperties surfaceProperties = Persistance.Load<SurfaceProperties>(figureDir.File("surface-properties.dat"));
 
-		var meshDirectory = figureDir.Subdirectory("refinement").Subdirectory("level-" + surfaceProperties.SubdivisionLevel);
-		SubdivisionMesh mesh = SubdivisionMeshPersistance.Load(meshDirectory);
-		int[] surfaceMap = meshDirectory.File("surface-map.array").ReadArray<int>();
+		var refinementDirectory = figureDir.Subdirectory("refinement");
+
+		var controlMeshDirectory = refinementDirectory.Subdirectory("control");
+		int[] surfaceMap = controlMeshDirectory.File("surface-map.array").ReadArray<int>();
+
+		var refinedMeshDirectory = refinementDirectory.Subdirectory("level-" + surfaceProperties.SubdivisionLevel);
+		SubdivisionMesh mesh = SubdivisionMeshPersistance.Load(refinedMeshDirectory);
+		int[] controlFaceMap = refinedMeshDirectory.File("control-face-map.array").ReadArray<int>();
 		
 		var materialSet = MaterialSet.LoadActive(device, shaderCache, dataDir, figureDir, materialSetName, surfaceProperties);
 		var materials = materialSet.Materials;
@@ -32,40 +37,30 @@ public class FigureRendererLoader {
 		
 		var vertexRefiner = new VertexRefiner(device, shaderCache, mesh, texturedVertexInfos);
 		
-		FigureSurface[] surfaces = FigureSurface.MakeSurfaces(device, materials.Length, texturedFaces, surfaceMap);
+		FigureSurface[] surfaces = FigureSurface.MakeSurfaces(device, materials.Length, texturedFaces, controlFaceMap, surfaceMap, materialSet.FaceTransparencies);
 		
-		HashSet<int> orderedSurfaces = new HashSet<int>();
-		List<int> opaqueSurfaces = new List<int>();
-		List<int> orderedTransparentSurfaces = new List<int>();
-		List<int> unorderedTransparentSurfaces = new List<int>();
+		HashSet<int> visitedSurfaceIndices = new HashSet<int>();
+		List<int> surfaceOrder = new List<int>(surfaces.Length);
+		bool[] areUnorderedTransparent = new bool[surfaces.Length];
+
+		//first add surfaces with an explicity-set render order
 		foreach (int surfaceIdx in surfaceProperties.RenderOrder) {
-			orderedSurfaces.Add(surfaceIdx);
-			if (!materials[surfaceIdx].IsTransparent) {
-				opaqueSurfaces.Add(surfaceIdx);
-			} else {
-				orderedTransparentSurfaces.Add(surfaceIdx);
-			}
+			visitedSurfaceIndices.Add(surfaceIdx);
+			surfaceOrder.Add(surfaceIdx);
+			areUnorderedTransparent[surfaceIdx] = false;
 		}
+
+		//then add any remaining surfaces
 		for (int surfaceIdx = 0; surfaceIdx < surfaces.Length; ++surfaceIdx) {
-			if (orderedSurfaces.Contains(surfaceIdx)) {
+			if (visitedSurfaceIndices.Contains(surfaceIdx)) {
 				continue;
 			}
-			if (!materials[surfaceIdx].IsTransparent) {
-				opaqueSurfaces.Add(surfaceIdx);
-			} else {
-				unorderedTransparentSurfaces.Add(surfaceIdx);
-			}
+			surfaceOrder.Add(surfaceIdx);
+			areUnorderedTransparent[surfaceIdx] = true;
 		}
-		
-		var isOneSided = figureDir.Name == "genesis-3-female"; //hack
-		RenderingLayer opaqueLayer = isOneSided ? RenderingLayer.OneSidedOpaque : RenderingLayer.TwoSidedOpaque;
-		RenderingLayer backToFrontTransparentLayer = isOneSided ? RenderingLayer.OneSidedBackToFrontTransparent : RenderingLayer.TwoSidedBackToFrontTransparent;
 
-		int[][] surfaceRenderOrderByLayer = new int[RenderingPass.Layers.Length][];
-		surfaceRenderOrderByLayer[(int) opaqueLayer] = opaqueSurfaces.ToArray();
-		surfaceRenderOrderByLayer[(int) backToFrontTransparentLayer] = orderedTransparentSurfaces.ToArray();
-		surfaceRenderOrderByLayer[(int) RenderingLayer.UnorderedTransparent] = unorderedTransparentSurfaces.ToArray();
-		
-		return new FigureRenderer(device, shaderCache, scatterer, vertexRefiner, surfaces, materialSet, surfaceRenderOrderByLayer);
+		var isOneSided = figureDir.Name == "genesis-3-female"; //hack
+
+		return new FigureRenderer(device, shaderCache, scatterer, vertexRefiner, materialSet, surfaces, isOneSided, surfaceOrder.ToArray(), areUnorderedTransparent);
 	}
 }

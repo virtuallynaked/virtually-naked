@@ -15,18 +15,24 @@ public class MaterialSet : IDisposable {
 		var textureLoader = new TextureLoader(device, texturesDirectory);
 		var multiMaterialSettings = Persistance.Load<MultiMaterialSettings>(materialsDirectory.File("material-settings.dat"));
 		var materials = multiMaterialSettings.PerMaterialSettings.Select(settings => settings.Load(device, shaderCache, textureLoader)).ToArray();
-		return new MaterialSet(textureLoader, materials);
+
+		float[] faceTransparencies = materialsDirectory.File("face-transparencies.array").ReadArray<float>();
+
+		return new MaterialSet(textureLoader, materials, faceTransparencies);
 	}
 	
 	private readonly TextureLoader textureLoader;
 	private IMaterial[] materials;
+	private float[] faceTransparencies;
 
-	public MaterialSet(TextureLoader textureLoader, IMaterial[] materials) {
+	public MaterialSet(TextureLoader textureLoader, IMaterial[] materials, float[] faceTransparencies) {
 		this.textureLoader = textureLoader;
 		this.materials = materials;
+		this.faceTransparencies = faceTransparencies;
 	}
 
 	public IMaterial[] Materials => materials;
+	public float[] FaceTransparencies => faceTransparencies;
 
 	public void Dispose() {
 		textureLoader.Dispose();

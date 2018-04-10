@@ -15,8 +15,6 @@ public enum OutputMode {
 }
 
 public struct RenderingPass {
-	public static readonly RenderingLayer[] Layers = Enum.GetValues(typeof(RenderingLayer)).Cast<RenderingLayer>().ToArray();
-
 	public RenderingLayer Layer { get; }
 	public OutputMode OutputMode { get; }
 

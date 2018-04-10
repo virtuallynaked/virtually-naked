@@ -53,9 +53,7 @@ class HairMaterial : IMaterial {
 		constantBuffer?.Dispose();
 		//don't dispose texture view because it's owned by the texture loader
 	}
-
-	public bool IsTransparent => settings.opacity.image != null || settings.opacity.value < 1;
-
+	
 	public string UvSet => settings.uvSet;
 
 	private PixelShader PickShader(OutputMode mode) {
@@ -69,8 +67,8 @@ class HairMaterial : IMaterial {
 		}
 	}
 	
-	public void Apply(DeviceContext context, RenderingPass pass) {
-		context.PixelShader.Set(PickShader(pass.OutputMode));
+	public void Apply(DeviceContext context, OutputMode outputMode) {
+		context.PixelShader.Set(PickShader(outputMode));
 		context.PixelShader.SetShaderResources(ShaderSlots.MaterialTextureStart, textureViews);
 		context.PixelShader.SetConstantBuffer(ShaderSlots.MaterialConstantBufferStart, constantBuffer);
 	}

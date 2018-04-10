@@ -12,7 +12,7 @@ public class ScatteringFormFactorCalculator {
 		Vector3[] vertexPositions = RefineVertexPositions(geometry, refinementResult);
 		
 		Quad[] faces = refinementResult.Mesh.Topology.Faces;
-		int[] surfaceMap = refinementResult.SurfaceMap;
+		int[] surfaceMap = geometry.SurfaceMap;
 
 		return new ScatteringFormFactorCalculator(vertexPositions, faces, surfaceMap);
 	}
@@ -32,6 +32,10 @@ public class ScatteringFormFactorCalculator {
 	private ConnectedComponentLabels connectedComponentLabels;
 	
 	private ScatteringFormFactorCalculator(Vector3[] vertexPositions, Quad[] faces, int[] surfaceMap) {
+		if (faces.Length != surfaceMap.Length) {
+			throw new ArgumentException("face count mismatch");
+		}
+
 		foreach (var face in faces) {
 			if (face.IsDegeneratedIntoTriangle) {
 				throw new NotImplementedException("ScatteringFormFactorCalculator only supports Quad faces");
