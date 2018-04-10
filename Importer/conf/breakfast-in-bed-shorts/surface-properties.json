@@ -1,4 +1,5 @@
 {
 	"subdivision-level": 1,
-	"share-textures": "breakfast-in-bed-outfit"
+	"share-textures": "breakfast-in-bed-outfit",
+	"render-order": [ "Shorts", "Lace", "Bows" ]
 }

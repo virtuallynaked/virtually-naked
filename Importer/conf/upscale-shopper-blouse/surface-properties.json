@@ -1,4 +1,5 @@
 {
 	"subdivision-level": 0,
-	"share-textures": "upscale-shopper-outfit"
+	"share-textures": "upscale-shopper-outfit",
+	"render-order": [ "BlazerTop" ]
 }
