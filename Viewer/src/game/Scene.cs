@@ -17,7 +17,7 @@ class Scene : IDisposable {
 		var textureCache = new TextureCache(device);
 
 		toneMappingSettings = new ToneMappingSettings();
-		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, InitialSettings.Environment);
+		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, InitialSettings.Environment, InitialSettings.EnvironmentRotation);
 		backdrop = new Backdrop(device, shaderCache);
 		floor = new PlayspaceFloor(device, shaderCache);
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, trackedDeviceBufferManager);

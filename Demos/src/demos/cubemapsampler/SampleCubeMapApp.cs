@@ -12,7 +12,7 @@ public class SampleCubeMapApp : IDemoApp {
 		var stamdardSamplers = new StandardSamplers(device);
 
 		var dataDir = UnpackedArchiveDirectory.Make(CommonPaths.WorkDir);
-		var environment = new ImageBasedLightingEnvironment(device, stamdardSamplers, dataDir, "ruins");
+		var environment = new ImageBasedLightingEnvironment(device, stamdardSamplers, dataDir, "ruins", 0);
 		
 		DeviceContext context = device.ImmediateContext;
 		

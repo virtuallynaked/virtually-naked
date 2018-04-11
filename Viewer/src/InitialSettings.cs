@@ -2,7 +2,8 @@ using SharpDX;
 using System.Collections.Generic;
 
 public static class InitialSettings {
-	public const string Environment = "Ruins B";
+	public const string Environment = "Ruins A";
+	public const float EnvironmentRotation = -2.60f;
 
 	public const string Character = "Eva";
 	

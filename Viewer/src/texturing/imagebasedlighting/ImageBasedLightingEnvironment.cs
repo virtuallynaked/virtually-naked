@@ -26,7 +26,7 @@ public class ImageBasedLightingEnvironment : IDisposable {
 	private ShaderResourceView diffuseEnvironmentCube;
 	private ShaderResourceView glossyEnvironmentCube;
 
-	public float Rotation { get; set; } = 0;
+	public float Rotation { get; set; }
 	
 	private static ShaderResourceView LoadTexture(Device device, IArchiveFile file) {
 		using (var dataView = file.OpenDataView()) {
@@ -36,7 +36,7 @@ public class ImageBasedLightingEnvironment : IDisposable {
 		}
 	}
 
-	public ImageBasedLightingEnvironment(Device device, StandardSamplers standardSamplers, IArchiveDirectory dataDir, string environmentName) {
+	public ImageBasedLightingEnvironment(Device device, StandardSamplers standardSamplers, IArchiveDirectory dataDir, string environmentName, float rotation) {
 		this.device = device;
 		this.standardSamplers = standardSamplers;
 		this.dataDir = dataDir;
@@ -44,7 +44,7 @@ public class ImageBasedLightingEnvironment : IDisposable {
 		constantBufferManager = new ConstantBufferManager<ShaderConstants>(device);
 
 		EnvironmentName = environmentName;
-
+		Rotation = rotation;
 	}
 
 	public void Dispose() {

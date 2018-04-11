@@ -83,8 +83,8 @@ public class ToneMappingMenuLevel : IMenuLevel {
 		items = new List<IMenuItem> {
 			new WhiteBalanceMenuItem(settings),
 			new ExposureMenuItem(settings),
-			new GenericRangeMenuItem("Burn Highlights", 0, 0.25, 1, () => settings.BurnHighlights, (value) => settings.BurnHighlights = value),
-			new GenericRangeMenuItem("Crush Shadows", 0, 0.2, 1, () => settings.CrushBlacks, (value) => settings.CrushBlacks = value)
+			new GenericRangeMenuItem("Burn Highlights", 0, ToneMappingSettings.DefaultBurnHighlights, 1, () => settings.BurnHighlights, (value) => settings.BurnHighlights = value),
+			new GenericRangeMenuItem("Crush Shadows", 0, ToneMappingSettings.DefaultCrushBlacks, 1, () => settings.CrushBlacks, (value) => settings.CrushBlacks = value)
 		};
 	}
 

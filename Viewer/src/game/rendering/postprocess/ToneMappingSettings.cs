@@ -4,11 +4,13 @@ using System;
 public class ToneMappingSettings {
 	public const double NeutralWhiteBalance = 6500;
 	public const double NeutralExposure = 13;
+	public const double DefaultBurnHighlights = 0.52;
+	public const double DefaultCrushBlacks = 0.12;
 	
 	public double WhiteBalance { get; set; } = NeutralWhiteBalance;
 	public double ExposureValue { get; set; } = NeutralExposure;
-	public double BurnHighlights { get; set; } = 0.25;
-	public double CrushBlacks { get; set; } = 0.2;
+	public double BurnHighlights { get; set; } = DefaultBurnHighlights;
+	public double CrushBlacks { get; set; } = DefaultCrushBlacks;
 
 
 	public class Recipe {
