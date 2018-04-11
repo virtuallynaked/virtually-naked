@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,24 +8,36 @@ public class UnpackedArchiveDirectory : IArchiveDirectory {
 	}
 
 	private readonly DirectoryInfo info;
+	private readonly Dictionary<string, UnpackedArchiveDirectory> subdirectories;
+	private readonly Dictionary<string, UnpackedArchiveFile> files;
 	
 	private UnpackedArchiveDirectory(DirectoryInfo info) {
 		this.info = info;
+
+		subdirectories = info.GetDirectories().ToDictionary(
+			subdirInfo => subdirInfo.Name,
+			subdirInfo => Make(subdirInfo));
+
+		files = info.GetFiles().ToDictionary(
+			fileInfo => fileInfo.Name,
+			fileInfo => UnpackedArchiveFile.Make(fileInfo));
 	}
 
 	public string Name => info.Name;
 		
-	public IArchiveDirectory Subdirectory(string name) {
-		return Make(info.Subdirectory(name));
-	}
-	
 	public IArchiveFile File(string name) {
-		return UnpackedArchiveFile.Make(info.File(name));
+		files.TryGetValue(name, out var file);
+		return file;
 	}
 
 	public IEnumerable<IArchiveFile> GetFiles() {
-		return info.GetFiles().Select(fileInfo => UnpackedArchiveFile.Make(fileInfo));
+		return files.Values;
 	}
-	
-	public IEnumerable<IArchiveDirectory> Subdirectories => info.GetDirectories().Select(dirInfo => UnpackedArchiveDirectory.Make(dirInfo));
+
+	public IEnumerable<IArchiveDirectory> Subdirectories => subdirectories.Values;
+
+	public IArchiveDirectory Subdirectory(string name) {
+		subdirectories.TryGetValue(name, out var subdir);
+		return subdir;
+	}
 }
