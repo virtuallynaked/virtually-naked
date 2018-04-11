@@ -71,6 +71,10 @@ public class FigureFacade : IDisposable {
 	}
 	
 	public FigureSystemOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, FigureSystemOutputs parentOutputs) {
+		if (!model.IsVisible) {
+			return null;
+		}
+
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults(context);
 
 		ChannelInputs shapeInputs = new ChannelInputs(model.Shape.ChannelInputs);
@@ -91,6 +95,10 @@ public class FigureFacade : IDisposable {
 	}
 
 	public void UpdateVertexPositions(DeviceContext context, ShaderResourceView parentDeltasView) {
+		if (!model.IsVisible) {
+			return;
+		}
+
 		controlVertexProvider.UpdateVertexPositions(context, parentDeltasView);
 	}
 
