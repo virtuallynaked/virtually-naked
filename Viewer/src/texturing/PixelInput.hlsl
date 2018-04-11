@@ -16,13 +16,18 @@ struct PixelInput {
 	float3 scatteredIllumination;
 };
 
+float3 normalizeNonZero(float3 v) {
+	float lengthSquared = dot(v, v);
+	return lengthSquared == 0 ? v : v * rsqrt(lengthSquared);
+}
+
 PixelInput preparePixelInput(VertexOutput vertexOutput, bool isFrontFace) {
 	PixelInput input;
 
 	input.eyeDirection = normalize(vertexOutput.positions.objectRelativeEyePosition);
 	
 	float3 normal = normalize(vertexOutput.normal);
-	float3 tangent = -normalize(vertexOutput.tangent - normal * dot(vertexOutput.tangent, normal));
+	float3 tangent = -normalizeNonZero(vertexOutput.tangent - normal * dot(vertexOutput.tangent, normal));
 
 	input.texcoord = vertexOutput.texcoord;
 
