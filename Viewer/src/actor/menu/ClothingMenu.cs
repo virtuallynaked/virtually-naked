@@ -16,7 +16,18 @@ public class OutfitMenuItem : IToggleMenuItem {
 	public bool IsSet => outfit.IsMatch(actor.Clothing);
 
 	public void Toggle() {
-		actor.SetClothing(outfit.Figures);
+		var recipes = outfit.Elements
+			.Select(element => {
+				InitialSettings.MaterialSets.TryGetValue(element.Figure, out string initialMaterialSetName);
+				return new FigureFacade.Recipe {
+					name = element.Figure,
+					isVisible = element.IsInitiallyVisible,
+					materialSet = initialMaterialSetName
+				};
+			})
+			.ToArray();
+
+		actor.SetClothing(recipes);
 	}
 }
 
@@ -44,10 +55,15 @@ public class ClothingMenuLevel : IMenuLevel {
 		items.Add(new SubLevelMenuItem("Outfits", outfitsMenuLevel));
 		items.Add(new SubLevelMenuItem("Fabrics", materialsMenuLevel));
 
-		foreach (var figure in actor.Clothing) {
-			items.Add(new VisibilityToggleMenuItem(figure.Definition.Name, figure.Model));
-		}
+		var clothingFigures = actor.Clothing;
+		var activeOutfit = Outfit.Outfits.Find(outfit => outfit.IsMatch(clothingFigures));
 
+		for (int clothingIdx = 0; clothingIdx < clothingFigures.Length; ++clothingIdx) {
+			var clothingFigure = clothingFigures[clothingIdx];
+			var label = activeOutfit?.Elements[clothingIdx].Label ?? clothingFigure.Definition.Name;
+			items.Add(new VisibilityToggleMenuItem(label, clothingFigure.Model));
+		}
+		
 		return items;
 	}
 	

@@ -15,7 +15,10 @@ public class Actor : IDisposable {
 		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Definition.Directory, actorModel);
 
 		var actor = new Actor(device, actorModel, figureLoader, mainFigure, hairFigure, behavior);
-		actor.SetClothing(InitialSettings.Clothing);
+		var clothingFigures = InitialSettings.Clothing
+			.Select(clothingFigureName => figureLoader.Load(clothingFigureName, mainFigure.Definition))
+			.ToArray();
+		actor.SetClothingFigures(clothingFigures);
 
 		return actor;
 	}
@@ -74,15 +77,8 @@ public class Actor : IDisposable {
 	public IMenuLevel MenuLevel => ActorMenuProvider.MakeRootMenuLevel(this);
 
 	public event Action ClothingChanged;
-
-	public void SetClothing(List<string> clothingFigureNames) {
-		var newClothingFigures = clothingFigureNames
-			.Select(figureName => figureLoader.Load(figureName, mainFigure.Definition))
-			.ToArray();
-		SetClothingFigures(newClothingFigures);
-	}
-
-	private void SetClothing(FigureFacade.Recipe[] recipes) {
+	
+	public void SetClothing(FigureFacade.Recipe[] recipes) {
 		var newClothingFigures = recipes
 			.Select(recipe => figureLoader.Load(recipe, mainFigure.Definition))
 			.ToArray();
