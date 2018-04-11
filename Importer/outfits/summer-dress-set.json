@@ -1,0 +1,7 @@
+{
+	"label": "Summer Dress Set",
+	"items": [
+		{ "figure": "summer-dress-dress", "label": "Dress" },
+		{ "figure": "summer-dress-shoes", "label": "Shoes" }
+	]
+}

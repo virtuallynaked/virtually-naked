@@ -47,6 +47,8 @@ public class ImporterMain : IDisposable {
 
 		new UiImporter().Run();
 		new EnvironmentCubeGenerator().Run(settings);
+		
+		OutfitImporter.ImportAll();
 
 		var loader = new FigureRecipeLoader(objectLocator);
 

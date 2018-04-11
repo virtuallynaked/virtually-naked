@@ -1,0 +1,8 @@
+{
+	"label": "Relaxed Sunday",
+	"items": [
+		{ "figure": "relaxed-sunday-tank", "label": "Tank" },
+		{ "figure": "relaxed-sunday-shorts", "label": "Shorts" },
+		{ "figure": "relaxed-sunday-shoes", "label": "Shoes" }
+	]
+}

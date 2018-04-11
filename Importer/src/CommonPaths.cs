@@ -4,4 +4,5 @@ public static class CommonPaths {
 	public static readonly DirectoryInfo SourceAssetsDir = new DirectoryInfo("source-assets");
 	public static readonly DirectoryInfo WorkDir = new DirectoryInfo("work");
 	public static readonly DirectoryInfo ConfDir = new DirectoryInfo("Importer/conf");
+	public static readonly DirectoryInfo OutfitsDir = new DirectoryInfo("Importer/outfits");
 }

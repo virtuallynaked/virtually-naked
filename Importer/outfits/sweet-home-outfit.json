@@ -1,0 +1,11 @@
+{
+	"label": "Sweet Home",
+	"items": [
+		{ "figure": "sweet-home-tshirt", "label": "T-Shirt" },
+		{ "figure": "sweet-home-panties", "label": "Panties" },
+		{ "figure": "sweet-home-shorts", "label": "Shorts", "is-initially-visible": false },
+		{ "figure": "sweet-home-thigh-socks", "label": "Thigh Socks" },
+		{ "figure": "sweet-home-shin-socks", "label": "Shin Socks", "is-initially-visible": false },
+		{ "figure": "sweet-home-ankle-socks", "label": "Ankle Socks", "is-initially-visible": false }
+	]
+}

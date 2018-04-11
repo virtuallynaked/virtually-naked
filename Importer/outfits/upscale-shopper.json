@@ -1,0 +1,9 @@
+{
+	"label": "Upscale Shopper",
+	"items": [
+		{ "figure": "upscale-shopper-blazer", "label": "Blazer" },
+		{ "figure": "upscale-shopper-blouse", "label": "Blouse" },
+		{ "figure": "upscale-shopper-pants", "label": "Pants" },
+		{ "figure": "upscale-shopper-heels", "label": "Heels" }
+	]
+}

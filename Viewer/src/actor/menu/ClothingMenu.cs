@@ -56,7 +56,7 @@ public class ClothingMenuLevel : IMenuLevel {
 		items.Add(new SubLevelMenuItem("Fabrics", materialsMenuLevel));
 
 		var clothingFigures = actor.Clothing;
-		var activeOutfit = Outfit.Outfits.Find(outfit => outfit.IsMatch(clothingFigures));
+		var activeOutfit = actor.Outfits.Find(outfit => outfit.IsMatch(clothingFigures));
 
 		for (int clothingIdx = 0; clothingIdx < clothingFigures.Length; ++clothingIdx) {
 			var clothingFigure = clothingFigures[clothingIdx];
@@ -78,7 +78,7 @@ public class ClothingMenuLevel : IMenuLevel {
 	}
 
 	public IMenuLevel MakeOutfitsMenuLevel() {
-		var items = Outfit.Outfits
+		var items = actor.Outfits
 			.Select(outfit => new OutfitMenuItem(actor, outfit))
 			.ToArray();
 		return new StaticMenuLevel(items);

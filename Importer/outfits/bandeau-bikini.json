@@ -1,0 +1,7 @@
+{
+	"label": "Bandeau Bikini",
+	"items": [
+		{ "figure": "bandeau-bikini-top", "label": "Top" },
+		{ "figure": "bandeau-bikini-bottoms", "label": "Bottoms" }
+	]
+}

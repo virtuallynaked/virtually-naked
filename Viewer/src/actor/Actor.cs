@@ -14,7 +14,9 @@ public class Actor : IDisposable {
 				
 		var behavior = ActorBehavior.Load(controllerManager, mainFigure.Definition.Directory, actorModel);
 
-		var actor = new Actor(device, actorModel, figureLoader, mainFigure, hairFigure, behavior);
+		var outfits = Outfit.LoadList(dataDir);
+
+		var actor = new Actor(device, outfits, actorModel, figureLoader, mainFigure, hairFigure, behavior);
 		var clothingFigures = InitialSettings.Clothing
 			.Select(clothingFigureName => figureLoader.Load(clothingFigureName, mainFigure.Definition))
 			.ToArray();
@@ -35,6 +37,7 @@ public class Actor : IDisposable {
 		}
 	}
 	
+	private readonly List<Outfit> outfits;
 	private readonly ActorModel model;
 	private readonly FigureLoader figureLoader;
 	private readonly FigureFacade mainFigure;
@@ -44,7 +47,8 @@ public class Actor : IDisposable {
 	private FigureFacade[] clothingFigures;
 	private readonly FigureGroup figureGroup;
 	
-	public Actor(Device device, ActorModel model, FigureLoader figureLoader, FigureFacade mainFigure, FigureFacade hairFigure, ActorBehavior behavior) {
+	public Actor(Device device, List<Outfit> outfits, ActorModel model, FigureLoader figureLoader, FigureFacade mainFigure, FigureFacade hairFigure, ActorBehavior behavior) {
+		this.outfits = outfits;
 		this.model = model;
 		this.figureLoader = figureLoader;
 		this.mainFigure = mainFigure;
@@ -68,6 +72,7 @@ public class Actor : IDisposable {
 		}
 	}
 	
+	public List<Outfit> Outfits => outfits;
 	public ActorModel Model => model;
 	public FigureFacade Main => mainFigure;
 	public FigureFacade Hair => hairFigure;
