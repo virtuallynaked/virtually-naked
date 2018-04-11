@@ -94,15 +94,21 @@ public class ControlVertexProvider : IDisposable {
 		}
 	}
 
-	public ChannelOutputs UpdateFrame(DeviceContext context, ChannelOutputs parentOutputs, ChannelInputs inputs) {
-		var channelOutputs = definition.ChannelSystem.Evaluate(parentOutputs, inputs);
-		var boneTransforms = definition.BoneSystem.GetBoneTransforms(channelOutputs);
-		if (parentOutputs != null) {
+	public FigureSystemOutputs UpdateFrame(DeviceContext context, FigureSystemOutputs parentOutputs, ChannelInputs inputs) {
+		var channelOutputs = definition.ChannelSystem.Evaluate(parentOutputs?.ChannelOutputs, inputs);
+
+		StagedSkinningTransform[] boneTransforms;
+		if (parentOutputs == null) {
+			boneTransforms = definition.BoneSystem.GetBoneTransforms(channelOutputs);
+		} else {
+			boneTransforms = (StagedSkinningTransform[]) parentOutputs.BoneTransforms.Clone();
 			BoneSystem.PrependChildToParentBindPoseTransforms(definition.ChildToParentBindPoseTransforms, boneTransforms);
 		}
+
 		occluder.SetValues(context, channelOutputs);
 		shaper.SetValues(context, channelOutputs, boneTransforms);
-		return channelOutputs;
+
+		return new FigureSystemOutputs(channelOutputs, boneTransforms);
 	}
 
 	public void UpdateVertexPositionsAndGetDeltas(DeviceContext context, UnorderedAccessView deltasOutView) {

@@ -70,7 +70,7 @@ public class FigureFacade : IDisposable {
 		renderer.RenderPass(context, pass);
 	}
 	
-	public ChannelOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, ChannelOutputs parentOutputs) {
+	public FigureSystemOutputs UpdateFrame(DeviceContext context, FrameUpdateParameters updateParameters, FigureSystemOutputs parentOutputs) {
 		var previousFrameResults = controlVertexProvider.GetPreviousFrameResults(context);
 
 		ChannelInputs shapeInputs = new ChannelInputs(model.Shape.ChannelInputs);
