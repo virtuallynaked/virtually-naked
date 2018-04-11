@@ -5,11 +5,13 @@ public class FigureRendererLoader {
 	private readonly IArchiveDirectory dataDir;
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
+	private readonly TextureCache textureCache;
 
-	public FigureRendererLoader(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache) {
+	public FigureRendererLoader(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, TextureCache textureCache) {
 		this.dataDir = dataDir;
 		this.device = device;
 		this.shaderCache = shaderCache;
+		this.textureCache = textureCache;
 	}
 
 	public FigureRenderer Load(IArchiveDirectory figureDir, string materialSetName) {
@@ -24,7 +26,7 @@ public class FigureRendererLoader {
 		SubdivisionMesh mesh = SubdivisionMeshPersistance.Load(refinedMeshDirectory);
 		int[] controlFaceMap = refinedMeshDirectory.File("control-face-map.array").ReadArray<int>();
 		
-		var materialSet = MaterialSet.LoadActive(device, shaderCache, dataDir, figureDir, materialSetName, surfaceProperties);
+		var materialSet = MaterialSet.LoadActive(device, shaderCache, textureCache, dataDir, figureDir, materialSetName, surfaceProperties);
 		var materials = materialSet.Materials;
 		
 		Scatterer scatterer = surfaceProperties.PrecomputeScattering ? Scatterer.Load(device, shaderCache, figureDir, materialSetName) : null;

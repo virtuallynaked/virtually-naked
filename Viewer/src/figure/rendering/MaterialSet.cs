@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 
 public class MaterialSet : IDisposable {
-	public static MaterialSet LoadActive(Device device, ShaderCache shaderCache, IArchiveDirectory dataDir, IArchiveDirectory figureDir, string materialSetName, SurfaceProperties surfaceProperties) {
+	public static MaterialSet LoadActive(Device device, ShaderCache shaderCache, TextureCache textureCache, IArchiveDirectory dataDir, IArchiveDirectory figureDir, string materialSetName, SurfaceProperties surfaceProperties) {
 		var materialsDirectory = figureDir
 			.Subdirectory("material-sets")
 			.Subdirectory(materialSetName);
@@ -12,7 +12,7 @@ public class MaterialSet : IDisposable {
 			dataDir.Subdirectory("textures").Subdirectory(surfaceProperties.ShareTextures) :
 			materialsDirectory;
 		
-		var textureLoader = new TextureLoader(device, texturesDirectory);
+		var textureLoader = new TextureLoader(device, textureCache, texturesDirectory);
 		var multiMaterialSettings = Persistance.Load<MultiMaterialSettings>(materialsDirectory.File("material-settings.dat"));
 		var materials = multiMaterialSettings.PerMaterialSettings.Select(settings => settings.Load(device, shaderCache, textureLoader)).ToArray();
 

@@ -2,8 +2,6 @@ using Newtonsoft.Json;
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
-using System.IO;
-using Valve.VR;
 
 class Scene : IDisposable {
 	private readonly ToneMappingSettings toneMappingSettings;
@@ -16,6 +14,8 @@ class Scene : IDisposable {
 	private readonly Menu menu;
 
 	public Scene(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, StandardSamplers standardSamplers, TrackedDeviceBufferManager trackedDeviceBufferManager, ControllerManager controllerManager) {
+		var textureCache = new TextureCache(device);
+
 		toneMappingSettings = new ToneMappingSettings();
 		iblEnvironment = new ImageBasedLightingEnvironment(device, standardSamplers, dataDir, InitialSettings.Environment);
 		backdrop = new Backdrop(device, shaderCache);
@@ -23,7 +23,7 @@ class Scene : IDisposable {
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, trackedDeviceBufferManager);
 		primitiveRenderer = new MeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100).AsTriMesh());
 
-		var figureRendererLoader = new FigureRendererLoader(dataDir, device, shaderCache);
+		var figureRendererLoader = new FigureRendererLoader(dataDir, device, shaderCache, textureCache);
 		var figureLoader = new FigureLoader(dataDir, device, shaderCache, figureRendererLoader);
 		actor = Actor.Load(dataDir, device, shaderCache, controllerManager, figureLoader);
 		

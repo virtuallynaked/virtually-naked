@@ -10,13 +10,15 @@ public class TextureLoader : IDisposable {
 	}
 
 	private readonly Device device;
+	private readonly TextureCache textureCache;
 	private readonly IArchiveDirectory texturesDirectory;
 	private readonly ShaderResourceView defaultStandardTexture;
 	private readonly ShaderResourceView defaultBumpTexture;
-	private readonly Dictionary<string, ShaderResourceView> cache = new Dictionary<string, ShaderResourceView>();
+	private readonly Dictionary<string, SharedTexture> cache = new Dictionary<string, SharedTexture>();
 
-	public TextureLoader(Device device, IArchiveDirectory texturesDirectory) {
+	public TextureLoader(Device device, TextureCache textureCache, IArchiveDirectory texturesDirectory) {
 		this.device = device;
+		this.textureCache = textureCache;
 		this.texturesDirectory = texturesDirectory;
 		this.defaultStandardTexture = MakeMonochromeTexture(device, Vector4.One);
 		this.defaultBumpTexture = MakeMonochromeTexture(device, new Vector4(0.5f, 0.5f, 1, 1));
@@ -47,11 +49,7 @@ public class TextureLoader : IDisposable {
 
 		if (!cache.TryGetValue(name, out var textureView)) {
 			var imageFile = texturesDirectory.File(name + ".dds");
-			using (var dataView = imageFile.OpenDataView()) {
-				DdsLoader.CreateDDSTextureFromMemory(device, dataView.DataPointer, out var texture, out textureView);
-				texture.Dispose();
-			}
-			
+			textureView = textureCache.Get(imageFile);
 			cache.Add(name, textureView);
 		}
 
