@@ -5,5 +5,43 @@
 		{ "figure": "upscale-shopper-blouse", "label": "Blouse" },
 		{ "figure": "upscale-shopper-pants", "label": "Pants" },
 		{ "figure": "upscale-shopper-heels", "label": "Heels" }
-	]
+	],
+	"fabrics": {
+		"Red Stripe": {
+			"upscale-shopper-blazer": "Grey",
+			"upscale-shopper-blouse": "White Stripes",
+			"upscale-shopper-pants": "Red",
+			"upscale-shopper-heels": "Light"
+		},
+		"White": {
+			"upscale-shopper-blazer": "Light",
+			"upscale-shopper-blouse": "White",
+			"upscale-shopper-pants": "White",
+			"upscale-shopper-heels": "Mustard"
+		},
+		"Polka Dot": {
+			"upscale-shopper-blazer": "Black",
+			"upscale-shopper-blouse": "Blue",
+			"upscale-shopper-pants": "Black",
+			"upscale-shopper-heels": "Black"
+		},
+		"Grey": {
+			"upscale-shopper-blazer": "Blue",
+			"upscale-shopper-blouse": "Grey",
+			"upscale-shopper-pants": "Denim",
+			"upscale-shopper-heels": "Brown"
+		},
+		"Grey - Torn": {
+			"upscale-shopper-blazer": "Blue",
+			"upscale-shopper-blouse": "Grey",
+			"upscale-shopper-pants": "Denim Broken",
+			"upscale-shopper-heels": "Brown"
+		},
+		"Skull": {
+			"upscale-shopper-blazer": "Grey Stripes",
+			"upscale-shopper-blouse": "White Skull",
+			"upscale-shopper-pants": "Mustard",
+			"upscale-shopper-heels": "Grey"
+		}
+	}
 }

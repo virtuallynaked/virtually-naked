@@ -2,6 +2,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+public class FabricMenuItem : IToggleMenuItem {
+	private readonly Actor actor;
+	private readonly Outfit.Fabric fabric;
+
+	public FabricMenuItem(Actor actor, Outfit.Fabric fabric) {
+		this.actor = actor;
+		this.fabric = fabric;
+	}
+
+	public bool IsSet {
+		get {
+			foreach (var clothingFigure in actor.Clothing) {
+				if (fabric.MaterialSetsByFigure.TryGetValue(clothingFigure.Definition.Name, out var materialSet)) {
+					if (clothingFigure.Model.MaterialSetName != materialSet) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+	}
+
+	public string Label => fabric.Label;
+
+	public void Toggle() {
+		foreach (var clothingFigure in actor.Clothing) {
+			if (fabric.MaterialSetsByFigure.TryGetValue(clothingFigure.Definition.Name, out var materialSet)) {
+				clothingFigure.Model.MaterialSetName = materialSet;
+			}
+		}
+	}
+}
+
 public class OutfitMenuItem : IToggleMenuItem {
 	private readonly Actor actor;
 	private readonly Outfit outfit;
@@ -49,14 +82,16 @@ public class ClothingMenuLevel : IMenuLevel {
 
 	public List<IMenuItem> GetItems() {
 		var outfitsMenuLevel = MakeOutfitsMenuLevel();
-		var materialsMenuLevel = MakeMaterialsMenuLevel();
+
+		var clothingFigures = actor.Clothing;
+		var activeOutfit = actor.Outfits.Find(outfit => outfit.IsMatch(clothingFigures));
+
+		var materialsMenuLevel = MakeMaterialsMenuLevel(activeOutfit);
 
 		var items = new List<IMenuItem> { };
 		items.Add(new SubLevelMenuItem("Outfits", outfitsMenuLevel));
 		items.Add(new SubLevelMenuItem("Fabrics", materialsMenuLevel));
 
-		var clothingFigures = actor.Clothing;
-		var activeOutfit = actor.Outfits.Find(outfit => outfit.IsMatch(clothingFigures));
 
 		for (int clothingIdx = 0; clothingIdx < clothingFigures.Length; ++clothingIdx) {
 			var clothingFigure = clothingFigures[clothingIdx];
@@ -67,14 +102,21 @@ public class ClothingMenuLevel : IMenuLevel {
 		return items;
 	}
 	
-	public IMenuLevel MakeMaterialsMenuLevel() {
-		var individualMaterialItems = actor.Clothing
-			.SelectMany(figure => figure.Definition.MaterialSetOptions
-				.Select(materialSet => new MaterialSetMenuItem(figure.Model, materialSet)))
-			.ToList<IToggleMenuItem>();
-		var compositeMaterialItems = CompositeToggleMenuItem.CombineByLabel(individualMaterialItems);
-		var materialsMenuLevel = new StaticMenuLevel(compositeMaterialItems.ToArray());
-		return materialsMenuLevel;
+	public IMenuLevel MakeMaterialsMenuLevel(Outfit activeOutfit) {
+		if (activeOutfit.Fabrics != null) {
+			var items = activeOutfit.Fabrics
+				.Select(fabric => new FabricMenuItem(actor, fabric))
+				.ToArray();
+			return new StaticMenuLevel(items);
+		} else {
+			var individualMaterialItems = actor.Clothing
+				.SelectMany(figure => figure.Definition.MaterialSetOptions
+					.Select(materialSet => new MaterialSetMenuItem(figure.Model, materialSet)))
+				.ToList<IToggleMenuItem>();
+			var compositeMaterialItems = CompositeToggleMenuItem.CombineByLabel(individualMaterialItems);
+			var materialsMenuLevel = new StaticMenuLevel(compositeMaterialItems.ToArray());
+			return materialsMenuLevel;
+		}
 	}
 
 	public IMenuLevel MakeOutfitsMenuLevel() {

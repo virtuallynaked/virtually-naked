@@ -19,6 +19,9 @@ public class OutfitJsonProxy {
 
 	[JsonProperty(PropertyName = "items")]
 	public List<OutfitItemJsonProxy> items = new List<OutfitItemJsonProxy>();
+
+	[JsonProperty(PropertyName = "fabrics")]
+	public Dictionary<string, Dictionary<string, string>> fabrics;
 }
 
 public class OutfitImporter {
@@ -43,7 +46,23 @@ public class OutfitImporter {
 				})
 				.ToList();
 
-			var outfit = new Outfit(proxy.label, items);
+			List<Outfit.Fabric> fabrics = proxy.fabrics?.Select(entry => {
+					var label = entry.Key;
+					var materialSetsByFigureName = entry.Value;
+
+					//verify that the material set for each figure exists
+					foreach (var entry2 in materialSetsByFigureName) {
+						var figureName = entry2.Key;
+						var materialSetName = entry2.Value;
+						var materialSetsConfs = MaterialSetImportConfiguration.Load(figureName);
+						materialSetsConfs.Where(conf => conf.name == materialSetName).Single(); 
+					}
+
+					return new Outfit.Fabric(label, materialSetsByFigureName);
+				})
+				.ToList();
+
+			var outfit = new Outfit(proxy.label, items, fabrics);
 
 			Persistance.Save(destinationFile, outfit);
 		}
