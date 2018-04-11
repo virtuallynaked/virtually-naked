@@ -45,6 +45,7 @@ public class Outfit {
 		new OutfitElement("sweet-home-shin-socks", "Shin Socks", false),
 		new OutfitElement("sweet-home-ankle-socks", "Ankle Socks", false)
 	});
+	public static Outfit Naked = new Outfit("Naked", new List<OutfitElement> { });
 
 	public static List<Outfit> Outfits = new List<Outfit> {
 		BandeauBikiniOutfit,
@@ -52,7 +53,8 @@ public class Outfit {
 		RelaxedSundayOutfit,
 		SummerDressSetOutfit,
 		UpscaleShopperOutfit,
-		SweetHomeOutfit
+		SweetHomeOutfit,
+		Naked
 	};
 	
 	public bool IsMatch(FigureFacade[] figures) {
