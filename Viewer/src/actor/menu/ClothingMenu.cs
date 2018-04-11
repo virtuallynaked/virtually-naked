@@ -103,7 +103,7 @@ public class ClothingMenuLevel : IMenuLevel {
 	}
 	
 	public IMenuLevel MakeMaterialsMenuLevel(Outfit activeOutfit) {
-		if (activeOutfit.Fabrics != null) {
+		if (activeOutfit?.Fabrics != null) {
 			var items = activeOutfit.Fabrics
 				.Select(fabric => new FabricMenuItem(actor, fabric))
 				.ToArray();
