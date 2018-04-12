@@ -14,7 +14,7 @@ public class PostProcessor : IDisposable {
 		[FieldOffset(4 * 4)] public float crushBlacksValue;
 	};
 
-	private const Format ColorFormat = Format.B8G8R8X8_UNorm_SRgb;
+	private const Format ColorFormat = Format.R8G8B8A8_UNorm_SRgb;
 
 	public Texture2D ResultTexture { get; }
 	private RenderTargetView ResultTargetView { get; }
