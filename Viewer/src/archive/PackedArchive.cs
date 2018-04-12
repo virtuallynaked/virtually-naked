@@ -58,6 +58,10 @@ public class PackedArchive : IDisposable {
 	}
 
 	public Stream OpenStream(PackedArchiveFileRecord record) {
+		if (record.Size == 0) {
+			//CreateViewStream interprets size = 0 as "whole file" so I can't use it for empty files
+			return Stream.Null;
+		}
 		return map.CreateViewStream(payloadOffset + record.Offset, record.Size, MemoryMappedFileAccess.Read);
 	}
 
