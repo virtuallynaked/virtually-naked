@@ -11,7 +11,9 @@ public class FigureFacade : IDisposable {
 	private readonly ControlVertexProvider controlVertexProvider;
 	private readonly FigureRendererLoader figureRendererLoader;
 
+	private MaterialSetOption currentMaterialSet;
 	private FigureRenderer renderer;
+
 	private List<FigureFacade> children = new List<FigureFacade>();
 
 	public IFigureAnimator Animator { get; set; } = null;
@@ -21,13 +23,9 @@ public class FigureFacade : IDisposable {
 		this.model = model;
 		this.controlVertexProvider = controlVertexProvider;
 		this.figureRendererLoader = figureRendererLoader;
-
-		model.MaterialSetChanged += Model_MaterialSetChanged;
-		SyncMaterialSet();
 	}
 	
 	public void Dispose() {
-		model.MaterialSetChanged -= Model_MaterialSetChanged;
 		controlVertexProvider.Dispose();
 		renderer.Dispose();
 	}
@@ -36,18 +34,19 @@ public class FigureFacade : IDisposable {
 	public FigureModel Model => model;
 	public int VertexCount => controlVertexProvider.VertexCount;
 	
-	private void Model_MaterialSetChanged(MaterialSetOption oldMaterialSet, MaterialSetOption newMaterialSet) {
-		SyncMaterialSet();
-	}
-
 	private void SyncMaterialSet() {
-		string materialSetName = model.MaterialSet.Label;
-		var newRenderer = figureRendererLoader.Load(definition.Directory, materialSetName);
-		renderer?.Dispose();
-		renderer = newRenderer;
+		if (model.MaterialSet != currentMaterialSet) {
+			var newRenderer = figureRendererLoader.Load(definition.Directory, model.MaterialSet.Label);
+			renderer?.Dispose();
+
+			renderer = newRenderer;
+			currentMaterialSet = model.MaterialSet;
+		}
 	}
 
 	public void SyncWithModel() {
+		SyncMaterialSet();
+
 		var childControlVertexProviders = children
 			.Select(child => child.controlVertexProvider)
 			.ToList();
