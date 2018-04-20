@@ -8,44 +8,9 @@ public class FigureModel {
 		this.definition = definition;
 	}
 
-	private bool isVisible = true;
-	public event Action<bool, bool> IsVisibleChanged;
-	public bool IsVisible {
-		get {
-			return isVisible;
-		}
-		set {
-			var old = isVisible;
-			isVisible = value;
-			IsVisibleChanged?.Invoke(old, value);
-		}
-	}
-
-	private Shape shape;
-	public event Action<Shape, Shape> ShapeChanged;
-	public Shape Shape {
-		get {
-			return shape;
-		}
-		set {
-			var old = shape;
-			shape = value;
-			ShapeChanged?.Invoke(old, value);
-		}
-	}
-
-	private MaterialSetOption materialSet;
-	public event Action<MaterialSetOption, MaterialSetOption> MaterialSetChanged;
-	public MaterialSetOption MaterialSet {
-		get {
-			return materialSet;
-		}
-		set {
-			var old = materialSet;
-			materialSet = value;
-			MaterialSetChanged?.Invoke(old, value);
-		}
-	}
+	public bool IsVisible { get; set; }
+	public Shape Shape { get; set; }
+	public MaterialSetOption MaterialSet { get; set; }
 	
 	public string ShapeName {
 		get {
