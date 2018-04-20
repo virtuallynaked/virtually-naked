@@ -27,6 +27,8 @@ static class ActorMenuProvider {
 
 		var charactersMenuLevel = new CharactersMenuLevel(actor.Main.Definition, actor.Main.Model);
 
+		var skinDetailsMenuLevel = new MaterialSetVariantsMenuLevel(actor.Main.Definition, actor.Main.Model);
+
 		var shapingItems = new List<IMenuItem>();
 		var channelShapesMenuLevel = channelMenuLevel.Extract(new string[] {"Shapes"});
 		shapingItems.Add(new ActionMenuItem("Reset Shape", () => model.ResetShape()));
@@ -41,6 +43,7 @@ static class ActorMenuProvider {
 
 		List<IMenuItem> items = new List<IMenuItem> { };
 		items.Add(new SubLevelMenuItem("Characters", charactersMenuLevel));
+		items.Add(new SubLevelMenuItem("Skin Details", skinDetailsMenuLevel));
 		items.Add(new SubLevelMenuItem("Clothing", clothingMenuLevel));
 		if (hairMenuLevel != null) {
 			items.Add(new SubLevelMenuItem("Hair", hairMenuLevel));

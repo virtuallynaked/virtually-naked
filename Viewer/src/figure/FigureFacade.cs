@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using SharpDX.Direct3D11;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
 
@@ -12,6 +13,7 @@ public class FigureFacade : IDisposable {
 	private readonly FigureRendererLoader figureRendererLoader;
 
 	private MaterialSetOption currentMaterialSet;
+	private ImmutableDictionary<string, string> currentMaterialSetVariants;
 	private FigureRenderer renderer;
 
 	private List<FigureFacade> children = new List<FigureFacade>();
@@ -35,12 +37,13 @@ public class FigureFacade : IDisposable {
 	public int VertexCount => controlVertexProvider.VertexCount;
 	
 	private void SyncMaterialSet() {
-		if (model.MaterialSet != currentMaterialSet) {
-			var newRenderer = figureRendererLoader.Load(definition.Directory, model.MaterialSet.Label);
+		if (model.MaterialSet != currentMaterialSet || model.MaterialSetVariants != currentMaterialSetVariants) {
+			var newRenderer = figureRendererLoader.Load(definition.Directory, model.MaterialSet, model.MaterialSetVariants);
 			renderer?.Dispose();
 
 			renderer = newRenderer;
 			currentMaterialSet = model.MaterialSet;
+			currentMaterialSetVariants = model.MaterialSetVariants;
 		}
 	}
 

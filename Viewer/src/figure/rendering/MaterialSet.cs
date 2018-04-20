@@ -1,25 +1,31 @@
 using SharpDX.Direct3D11;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 
 public class MaterialSet : IDisposable {
-	public static MaterialSet LoadActive(Device device, ShaderCache shaderCache, TextureCache textureCache, IArchiveDirectory dataDir, IArchiveDirectory figureDir, string materialSetName, SurfaceProperties surfaceProperties) {
-		var materialsDirectory = figureDir
-			.Subdirectory("material-sets")
-			.Subdirectory(materialSetName);
-
+	public static MaterialSet LoadActive(Device device, ShaderCache shaderCache, TextureCache textureCache, IArchiveDirectory dataDir, IArchiveDirectory figureDir, IArchiveDirectory materialSetDirectory, MultiMaterialSettings multiMaterialSettings, ImmutableDictionary<string, string> variantsSelections, SurfaceProperties surfaceProperties) {
 		var texturesDirectory = surfaceProperties.ShareTextures != null ?
 			dataDir.Subdirectory("textures").Subdirectory(surfaceProperties.ShareTextures) :
-			materialsDirectory;
+			materialSetDirectory;
 		
 		var textureLoader = new TextureLoader(device, textureCache, texturesDirectory);
-		var multiMaterialSettings = Persistance.Load<MultiMaterialSettings>(materialsDirectory.File("material-settings.dat"));
 
 		var materialSettingsBySurface = multiMaterialSettings.PerMaterialSettings;
 
 		var rnd = new Random();
 		foreach (var variantCategory in multiMaterialSettings.VariantCategories) {
-			var variant = variantCategory.Variants[rnd.Next(variantCategory.Variants.Length)];
+			if (!variantsSelections.TryGetValue(variantCategory.Name, out string variantSelection)) {
+				continue;
+			}
+
+			var variant = variantCategory.Variants
+				.Where(variantOption => variantOption.Name == variantSelection)
+				.FirstOrDefault();
+			if (variant == null) {
+				continue;
+			}
+
 			for (int variantSurfaceIdx = 0; variantSurfaceIdx < variantCategory.Surfaces.Length; ++variantSurfaceIdx) {
 				int surfaceIdx = variantCategory.Surfaces[variantSurfaceIdx];
 				var materialSettings = variant.SettingsBySurface[variantSurfaceIdx];
@@ -29,7 +35,7 @@ public class MaterialSet : IDisposable {
 
 		var materials = materialSettingsBySurface.Select(settings => settings.Load(device, shaderCache, textureLoader)).ToArray();
 
-		float[] faceTransparencies = materialsDirectory.File("face-transparencies.array").ReadArray<float>();
+		float[] faceTransparencies = materialSetDirectory.File("face-transparencies.array").ReadArray<float>();
 
 		return new MaterialSet(textureLoader, materials, faceTransparencies);
 	}

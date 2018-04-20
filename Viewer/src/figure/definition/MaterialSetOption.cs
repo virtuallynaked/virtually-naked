@@ -13,15 +13,18 @@ public class MaterialSetOption {
 		return materialSets;
 	}
 
-	public static MaterialSetOption Load(IArchiveDirectory shapeDirectory) {
-		return new MaterialSetOption(shapeDirectory.Name, shapeDirectory);
+	public static MaterialSetOption Load(IArchiveDirectory materialSetDirectory) {
+		var settings = Persistance.Load<MultiMaterialSettings>(materialSetDirectory.File("material-settings.dat"));
+		return new MaterialSetOption(materialSetDirectory.Name, materialSetDirectory, settings);
 	}
 	
 	public string Label { get; }
 	public IArchiveDirectory Directory { get; }
+	public MultiMaterialSettings Settings { get; }
 
-	public MaterialSetOption(string label, IArchiveDirectory directory) {
+	public MaterialSetOption(string label, IArchiveDirectory directory, MultiMaterialSettings settings) {
 		Label = label;
 		Directory = directory;
+		Settings = settings;
 	}
 }
