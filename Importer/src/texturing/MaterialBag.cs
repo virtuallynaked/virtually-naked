@@ -25,14 +25,29 @@ public class MaterialBag {
 
 	private readonly ContentFileLocator fileLocator;
 	private readonly DsonObjectLocator objectLocator;
-	private readonly Dictionary<string, DsonTypes.Image> imagesByUrl = new Dictionary<string, DsonTypes.Image>();
-	private readonly HashSet<string> extraTypes = new HashSet<string>();
-	private readonly Dictionary<string, object> values = new Dictionary<string, object>();
+	private readonly Dictionary<string, DsonTypes.Image> imagesByUrl;
+	private readonly HashSet<string> extraTypes;
+	private readonly Dictionary<string, object> values;
 	
-	public MaterialBag(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Dictionary<string, DsonTypes.Image> imagesByUrl) {
+	public MaterialBag(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Dictionary<string, DsonTypes.Image> imagesByUrl) : this(
+		fileLocator, objectLocator, imagesByUrl,
+		new HashSet<string>(),
+		new Dictionary<string, object>()) {
+	}
+
+	public MaterialBag(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Dictionary<string, DsonTypes.Image> imagesByUrl, HashSet<string> extraTypes, Dictionary<string, object> values) {
 		this.fileLocator = fileLocator;
 		this.objectLocator = objectLocator;
 		this.imagesByUrl = imagesByUrl;
+		this.extraTypes = extraTypes;
+		this.values = values;
+	}
+
+	public MaterialBag Branch() {
+		var branchedExtraTypes = new HashSet<string>(extraTypes);
+		var branchedValues = new Dictionary<string, object>(values);
+
+		return new MaterialBag(fileLocator, objectLocator, imagesByUrl, branchedExtraTypes, branchedValues);
 	}
 
 	public void AddExtraType(string type) {

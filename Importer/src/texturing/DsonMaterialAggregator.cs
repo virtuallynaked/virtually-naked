@@ -4,12 +4,30 @@ using System.Collections.Generic;
 class DsonMaterialAggregator {
 	private readonly ContentFileLocator fileLocator;
 	private readonly DsonObjectLocator objectLocator;
-	private readonly Dictionary<string, DsonTypes.Image> imagesByUrl = new Dictionary<string, DsonTypes.Image>();
-	private readonly Dictionary<string, MaterialBag> bags = new Dictionary<string, MaterialBag>();
+	private readonly Dictionary<string, DsonTypes.Image> imagesByUrl;
+	private readonly Dictionary<string, MaterialBag> bags;
 
-	public DsonMaterialAggregator(ContentFileLocator fileLocator, DsonObjectLocator objectLocator) {
+	public DsonMaterialAggregator(ContentFileLocator fileLocator, DsonObjectLocator objectLocator) : this(
+		fileLocator, objectLocator, 
+		new Dictionary<string, DsonTypes.Image>(),
+		new Dictionary<string, MaterialBag>()) {
+	}
+
+	public DsonMaterialAggregator(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Dictionary<string, DsonTypes.Image> imagesByUrl, Dictionary<string, MaterialBag> bags) {
 		this.fileLocator = fileLocator;
 		this.objectLocator = objectLocator;
+		this.imagesByUrl = imagesByUrl;
+		this.bags = bags;
+	}
+
+	public DsonMaterialAggregator Branch() {
+		Dictionary<string, MaterialBag> branchedBags = new Dictionary<string, MaterialBag>();
+		foreach (var entry in bags) {
+			var branchedBag = entry.Value.Branch();
+			branchedBags.Add(entry.Key, branchedBag);
+		}
+
+		return new DsonMaterialAggregator(fileLocator, objectLocator, imagesByUrl, branchedBags);
 	}
 	
 	private MaterialBag MakeBag(string materialName) {

@@ -40,6 +40,10 @@ class MaterialSetDumper {
 			materialImporter = new UberMaterialImporter(figure, textureProcessor, faceTransparencyProcessor);
 		}
 		
+		string[] surfaceNames = figure.Geometry.SurfaceNames;
+		Dictionary<string, int> surfaceNameToIdx = Enumerable.Range(0, surfaceNames.Length)
+			.ToDictionary(idx => surfaceNames[idx], idx => idx);
+
 		var perMaterialSettings = Enumerable.Range(0, figure.Geometry.SurfaceCount)
 			.Select(surfaceIdx => {
 				string surfaceName = figure.Geometry.SurfaceNames[surfaceIdx];
@@ -49,7 +53,38 @@ class MaterialSetDumper {
 			})
 			.ToArray();
 
-		var multiMaterialSettings = new MultiMaterialSettings(perMaterialSettings);
+		var variantCategories = configuration.variantCategories
+			.Select(variantCategoryConf => {
+				int[] surfaceIdxs = variantCategoryConf.surfaces
+					.Select(surfaceName => surfaceNameToIdx[surfaceName])
+					.ToArray();
+
+				var variants = variantCategoryConf.variants
+					.Select(variantConf => {
+						var variantAggregator = aggregator.Branch();
+						foreach (string path in variantConf.materialsDufPaths) {
+							DsonTypes.DsonDocument doc = objectLocator.LocateRoot(path);
+							variantAggregator.IncludeDuf(doc.Root);
+						}
+
+						var settingsBySurface = variantCategoryConf.surfaces
+							.Select(surfaceName => {
+								int surfaceIdx = surfaceNameToIdx[surfaceName];
+								var bag = variantAggregator.GetBag(surfaceName);
+								var materialSettings = materialImporter.Import(surfaceIdx, bag);
+								return materialSettings;
+							})
+							.ToArray();
+
+						return new MultiMaterialSettings.Variant(variantConf.name, settingsBySurface);
+					})
+					.ToArray();
+
+				return new MultiMaterialSettings.VariantCategory(variantCategoryConf.name, surfaceIdxs, variants);
+			})
+			.ToArray();
+
+		var multiMaterialSettings = new MultiMaterialSettings(perMaterialSettings, variantCategories);
 		
 		materialSetDirectory.CreateWithParents();
 

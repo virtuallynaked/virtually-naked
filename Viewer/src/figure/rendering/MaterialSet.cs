@@ -14,7 +14,20 @@ public class MaterialSet : IDisposable {
 		
 		var textureLoader = new TextureLoader(device, textureCache, texturesDirectory);
 		var multiMaterialSettings = Persistance.Load<MultiMaterialSettings>(materialsDirectory.File("material-settings.dat"));
-		var materials = multiMaterialSettings.PerMaterialSettings.Select(settings => settings.Load(device, shaderCache, textureLoader)).ToArray();
+
+		var materialSettingsBySurface = multiMaterialSettings.PerMaterialSettings;
+
+		var rnd = new Random();
+		foreach (var variantCategory in multiMaterialSettings.VariantCategories) {
+			var variant = variantCategory.Variants[rnd.Next(variantCategory.Variants.Length)];
+			for (int variantSurfaceIdx = 0; variantSurfaceIdx < variantCategory.Surfaces.Length; ++variantSurfaceIdx) {
+				int surfaceIdx = variantCategory.Surfaces[variantSurfaceIdx];
+				var materialSettings = variant.SettingsBySurface[variantSurfaceIdx];
+				materialSettingsBySurface[surfaceIdx] = materialSettings;
+			}
+		}
+
+		var materials = materialSettingsBySurface.Select(settings => settings.Load(device, shaderCache, textureLoader)).ToArray();
 
 		float[] faceTransparencies = materialsDirectory.File("face-transparencies.array").ReadArray<float>();
 

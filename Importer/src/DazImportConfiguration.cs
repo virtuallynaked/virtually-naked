@@ -1,10 +1,30 @@
 using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Collections.Generic;
 
 [Serializable]
 public class MaterialSetImportConfiguration {
+	[Serializable]
+	public class Variant {
+		[JsonProperty("name")]
+		public string name;
+
+		[JsonProperty("paths")]
+		public string[] materialsDufPaths;
+	}
+
+	[Serializable]
+	public class VariantCategory {
+		[JsonProperty("name")]
+		public string name;
+
+		[JsonProperty("surfaces")]
+		public string[] surfaces;
+
+		[JsonProperty("variants")]
+		public Variant[] variants;
+	}
+
 	public static MaterialSetImportConfiguration[] Load(string figureName) {
 		string json = CommonPaths.ConfDir.Subdirectory(figureName).File("materials-sets.json").ReadAllText();
 		MaterialSetImportConfiguration[] confs = JsonConvert.DeserializeObject<MaterialSetImportConfiguration[]>(json);
@@ -18,6 +38,9 @@ public class MaterialSetImportConfiguration {
 
 	[JsonProperty("use-custom-occlusion")]
 	public bool useCustomOcclusion;
+
+	[JsonProperty("variant-categories")]
+	public VariantCategory[] variantCategories = { };
 }
 
 [Serializable]
