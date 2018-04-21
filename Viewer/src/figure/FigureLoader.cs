@@ -32,9 +32,9 @@ public class FigureLoader {
 
 		var model = new FigureModel(definition) {
 			IsVisible = recipe.isVisible,
-			ShapeName = recipe.shape,
-			MaterialSetName = recipe.materialSet
+			ShapeName = recipe.shape
 		};
+		model.SetMaterialSetAndVariantByName(recipe.materialSet, recipe.materialVariants);
 		
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition);
 				

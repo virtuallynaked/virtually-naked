@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 public class FigureModel {
@@ -33,19 +35,15 @@ public class FigureModel {
 			Shape = shape;
 		}
 	}
-
-	public string MaterialSetName {
-		get {
-			return MaterialSet?.Label;
+	
+	public void SetMaterialSetAndVariantByName(string materialSetName, Dictionary<string, string> variantNames) {
+		var materialSet = definition.MaterialSetOptions.Find(option => option.Label == materialSetName);
+		if (materialSet == null) {
+			materialSet = definition.MaterialSetOptions.First();
 		}
-		set {
-			var materialSet = definition.MaterialSetOptions.Find(option => option.Label == value);
-			if (materialSet == null) {
-				materialSet = definition.MaterialSetOptions.First();
-			} 
 
-			MaterialSet = materialSet;
-		}
+		MaterialSetAndVariant = variantNames == null ?
+			MaterialSetAndVariantOption.MakeWithDefaultVariants(materialSet) :
+			new MaterialSetAndVariantOption(materialSet, variantNames.ToImmutableDictionary());
 	}
-
 }

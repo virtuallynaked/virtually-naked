@@ -125,6 +125,9 @@ public class FigureFacade : IDisposable {
 		[JsonProperty("material-set")]
 		public string materialSet;
 
+		[JsonProperty("material-variants", DefaultValueHandling = DefaultValueHandling.Ignore)]
+		public Dictionary<string, string> materialVariants;
+
 		public void Merge(FigureFacade figure) {
 			figure.Model.IsVisible = isVisible;
 
@@ -133,7 +136,7 @@ public class FigureFacade : IDisposable {
 			}
 
 			if (materialSet != null) {
-				figure.Model.MaterialSetName = materialSet;
+				figure.Model.SetMaterialSetAndVariantByName(materialSet, materialVariants);
 			}
 		}
 	}
@@ -143,7 +146,10 @@ public class FigureFacade : IDisposable {
 			name = definition.Name,
 			isVisible = model.IsVisible,
 			shape = model.ShapeName,
-			materialSet = model.MaterialSetName
+			materialSet = model.MaterialSetAndVariant.MaterialSet.Label,
+			materialVariants = 
+				model.MaterialSetAndVariant.MaterialSet.Settings.VariantCategories.Length == 0 ? null :
+				new Dictionary<string, string>(model.MaterialSetAndVariant.VariantSelections)
 		};
 	}
 }

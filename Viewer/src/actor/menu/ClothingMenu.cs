@@ -15,7 +15,7 @@ public class FabricMenuItem : IToggleMenuItem {
 		get {
 			foreach (var clothingFigure in actor.Clothing) {
 				if (fabric.MaterialSetsByFigure.TryGetValue(clothingFigure.Definition.Name, out var materialSet)) {
-					if (clothingFigure.Model.MaterialSetName != materialSet) {
+					if (clothingFigure.Model.MaterialSet.Label != materialSet) {
 						return false;
 					}
 				}
@@ -29,7 +29,7 @@ public class FabricMenuItem : IToggleMenuItem {
 	public void Toggle() {
 		foreach (var clothingFigure in actor.Clothing) {
 			if (fabric.MaterialSetsByFigure.TryGetValue(clothingFigure.Definition.Name, out var materialSet)) {
-				clothingFigure.Model.MaterialSetName = materialSet;
+				clothingFigure.Model.SetMaterialSetAndVariantByName(materialSet, null);
 			}
 		}
 	}
