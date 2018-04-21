@@ -331,7 +331,7 @@
 			"surfaces": [ "Face", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 01.duf" ]
+				"paths": [ /* use default */ ]
 			}, {
 				"name": "Makeup 02",
 				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 02.duf" ]
@@ -353,7 +353,7 @@
 			"surfaces": [ "Lips" ],
 			"variants": [{
 				"name": "Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 01.duf" ]
+				"paths": [  /* use default */ ]
 			}, {
 				"name": "Lips 02",
 				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 02.duf" ]
