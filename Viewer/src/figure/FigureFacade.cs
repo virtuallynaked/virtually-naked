@@ -12,8 +12,7 @@ public class FigureFacade : IDisposable {
 	private readonly ControlVertexProvider controlVertexProvider;
 	private readonly FigureRendererLoader figureRendererLoader;
 
-	private MaterialSetOption currentMaterialSet;
-	private ImmutableDictionary<string, string> currentMaterialSetVariants;
+	private MaterialSetAndVariantOption currentMaterialSetAndVariant;
 	private FigureRenderer renderer;
 
 	private List<FigureFacade> children = new List<FigureFacade>();
@@ -37,13 +36,12 @@ public class FigureFacade : IDisposable {
 	public int VertexCount => controlVertexProvider.VertexCount;
 	
 	private void SyncMaterialSet() {
-		if (model.MaterialSet != currentMaterialSet || model.MaterialSetVariants != currentMaterialSetVariants) {
-			var newRenderer = figureRendererLoader.Load(definition.Directory, model.MaterialSet, model.MaterialSetVariants);
+		if (model.MaterialSetAndVariant != currentMaterialSetAndVariant) {
+			var newRenderer = figureRendererLoader.Load(definition.Directory, model.MaterialSetAndVariant);
 			renderer?.Dispose();
 
 			renderer = newRenderer;
-			currentMaterialSet = model.MaterialSet;
-			currentMaterialSetVariants = model.MaterialSetVariants;
+			currentMaterialSetAndVariant = model.MaterialSetAndVariant;
 		}
 	}
 

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Immutable;
 
 public class FigureModel {
 	private readonly FigureDefinition definition;
@@ -12,9 +9,17 @@ public class FigureModel {
 
 	public bool IsVisible { get; set; }
 	public Shape Shape { get; set; }
-	public MaterialSetOption MaterialSet { get; set; }
-	public ImmutableDictionary<string, string> MaterialSetVariants { get; set; } = ImmutableDictionary<string, string>.Empty;
+	public MaterialSetAndVariantOption MaterialSetAndVariant { get; set; }
 	
+	public MaterialSetOption MaterialSet {
+		get {
+			return MaterialSetAndVariant.MaterialSet;
+		}
+		set {
+			MaterialSetAndVariant = MaterialSetAndVariantOption.MakeWithDefaultVariants(value);
+		}
+	}
+
 	public string ShapeName {
 		get {
 			return Shape?.Label;

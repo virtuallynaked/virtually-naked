@@ -15,7 +15,7 @@ public class FigureRendererLoader {
 		this.textureCache = textureCache;
 	}
 
-	public FigureRenderer Load(IArchiveDirectory figureDir, MaterialSetOption materialSetOption, ImmutableDictionary<string, string> materialSetVariants) {
+	public FigureRenderer Load(IArchiveDirectory figureDir, MaterialSetAndVariantOption materialSetOption) {
 		SurfaceProperties surfaceProperties = Persistance.Load<SurfaceProperties>(figureDir.File("surface-properties.dat"));
 
 		var refinementDirectory = figureDir.Subdirectory("refinement");
@@ -27,10 +27,10 @@ public class FigureRendererLoader {
 		SubdivisionMesh mesh = SubdivisionMeshPersistance.Load(refinedMeshDirectory);
 		int[] controlFaceMap = refinedMeshDirectory.File("control-face-map.array").ReadArray<int>();
 		
-		var materialSet = MaterialSet.LoadActive(device, shaderCache, textureCache, dataDir, figureDir, materialSetOption.Directory, materialSetOption.Settings, materialSetVariants, surfaceProperties);
+		var materialSet = MaterialSet.LoadActive(device, shaderCache, textureCache, dataDir, figureDir, materialSetOption, surfaceProperties);
 		var materials = materialSet.Materials;
 		
-		Scatterer scatterer = surfaceProperties.PrecomputeScattering ? Scatterer.Load(device, shaderCache, figureDir, materialSetOption.Label) : null;
+		Scatterer scatterer = surfaceProperties.PrecomputeScattering ? Scatterer.Load(device, shaderCache, figureDir, materialSetOption.MaterialSet.Label) : null;
 
 		var uvSetName = materials[0].UvSet;
 		IArchiveDirectory uvSetDirectory = figureDir.Subdirectory("uv-sets").Subdirectory(uvSetName);

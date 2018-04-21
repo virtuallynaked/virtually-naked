@@ -17,13 +17,13 @@ public class MaterialSetVariantMenuItem : IToggleMenuItem {
 
 	public bool IsSet {
 		get {
-			model.MaterialSetVariants.TryGetValue(category.Name, out var activeVariantName);
+			model.MaterialSetAndVariant.VariantSelections.TryGetValue(category.Name, out var activeVariantName);
 			return activeVariantName == variant.Name;
 		}
 	}
 
 	public void Toggle() {
-		model.MaterialSetVariants = model.MaterialSetVariants.SetItem(category.Name, variant.Name);
+		model.MaterialSetAndVariant = model.MaterialSetAndVariant.SetVariant(category, variant);
 	}
 }
 
@@ -42,7 +42,7 @@ public class MaterialSetVariantsMenuLevel : IMenuLevel {
 	}
 	
 	public List<IMenuItem> GetItems() {
-		return model.MaterialSet.Settings.VariantCategories
+		return model.MaterialSetAndVariant.MaterialSet.Settings.VariantCategories
 			.Select(category => (IMenuItem) new SubLevelMenuItem(category.Name, MakeVariantMenuLevel(category)))
 			.ToList();
 	}
