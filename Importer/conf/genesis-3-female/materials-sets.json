@@ -40,7 +40,7 @@
 			}]
 		}, {
 		    "name": "Makeup",
-			"surfaces": [ "Face", "Ears", "EyeSocket" ],
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 01",
 				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 01 MAT.duf" ]
@@ -58,28 +58,6 @@
 				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 05 MAT.duf" ]
 			}, {
 				"name": "Makeup 06",
-				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 06 MAT.duf" ]
-			}]
-		}, {
-		    "name": "Lips",
-			"surfaces": [ "Lips" ],
-			"variants": [{
-				"name": "Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 01 MAT.duf" ]
-			}, {
-				"name": "Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 02 MAT.duf" ]
-			}, {
-				"name": "Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 03 MAT.duf" ]
-			}, {
-				"name": "Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 04 MAT.duf" ]
-			}, {
-				"name": "Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 05 MAT.duf" ]
-			}, {
-				"name": "Lips 06",
 				"paths": [ "/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Face 06 MAT.duf" ]
 			}]
 		}]
@@ -120,7 +98,7 @@
 			}]
 		}, {
 		    "name": "Makeup",
-			"surfaces": [ "Face", "Ears", "EyeSocket" ],
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 01",
 				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 01.duf" ]
@@ -138,28 +116,6 @@
 				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 05.duf" ]
 			}, {
 				"name": "Makeup 06",
-				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 06.duf" ]
-			}]
-		}, {
-		    "name": "Lips",
-			"surfaces": [ "Lips" ],
-			"variants": [{
-				"name": "Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 01.duf" ]
-			}, {
-				"name": "Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 02.duf" ]
-			}, {
-				"name": "Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 03.duf" ]
-			}, {
-				"name": "Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 04.duf" ]
-			}, {
-				"name": "Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 05.duf" ]
-			}, {
-				"name": "Lips 06",
 				"paths": [ "/People/Genesis 3 Female/Materials/Kalea 7/Iray/Kalea 7 Face 06.duf" ]
 			}]
 		}]
@@ -207,7 +163,7 @@
 			}]
 		}, {
 		    "name": "Makeup",
-			"surfaces": [ "Face", "Ears", "EyeSocket" ],
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 01",
 				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 01.duf" ]
@@ -225,28 +181,6 @@
 				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 05.duf" ]
 			}, {
 				"name": "Makeup 06",
-				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 06.duf" ]
-			}]
-		}, {
-		    "name": "Lips",
-			"surfaces": [ "Lips" ],
-			"variants": [{
-				"name": "Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 01.duf" ]
-			}, {
-				"name": "Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 02.duf" ]
-			}, {
-				"name": "Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 03.duf" ]
-			}, {
-				"name": "Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 04.duf" ]
-			}, {
-				"name": "Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 05.duf" ]
-			}, {
-				"name": "Lips 06",
 				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 06.duf" ]
 			}]
 		}]
@@ -328,7 +262,7 @@
 			}]
 		}, {
 		    "name": "Makeup",
-			"surfaces": [ "Face", "Ears", "EyeSocket" ],
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 01",
 				"paths": [ /* use default */ ]
@@ -346,28 +280,6 @@
 				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 05.duf" ]
 			}, {
 				"name": "Makeup 06",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 06.duf" ]
-			}]
-		}, {
-		    "name": "Lips",
-			"surfaces": [ "Lips" ],
-			"variants": [{
-				"name": "Lips 01",
-				"paths": [  /* use default */ ]
-			}, {
-				"name": "Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 02.duf" ]
-			}, {
-				"name": "Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 03.duf" ]
-			}, {
-				"name": "Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 04.duf" ]
-			}, {
-				"name": "Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 05.duf" ]
-			}, {
-				"name": "Lips 06",
 				"paths": [ "/People/Genesis 3 Female/Materials/Eva 7/Iray/Eva 7 Face 06.duf" ]
 			}]
 		}]
@@ -467,7 +379,7 @@
 			}]
 		}, {
 		    "name": "Makeup",
-			"surfaces": [ "Face", "Ears", "EyeSocket" ],
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 01",
 				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 01.duf" ]
@@ -485,28 +397,6 @@
 				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 05.duf" ]
 			}, {
 				"name": "Makeup 06",
-				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 06.duf" ]
-			}]
-		}, {
-		    "name": "Lips",
-			"surfaces": [ "Lips" ],
-			"variants": [{
-				"name": "Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 01.duf" ]
-			}, {
-				"name": "Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 02.duf" ]
-			}, {
-				"name": "Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 03.duf" ]
-			}, {
-				"name": "Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 04.duf" ]
-			}, {
-				"name": "Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 05.duf" ]
-			}, {
-				"name": "Lips 06",
 				"paths": [ "/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Face 06.duf" ]
 			}]
 		}]
@@ -536,25 +426,37 @@
 			}]
 		}, {
 		    "name": "Makeup",
-			"surfaces": [ "Face", "Ears", "EyeSocket" ],
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
 			"variants": [{
 				"name": "Makeup 00",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 00.duf" ]
+				"paths": [
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 00.duf",
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 00.duf" ]
 			}, {
 				"name": "Makeup 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 01.duf" ]
+				"paths": [
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 01.duf",
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 01.duf" ]
 			}, {
 				"name": "Makeup 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 02.duf" ]
+				"paths": [
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 02.duf",
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 02.duf" ]
 			}, {
 				"name": "Makeup 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 03.duf" ]
+				"paths": [
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 03.duf",
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 03.duf" ]
 			}, {
 				"name": "Makeup 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 04.duf" ]
+				"paths": [
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 04.duf",
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 04.duf" ]
 			}, {
 				"name": "Makeup 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 05.duf" ]
+				"paths": [
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup 05.duf",
+					"/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 05.duf" ]
 			}, {
 				"name": "War Paint 01",
 				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 01.duf" ]
@@ -578,52 +480,6 @@
 				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 07.duf" ]
 			}, {
 				"name": "War Paint 08",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 08.duf" ]
-			}]
-		}, {
-		    "name": "Lips",
-			"surfaces": [ "Lips" ],
-			"variants": [{
-				"name": "Lips 00",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 00.duf" ]
-			}, {
-				"name": "Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 01.duf" ]
-			}, {
-				"name": "Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 02.duf" ]
-			}, {
-				"name": "Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 03.duf" ]
-			}, {
-				"name": "Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 04.duf" ]
-			}, {
-				"name": "Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Lips 05.duf" ]
-			}, {
-				"name": "War Paint Lips 01",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 01.duf" ]
-			}, {
-				"name": "War Paint Lips 02",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 02.duf" ]
-			}, {
-				"name": "War Paint Lips 03",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 03.duf" ]
-			}, {
-				"name": "War Paint Lips 04",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 04.duf" ]
-			}, {
-				"name": "War Paint Lips 05",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 05.duf" ]
-			}, {
-				"name": "War Paint Lips 06",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 06.duf" ]
-			}, {
-				"name": "War Paint Lips 07",
-				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 07.duf" ]
-			}, {
-				"name": "War Paint Lips 08",
 				"paths": [ "/People/Genesis 3 Female/Materials/Rune 7/Iray/Rune 7 Makeup War 08.duf" ]
 			}]
 		}]
