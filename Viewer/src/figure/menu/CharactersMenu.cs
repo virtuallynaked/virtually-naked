@@ -36,8 +36,11 @@ public class CharactersMenuLevel : IMenuLevel {
 			new SubLevelMenuItem("Skin", materialsMenuLevel)
 		);
 
+		var detailsMenuLevel = new MaterialSetVariantsMenuLevel(definition, model);
+
 		items = new List<IMenuItem>{};
 		items.Add(new SubLevelMenuItem("Mix & Match", advancedMenuLevel));
+		items.Add(new SubLevelMenuItem("Character Details", detailsMenuLevel));
 		foreach (var shape in definition.ShapeOptions) {
 			if (materialSetDict.TryGetValue(shape.Label, out var materialSet)) {
 				items.Add(new CharacterMenuItem(model, shape, materialSet));
