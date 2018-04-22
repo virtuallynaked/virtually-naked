@@ -134,7 +134,7 @@ public class EnvironmentCubeGenerator {
 		glossyLevels.ForEach(file => file.Delete());
 	}
 
-	public void Run(ImportSettings importSettings) {
+	public void Run(ImportSettings importSettings, DirectoryInfo contentDestDir) {
 		DirectoryInfo sourceEnvironmentsDir = CommonPaths.SourceAssetsDir.Subdirectory("environments");
 
 		foreach (FileInfo sourceFile in sourceEnvironmentsDir.EnumerateFiles()) {
@@ -143,7 +143,7 @@ public class EnvironmentCubeGenerator {
 				continue;
 			}
 
-			DirectoryInfo destDir = CommonPaths.WorkDir.Subdirectory("environments").Subdirectory(environmentName);
+			DirectoryInfo destDir = contentDestDir.Subdirectory("environments").Subdirectory(environmentName);
 			Generate(sourceFile, destDir);
 		}
 	}

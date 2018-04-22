@@ -4,7 +4,8 @@ public class CalculateBoneAttributesDemo : IDemoApp {
 	public void Run() {
 		var fileLocator = new ContentFileLocator();
 		var objectLocator = new DsonObjectLocator(fileLocator);
-		var pathManager = new ImporterPathManager();
+		var contentPackConfs = ContentPackImportConfiguration.LoadAll(CommonPaths.ConfDir);
+		var pathManager = ImporterPathManager.Make(contentPackConfs);
 		var loader = new FigureRecipeLoader(objectLocator, pathManager);
 		var figureRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		var figure = figureRecipe.Bake(null);

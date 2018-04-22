@@ -14,7 +14,8 @@ public class FaceTransparencyDemo : IDemoApp {
 	public FaceTransparencyDemo() {
 		fileLocator = new ContentFileLocator();
 		objectLocator = new DsonObjectLocator(fileLocator);
-		pathManager = new ImporterPathManager();
+		var contentPackConfs = ContentPackImportConfiguration.LoadAll(CommonPaths.ConfDir);
+		pathManager = ImporterPathManager.Make(contentPackConfs);
 		device = new Device(DriverType.Hardware, DeviceCreationFlags.None, FeatureLevel.Level_11_1);
 		shaderCache = new ShaderCache(device);
 	}

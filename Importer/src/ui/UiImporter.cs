@@ -4,6 +4,12 @@ using System.Diagnostics;
 using System.IO;
 
 public class UiImporter {
+	private readonly DirectoryInfo contentDestDir;
+
+	public UiImporter(DirectoryInfo contentDestDir) {
+		this.contentDestDir = contentDestDir;
+	}
+
 	public void Run() {
 		Import("put-on-headset-overlay");
 	}
@@ -13,7 +19,7 @@ public class UiImporter {
 	}
 
 	private void Import(string name) {
-		var destDir = CommonPaths.WorkDir.Subdirectory("ui");
+		var destDir = contentDestDir.Subdirectory("ui");
 		var destFile = destDir.File(name + ".dds");
 		if (destFile.Exists) {
 			return;

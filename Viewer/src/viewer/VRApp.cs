@@ -27,32 +27,36 @@ public class VRApp : IDisposable {
 		}
 
 		var commandLineParser = new CommandLineApplication(false);
-		var archiveOption = commandLineParser.Option("--data", "path to archive file or directory", CommandOptionType.SingleValue);
+		var archiveOption = commandLineParser.Option("--content", "content directory", CommandOptionType.SingleValue);
 		commandLineParser.Execute(args);
 
-		string archivePath;
+		string contentPath;
 		if (archiveOption.HasValue()) {
-			archivePath = archiveOption.Value();
+			contentPath = archiveOption.Value();
 		} else {
-			archivePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.archive");
+			contentPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "content");
 		}
 
-		IArchiveDirectory dataDir;
+		var contentDir = new DirectoryInfo(contentPath);
 
-		var archiveAsDirectory = new DirectoryInfo(archivePath);
-		if (archiveAsDirectory.Exists) {
-			dataDir = UnpackedArchiveDirectory.Make(archiveAsDirectory);
-		} else {
-			var archive = new PackedArchive(new FileInfo(archivePath));
-			dataDir = archive.Root;
+		List<IArchiveDirectory> contentArchiveDirs = new List<IArchiveDirectory>();
+
+		foreach (var archiveDir in contentDir.GetDirectories()) {
+			contentArchiveDirs.Add(UnpackedArchiveDirectory.Make(archiveDir));
 		}
-		
+		foreach (var archiveFile in contentDir.GetFiles("*.archive")) {
+			var archive = new PackedArchive(archiveFile);
+			contentArchiveDirs.Add(archive.Root);
+		}
+
+		var unionedArchiveDir = UnionArchiveDirectory.Join("content", contentArchiveDirs);
+
 		LeakTracking.Setup();
 		
 		string title = Application.ProductName + " " + Application.ProductVersion;
 		
 		try {
-			using (VRApp app = new VRApp(dataDir, title)) {
+			using (VRApp app = new VRApp(unionedArchiveDir, title)) {
 				app.Run();
 			}
 		} catch (VRInitException e) {

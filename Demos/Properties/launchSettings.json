@@ -1,8 +1,8 @@
 {
 	"profiles": {
-		"PackArchiveDemo": {
+		"PackContentApp": {
 			"commandName": "Project",
-			"commandLineArgs": "PackArchiveDemo"
+			"commandLineArgs": "PackContentApp"
 		},
 		"RunImporterThenViewerApp": {
 			"commandName": "Project",
