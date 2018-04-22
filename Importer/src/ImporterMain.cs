@@ -1,7 +1,6 @@
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -49,15 +48,8 @@ public class ImporterMain : IDisposable {
 		var contentPackConfs = ContentPackImportConfiguration.LoadAll(CommonPaths.ConfDir);
 		var pathManager = ImporterPathManager.Make(contentPackConfs);
 		
-		var loader = new FigureRecipeLoader(objectLocator, pathManager);
+		var figureDumperLoader = new FigureDumperLoader(fileLocator, objectLocator, pathManager, device, shaderCache);
 
-		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
-		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
-		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
-		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(null);
-
-		Figure parentFigure = genesis3FemaleWithGenitalia;
-		
 		foreach (var contentPackConf in contentPackConfs) {
 			var destDir = pathManager.GetDestDirForContentPack(contentPackConf.Name);
 
@@ -73,29 +65,18 @@ public class ImporterMain : IDisposable {
 			var textureProcessorSharer = new TextureProcessorSharer(device, shaderCache, settings.CompressTextures, destDir);
 
 			foreach (var figureConf in contentPackConf.Figures) {
-				if (!settings.FiguresToImport.Contains(figureConf.Name)) {
+				string figureName = figureConf.Name;
+
+				if (!settings.FiguresToImport.Contains(figureName)) {
 					continue;
 				}
 
-				var figure = figureConf.Name == parentFigure.Name ?
-					parentFigure :
-					loader.LoadFigureRecipe(figureConf.Name, genesis3FemaleRecipe).Bake(parentFigure);
-
-				bool[] channelsToInclude = figure != parentFigure ? ChannelShaker.MakeChannelsToIncludeFromShapes(pathManager, figure) : null;
-
-				Console.WriteLine($"Dumping {figure.Name}...");
-
-				if (figure == parentFigure) {
-					AnimationDumper.DumpAllAnimations(pathManager, parentFigure);
-				}
+				var figureDumper = figureDumperLoader.LoadDumper(figureName);
 				
-				SystemDumper.DumpFigure(pathManager, figure, channelsToInclude);
-				GeometryDumper.DumpFigure(pathManager, figure);
-				UVSetDumper.DumpFigure(pathManager, figure);
+				figureDumper.DumpFigure();
 
-				MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, textureProcessorSharer);
-			
-				ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, pathManager, parentFigure, figure);
+				figureDumper.DumpMaterialSets(settings, textureProcessorSharer);
+				figureDumper.DumperShapes(settings);
 			}
 
 			textureProcessorSharer.Finish();
