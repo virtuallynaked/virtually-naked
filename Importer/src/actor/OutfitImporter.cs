@@ -25,7 +25,7 @@ public class OutfitJsonProxy {
 }
 
 public class OutfitImporter {
-	public static void ImportAll() {
+	public static void ImportAll(ImporterPathManager pathManager) {
 		var outfitsDir = CommonPaths.WorkDir.Subdirectory("outfits");
 		outfitsDir.CreateWithParents();
 
@@ -41,7 +41,7 @@ public class OutfitImporter {
 
 			var items = proxy.items
 				.Select(itemProxy => {
-					ImportProperties.Load(itemProxy.figure); //verify that that a figure with this name exists
+					ImportProperties.Load(pathManager, itemProxy.figure); //verify that that a figure with this name exists
 					return new Outfit.Item(itemProxy.figure, itemProxy.label, itemProxy.isInitiallyVisible);
 				})
 				.ToList();
@@ -54,7 +54,7 @@ public class OutfitImporter {
 					foreach (var entry2 in materialSetsByFigureName) {
 						var figureName = entry2.Key;
 						var materialSetName = entry2.Value;
-						var materialSetsConfs = MaterialSetImportConfiguration.Load(figureName);
+						var materialSetsConfs = MaterialSetImportConfiguration.Load(pathManager, figureName);
 						materialSetsConfs.Where(conf => conf.name == materialSetName).Single(); 
 					}
 

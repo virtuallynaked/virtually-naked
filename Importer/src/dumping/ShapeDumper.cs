@@ -5,11 +5,11 @@ using SharpDX.Direct3D11;
 using System.Collections.Generic;
 
 class ShapeDumper {
-	public static void DumpAllForFigure(ImportSettings settings, ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure) {
-		ShapeImportConfiguration[] configurations = ShapeImportConfiguration.Load(figure.Name);
+	public static void DumpAllForFigure(ImportSettings settings, ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, ImporterPathManager pathManager, Figure parentFigure, Figure figure) {
+		ShapeImportConfiguration[] configurations = ShapeImportConfiguration.Load(pathManager, figure.Name);
 		var baseConf = configurations.SingleOrDefault(conf => conf.name == "Base");
 
-		ShapeDumper dumper = new ShapeDumper(fileLocator, device, shaderCache, parentFigure, figure, baseConf);
+		ShapeDumper dumper = new ShapeDumper(fileLocator, device, shaderCache, pathManager, parentFigure, figure, baseConf);
 		
 		foreach (var conf in configurations) {
 			if (!settings.ShouldImportShape(figure.Name, conf.name)) {
@@ -21,7 +21,7 @@ class ShapeDumper {
 		
 		dumper.DumpUnmorphed();
 
-		MaterialSetImportConfiguration[] materialSetImportConfigurations = MaterialSetImportConfiguration.Load(figure.Name);
+		MaterialSetImportConfiguration[] materialSetImportConfigurations = MaterialSetImportConfiguration.Load(pathManager, figure.Name);
 		foreach (var materialSetConf in materialSetImportConfigurations) {
 			if (!settings.ShouldImportMaterialSet(figure.Name, materialSetConf.name)) {
 				continue;
@@ -38,19 +38,21 @@ class ShapeDumper {
 	private readonly ContentFileLocator fileLocator;
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
+	private readonly ImporterPathManager pathManager;
 	private readonly Figure parentFigure;
 	private readonly Figure figure;
 	private readonly ShapeImportConfiguration baseConfiguration;
 	private readonly DirectoryInfo figureDirectory;
 	
-	public ShapeDumper(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure, ShapeImportConfiguration baseConfiguration) {
+	public ShapeDumper(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, ImporterPathManager pathManager, Figure parentFigure, Figure figure, ShapeImportConfiguration baseConfiguration) {
 		this.fileLocator = fileLocator;
 		this.device = device;
 		this.shaderCache = shaderCache;
+		this.pathManager = pathManager;
 		this.parentFigure = parentFigure;
 		this.figure = figure;
 		this.baseConfiguration = baseConfiguration;
-		this.figureDirectory = CommonPaths.WorkDir.Subdirectory("figures").Subdirectory(figure.Name);
+		this.figureDirectory = pathManager.GetDestDirForFigure(figure.Name);
 	}
 	
 	private DirectoryInfo GetShapeDirectory(string shapeName) {
@@ -164,7 +166,7 @@ class ShapeDumper {
 		Console.WriteLine("Dumping occlusion system...");
 		
 		OccluderParameters parameters;
-		using (var calculator = new OccluderParametersCalculator(fileLocator, device, shaderCache, figure, shapeInputs)) {
+		using (var calculator = new OccluderParametersCalculator(fileLocator, device, shaderCache, pathManager, figure, shapeInputs)) {
 			parameters = calculator.CalculateOccluderParameters();
 		}
 
@@ -184,7 +186,7 @@ class ShapeDumper {
 		Console.WriteLine("Calculating occlusion...");
 		
 		if (faceTransparencies == null) {
-			faceTransparencies = FaceTransparencies.For(figure);
+			faceTransparencies = FaceTransparencies.For(pathManager, figure);
 		}
 
 		FigureGroup figureGroup;
@@ -193,7 +195,7 @@ class ShapeDumper {
 			figureGroup = new FigureGroup(figure);
 			faceTransparenciesGroup = new FaceTransparenciesGroup(faceTransparencies);
 		} else {
-			var parentFaceTransparencies = FaceTransparencies.For(parentFigure);
+			var parentFaceTransparencies = FaceTransparencies.For(pathManager, parentFigure);
 
 			figureGroup = new FigureGroup(parentFigure, figure);
 			faceTransparenciesGroup = new FaceTransparenciesGroup(parentFaceTransparencies, faceTransparencies);

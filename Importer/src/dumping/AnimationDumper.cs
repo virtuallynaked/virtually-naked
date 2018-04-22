@@ -5,8 +5,8 @@ using System.Collections.Generic;
 class AnimationDumper {
 	private static readonly DirectoryInfo AnimationSourceDirectory = CommonPaths.SourceAssetsDir.Subdirectory("mixamo-animations");
 
-	public static void DumpAllAnimations(Figure figure) {
-		AnimationDumper dumper = new AnimationDumper(figure);
+	public static void DumpAllAnimations(ImporterPathManager pathManager, Figure figure) {
+		AnimationDumper dumper = new AnimationDumper(pathManager, figure);
 		foreach (FileInfo animationSourceFile in AnimationSourceDirectory.EnumerateFiles("*.dae")) {
 			string animationName = Path.GetFileNameWithoutExtension(animationSourceFile.Name);
 			dumper.Dump(animationName, animationSourceFile);
@@ -18,10 +18,10 @@ class AnimationDumper {
 	private readonly DirectoryInfo animationsDirectory;
 	private readonly ChannelOutputs orientationOutputs;
 	
-	public AnimationDumper(Figure figure) {
+	public AnimationDumper(ImporterPathManager pathManager, Figure figure) {
 		this.figure = figure;
 
-		var figureDirectory = CommonPaths.WorkDir.Subdirectory("figures").Subdirectory(figure.Name);
+		var figureDirectory = pathManager.GetDestDirForFigure(figure.Name);
 		this.animationsDirectory = figureDirectory.Subdirectory("animations");
 		this.orientationOutputs = figure.ChannelSystem.DefaultOutputs; //orientation doesn't seem to change between actors so we can use default outputs
 	}

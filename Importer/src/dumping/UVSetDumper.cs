@@ -6,11 +6,10 @@ using System.IO;
 using System.Linq;
 
 public class UVSetDumper {
-	public static void DumpFigure(Figure figure) {
-		DirectoryInfo figureDirectory = CommonPaths.WorkDir.Subdirectory("figures")
-			.Subdirectory(figure.Name);
+	public static void DumpFigure(ImporterPathManager pathManager, Figure figure) {
+		DirectoryInfo figureDirectory = pathManager.GetDestDirForFigure(figure.Name);
 
-		var surfaceProperties = SurfacePropertiesJson.Load(figure);
+		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 		DirectoryInfo refinementDirectory = figureDirectory.Subdirectory("refinement").Subdirectory("level-" + surfaceProperties.SubdivisionLevel);
 		Quad[] spatialFaces = refinementDirectory.File("faces.array").ReadArray<Quad>();
 		SubdivisionTopologyInfo spatialTopologyInfo = Persistance.Load<SubdivisionTopologyInfo>(UnpackedArchiveFile.Make(refinementDirectory.File("topology-info.dat")));

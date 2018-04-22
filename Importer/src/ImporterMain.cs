@@ -48,9 +48,11 @@ public class ImporterMain : IDisposable {
 		new UiImporter().Run();
 		new EnvironmentCubeGenerator().Run(settings);
 		
-		OutfitImporter.ImportAll();
+		ImporterPathManager pathManager = new ImporterPathManager();
 
-		var loader = new FigureRecipeLoader(objectLocator);
+		OutfitImporter.ImportAll(pathManager);
+
+		var loader = new FigureRecipeLoader(objectLocator, pathManager);
 
 		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
@@ -69,21 +71,21 @@ public class ImporterMain : IDisposable {
 			.ToList();
 
 		Console.WriteLine($"Dumping parent...");
-		AnimationDumper.DumpAllAnimations(parentFigure);
+		AnimationDumper.DumpAllAnimations(pathManager, parentFigure);
 
 		var textureProcessorSharer = new TextureProcessorSharer(device, shaderCache, settings.CompressTextures);
 
 		foreach (Figure figure in figuresToDump) {
-			bool[] channelsToInclude = figure != parentFigure ? ChannelShaker.MakeChannelsToIncludeFromShapes(figure) : null;
+			bool[] channelsToInclude = figure != parentFigure ? ChannelShaker.MakeChannelsToIncludeFromShapes(pathManager, figure) : null;
 
 			Console.WriteLine($"Dumping {figure.Name}...");
-			SystemDumper.DumpFigure(figure, channelsToInclude);
-			GeometryDumper.DumpFigure(figure);
-			UVSetDumper.DumpFigure(figure);
+			SystemDumper.DumpFigure(pathManager, figure, channelsToInclude);
+			GeometryDumper.DumpFigure(pathManager, figure);
+			UVSetDumper.DumpFigure(pathManager, figure);
 
-			MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, figure, textureProcessorSharer);
+			MaterialSetDumper.DumpAllForFigure(settings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, textureProcessorSharer);
 			
-			ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, parentFigure, figure);
+			ShapeDumper.DumpAllForFigure(settings, fileLocator, device, shaderCache, pathManager, parentFigure, figure);
 		}
 
 		textureProcessorSharer.Finish();

@@ -25,8 +25,8 @@ public class MaterialSetImportConfiguration {
 		public Variant[] variants;
 	}
 
-	public static MaterialSetImportConfiguration[] Load(string figureName) {
-		string json = CommonPaths.ConfDir.Subdirectory(figureName).File("materials-sets.json").ReadAllText();
+	public static MaterialSetImportConfiguration[] Load(ImporterPathManager pathManager, string figureName) {
+		string json = pathManager.GetConfDirForFigure(figureName).File("materials-sets.json").ReadAllText();
 		MaterialSetImportConfiguration[] confs = JsonConvert.DeserializeObject<MaterialSetImportConfiguration[]>(json);
 		return confs;
 	}
@@ -45,8 +45,8 @@ public class MaterialSetImportConfiguration {
 
 [Serializable]
 public class ShapeImportConfiguration {
-	public static ShapeImportConfiguration[] Load(string figureName) {
-		var shapesFile = CommonPaths.ConfDir.Subdirectory(figureName).File("shapes.json");
+	public static ShapeImportConfiguration[] Load(ImporterPathManager pathManager, string figureName) {
+		var shapesFile = pathManager.GetConfDirForFigure(figureName).File("shapes.json");
 		if (shapesFile.Exists) {
 			string json = shapesFile.ReadAllText();
 			ShapeImportConfiguration[] confs = JsonConvert.DeserializeObject<ShapeImportConfiguration[]>(json);

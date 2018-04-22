@@ -1,23 +1,20 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using OpenSubdivFacade;
 
 public class GeometryDumper {
-	public static void DumpFigure(Figure figure) {
-		var refinementDirectory = CommonPaths.WorkDir.Subdirectory("figures")
-			.Subdirectory(figure.Name)
-			.Subdirectory("refinement");
+	public static void DumpFigure(ImporterPathManager pathManager, Figure figure) {
+		var refinementDirectory = pathManager.GetDestDirForFigure(figure.Name).Subdirectory("refinement");
 				
-		GeometryDumper dumper = new GeometryDumper(figure, refinementDirectory);
+		GeometryDumper dumper = new GeometryDumper(pathManager, figure, refinementDirectory);
 		dumper.DumpRefinement();
 	}
-		
+
+	private readonly ImporterPathManager pathManager;
 	private readonly Figure figure;
 	private readonly DirectoryInfo refinementDirectory;
 
-	private GeometryDumper(Figure figure, DirectoryInfo refinementDirectory) {
+	private GeometryDumper(ImporterPathManager pathManager, Figure figure, DirectoryInfo refinementDirectory) {
+		this.pathManager = pathManager;
 		this.figure = figure;
 		this.refinementDirectory = refinementDirectory;
 	}
@@ -52,7 +49,7 @@ public class GeometryDumper {
 	}
 	
 	private void DumpRefinement() {
-		var surfaceProperties = SurfacePropertiesJson.Load(figure);
+		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 
 		DumpControl();
 

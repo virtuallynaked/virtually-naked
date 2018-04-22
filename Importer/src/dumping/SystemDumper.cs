@@ -3,16 +3,17 @@ using System;
 using System.IO;
 
 public class SystemDumper {
-	private Figure figure;
-	private bool[] channelsToInclude;
-	private DirectoryInfo targetDirectory;
+	private readonly ImporterPathManager pathManager;
+	private readonly Figure figure;
+	private readonly bool[] channelsToInclude;
+	private readonly DirectoryInfo targetDirectory;
 
-	public SystemDumper(Figure figure, bool[] channelsToInclude) {
+	public SystemDumper(ImporterPathManager pathManager, Figure figure, bool[] channelsToInclude) {
+		this.pathManager = pathManager;
 		this.figure = figure;
 		this.channelsToInclude = channelsToInclude;
 
-		this.targetDirectory = CommonPaths.WorkDir.Subdirectory("figures")
-			.Subdirectory(figure.Name);
+		this.targetDirectory = pathManager.GetDestDirForFigure(figure.Name);
 	}
 
 	private void Dump<T>(string filename, Func<T> factoryFunc) {
@@ -52,7 +53,7 @@ public class SystemDumper {
 	}
 
 	public void DumpAll() {
-		var surfaceProperties = SurfacePropertiesJson.Load(figure);
+		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 		targetDirectory.CreateWithParents();
 		Persistance.Save(targetDirectory.File("surface-properties.dat"), surfaceProperties);
 		
@@ -68,7 +69,7 @@ public class SystemDumper {
 		}
 	}
 
-	public static void DumpFigure(Figure figure, bool[] channelsToInclude) {
-		new SystemDumper(figure, channelsToInclude).DumpAll();
+	public static void DumpFigure(ImporterPathManager pathManager, Figure figure, bool[] channelsToInclude) {
+		new SystemDumper(pathManager, figure, channelsToInclude).DumpAll();
 	}
 }

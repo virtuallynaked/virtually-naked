@@ -3,25 +3,24 @@ using System.IO;
 using System.Linq;
 
 public class ScatteringDumper {
-	public static void Dump(Figure figure, IMaterialSettings[] materialSettingsArray, string materialSetName) {
-		var surfaceProperties = SurfacePropertiesJson.Load(figure);
+	public static void Dump(ImporterPathManager pathManager, Figure figure, IMaterialSettings[] materialSettingsArray, string materialSetName) {
+		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 		if (!surfaceProperties.PrecomputeScattering) {
 			return;
 		}
 		
-		new ScatteringDumper(figure, materialSettingsArray, materialSetName).Dump();
+		new ScatteringDumper(pathManager, figure, materialSettingsArray, materialSetName).Dump();
 	}
 
 	private readonly Figure figure;
 	private readonly IMaterialSettings[] materialSettingsArray;
 	private readonly DirectoryInfo targetDirectory;
 
-	private ScatteringDumper(Figure figure, IMaterialSettings[] materialSettingsArray, string materialSetName) {
+	private ScatteringDumper(ImporterPathManager pathManager, Figure figure, IMaterialSettings[] materialSettingsArray, string materialSetName) {
 		this.figure = figure;
 		this.materialSettingsArray = materialSettingsArray;
 
-		targetDirectory = CommonPaths.WorkDir.Subdirectory("figures")
-			.Subdirectory(figure.Name)
+		targetDirectory = pathManager.GetDestDirForFigure(figure.Name)
 			.Subdirectory("scattering")
 			.Subdirectory(materialSetName);
 	}

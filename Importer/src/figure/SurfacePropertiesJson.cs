@@ -34,11 +34,11 @@ public class SurfacePropertiesJson {
 		public string materialSetForOpacities;
 	}
 
-	public static SurfaceProperties Load(Figure figure) {
+	public static SurfaceProperties Load(ImporterPathManager pathManager, Figure figure) {
 		JsonSerializerSettings settings = new JsonSerializerSettings {
 			MissingMemberHandling = MissingMemberHandling.Error
 		};
-		string json = CommonPaths.ConfDir.Subdirectory(figure.Name).File("surface-properties.json").ReadAllText();
+		string json = pathManager.GetConfDirForFigure(figure.Name).File("surface-properties.json").ReadAllText();
 		JsonProxy proxy = JsonConvert.DeserializeObject<JsonProxy>(json, settings);
 
 		int subdivisionLevel = proxy.subdivisionLevel;

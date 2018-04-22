@@ -31,11 +31,11 @@ public class ImportProperties {
 		public double hdCorrectionInitialValue;
 	}
 		
-	public static ImportProperties Load(string figureName) {
+	public static ImportProperties Load(ImporterPathManager pathManager, string figureName) {
 		JsonSerializerSettings settings = new JsonSerializerSettings {
 			MissingMemberHandling = MissingMemberHandling.Error
 		};
-		string json = CommonPaths.ConfDir.Subdirectory(figureName).File("import-properties.json").ReadAllText();
+		string json = pathManager.GetConfDirForFigure(figureName).File("import-properties.json").ReadAllText();
 		JsonProxy proxy = JsonConvert.DeserializeObject<JsonProxy>(json, settings);
 		UrisJsonProxy urisProxy = proxy.uris;
 		

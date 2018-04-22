@@ -7,18 +7,20 @@ using System.Linq;
 public class FaceTransparencyDemo : IDemoApp {
 	private readonly ContentFileLocator fileLocator;
 	private readonly DsonObjectLocator objectLocator;
+	private readonly ImporterPathManager pathManager;
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
 
 	public FaceTransparencyDemo() {
 		fileLocator = new ContentFileLocator();
 		objectLocator = new DsonObjectLocator(fileLocator);
+		pathManager = new ImporterPathManager();
 		device = new Device(DriverType.Hardware, DeviceCreationFlags.None, FeatureLevel.Level_11_1);
 		shaderCache = new ShaderCache(device);
 	}
 
 	public void Run() {
-		var loader = new FigureRecipeLoader(objectLocator);
+		var loader = new FigureRecipeLoader(objectLocator, pathManager);
 
 		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
@@ -30,7 +32,7 @@ public class FaceTransparencyDemo : IDemoApp {
 		FigureRecipe livHairRecipe = loader.LoadFigureRecipe("liv-hair", null);
 		var livHairFigure = livHairRecipe.Bake(parentFigure);
 
-		var processor = new FaceTransparencyProcessor(device, shaderCache, livHairFigure);
+		var processor = new FaceTransparencyProcessor(device, shaderCache, pathManager, livHairFigure);
 
 		for (int surfaceIdx = 0; surfaceIdx < livHairFigure.Geometry.SurfaceCount; ++surfaceIdx) {
 			string surfaceName = livHairFigure.Geometry.SurfaceNames[surfaceIdx];
