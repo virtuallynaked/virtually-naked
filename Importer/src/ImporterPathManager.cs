@@ -5,15 +5,17 @@ public class ImporterPathManager {
 	private readonly ImmutableDictionary<string, string> figureNameToContentPackNameDict;
 
 	public static ImporterPathManager Make(ImmutableList<ContentPackImportConfiguration> contentPacks) {
-		var figureNameToContentPackNameDictBuilder = ImmutableDictionary.CreateBuilder<string, string>();
+		var figureNameToPrimaryContentPackNameDictBuilder = ImmutableDictionary.CreateBuilder<string, string>();
 
 		foreach (var contentPack in contentPacks) {
 			foreach (var figure in contentPack.Figures) {
-				figureNameToContentPackNameDictBuilder.Add(figure.Name, contentPack.Name);
+				if (figure.IsPrimary) {
+					figureNameToPrimaryContentPackNameDictBuilder.Add(figure.Name, contentPack.Name);
+				}
 			}
 		}
 
-		return new ImporterPathManager(figureNameToContentPackNameDictBuilder.ToImmutable());
+		return new ImporterPathManager(figureNameToPrimaryContentPackNameDictBuilder.ToImmutable());
 	}
 
 	public ImporterPathManager(ImmutableDictionary<string, string> figureNameToContentPackNameDict) {

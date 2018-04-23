@@ -15,6 +15,8 @@ public class ContentPackImportConfiguration {
 		public override string ToString() {
 			return $"ContentPackImportConfiguration.Figure[{Name}]";
 		}
+
+		public bool IsPrimary => Directory.File("import-properties.json").Exists;
 	}
 
 	public class Outfit {

@@ -1,0 +1,45 @@
+[
+	{
+		"name": "Mei Lin",
+		"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 All Maps.duf" ],
+		"variant-categories": [{
+		    "name": "Eye Color",
+			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],
+			"variants": [{
+				"name": "Eye Color 01",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Eyes MAT 01.duf" ]
+			}, {
+				"name": "Eye Color 02",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Eyes MAT 02.duf" ]
+			}, {
+				"name": "Eye Color 03",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Eyes MAT 03.duf" ]
+			}, {
+				"name": "Eye Color 04",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Eyes MAT 04.duf" ]
+			}]
+		}, {
+		    "name": "Makeup",
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
+			"variants": [{
+				"name": "Makeup 01",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 01.duf" ]
+			}, {
+				"name": "Makeup 02",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 02.duf" ]
+			}, {
+				"name": "Makeup 03",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 03.duf" ]
+			}, {
+				"name": "Makeup 04",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 04.duf" ]
+			}, {
+				"name": "Makeup 05",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 05.duf" ]
+			}, {
+				"name": "Makeup 06",
+				"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Face MAT 06.duf" ]
+			}]
+		}]
+	}
+]

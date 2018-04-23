@@ -1,0 +1,219 @@
+[
+	{
+		"name": "Summer",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Summer/Iray/Summer All Mat.duf",
+			"/People/Genesis 3 Female/Characters/Summer/Iray/Summer SGenitalia.duf"
+		]
+	},
+	{
+		"name": "Adaline",
+		"paths": [ "/People/Genesis 3 Female/Characters/Adaline/MATs (Iray)/05 Genitalia/Adaline Genitalia.duf" ]
+	},
+	{
+		"name": "Chiyo",
+		"paths": [ "/People/Genesis 3 Female/Characters/Chiyo HD/Materials Iray/Chiyo 01 Skin.duf" ]
+	},
+	{
+		"name": "Halina",
+		"paths": [ "/People/Genesis 3 Female/Characters/Halina/Materials/Halina Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Lilinoe",
+		"paths": [ "/People/Genesis 3 Female/Characters/Lilinoe for Kalea 7/Lilinoe/Iray Materials/Lilinoe Base Mat.duf" ]
+	},
+	{
+		"name": "Samira",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/FWSA/Samira/Materials/Samira Base MAT.duf",
+			"/patches/samira-mouth.duf"
+		]
+	},
+	{
+		"name": "Taia",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/FWSA/Taia/Materials/Taia Base MAT.duf",
+			"/patches/taia-mouth.duf"
+		]
+	},
+	{
+		"name": "Cai",
+		"paths": [ "/People/Genesis 3 Female/Characters/FWSA/Cai/Materials/Cai Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Hye",
+		"paths": [ "/People/Genesis 3 Female/Characters/Hye/Iray Materials/Hye Base Mat.duf" ]
+	},
+	{
+		"name": "Phoenix",
+		"paths": [ "/People/Genesis 3 Female/Characters/Phoenix/Materials/Phoenix Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Dayanara",
+		"paths": [ "/People/Genesis 3 Female/Characters/FWSA/Dayanara/Materials/Dayanara Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Sapphire",
+		"paths": [ "/People/Genesis 3 Female/Characters/Sapphire HD/Materials Iray/Sapphire 01 Skin.duf" ]
+	},
+	{
+		"name": "Gillian",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/FWSA/Gillian/MATs (Iray)/Gillian Base Mat.duf",
+			"/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Gen MAT.duf"
+		]
+	},
+	{
+		"name": "Lien",
+		"paths": [ "/People/Genesis 3 Female/Characters/FWArt/Lien/Materials/Lien Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Olympia",
+		"paths": [ "/People/Genesis 3 Female/Materials/Olympia 7/Iray/Olympia 7 All Maps.duf" ]
+	},
+	{
+		"name": "Nathalie",
+		"paths": [ "/People/Genesis 3 Female/Characters/Nathalie/Iray/Nathalie All Mat.duf" ]
+	},
+	{
+		"name": "Rahele",
+		"paths": [ "/People/Genesis 3 Female/Characters/Rahele/Materials/Iray/Rahele Base Mat.duf" ]
+	},
+	{
+		"name": "Fiora",
+		"paths": [ "/People/Genesis 3 Female/Characters/Fiora/Iray/Fiora All Mat.duf" ]
+	},
+	{
+		"name": "Dayna",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Dayna/MATs Iray/Dayna Base Mat.duf",
+			"/People/Genesis 3 Female/Characters/Dayna/MATs Iray/05 Genitalia/Dayna Genitalia.duf"
+		]
+	},
+	{
+		"name": "Bethany",
+		"paths": [
+			"/People/Genesis 3 Female/Materials/Bethany 7/Iray/Bethany 7 All MAT.duf",
+			"/patches/bethany-genitalia.duf"
+		]
+	},
+	{
+		"name": "Camile",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Camile/MATs Iray/Camile Base Mat.duf",
+			"/People/Genesis 3 Female/Characters/Camile/MATs Iray/05 Genitalia/Camile Genitalia.duf"
+		]
+	},
+	{
+		"name": "Lainee",
+		"paths": [ "/People/Genesis 3 Female/Characters/Lainee/MATs A (Iray)/Lainee Base Full Mat.duf" ]
+	},
+	{
+		"name": "Xin-Qian",
+		"paths": [ "/People/Genesis 3 Female/Characters/FWSA/Xin-Qian/Materials/Xin-Qian Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Honey",
+		"paths": [ "/People/Genesis 3 Female/Characters/Honey/Materials/Honey Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Sushmita",
+		"paths": [ "/People/Genesis 3 Female/Characters/Sushmita/Materials/Sushmita Iray Base MAT.duf" ]
+	},
+	{
+		"name": "Sushmita-Henna",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Sushmita/Materials/Sushmita Iray Base MAT.duf",
+			"/People/Genesis 3 Female/Characters/Sushmita/Materials/05 Henna Mehndi/Sushmita Henna Apply.duf"
+		]
+	},
+	{
+		"name": "Sushmita-MakeupAndHenna",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Sushmita/Materials/Sushmita Iray Base MAT.duf",
+			"/People/Genesis 3 Female/Characters/Sushmita/Materials/01 Makeups/Sushmita Makeup C05.duf",
+			"/People/Genesis 3 Female/Characters/Sushmita/Materials/02 Lips/Sushmita Lips 06.duf",
+			"/People/Genesis 3 Female/Characters/Sushmita/Materials/05 Henna Mehndi/Sushmita Henna Apply.duf"
+		]
+	},
+	{
+		"name": "Karen",
+		"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 All Maps.duf" ]
+	},
+	{
+		"name": "Gia",
+		"paths": [ "/People/Genesis 3 Female/Materials/Gia 7/Iray/Gia 7 All Maps.duf" ]
+	},
+	{
+		"name": "Nala",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Nala/Materials/Iray/Nala 00 Basemat.duf",
+			"/People/Genesis 3 Female/Characters/Nala/Materials/Iray/Nala Gens.duf"
+		]
+	},
+	{
+		"name": "Desidora",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Desidora/Materials/Desidora All Mat.duf"
+		]
+	},
+	{
+		"name": "Matti",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Matti/Materials/Matti Base Iray Mat.duf"
+		]
+	},
+	{
+		"name": "Uma",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Uma/Materials/Iray/Uma Base MAT.duf",
+			"/patches/uma-mouth.duf"
+		]
+	},
+	{
+		"name": "Tisha",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Tisha/Materials/Tisha Iray Base MAT.duf"
+		]
+	},
+	{
+		"name": "Senna",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Senna/Materials/Senna All Mat.duf"
+		]
+	},
+	{
+		"name": "Cailin",
+		"paths": [ "/People/Genesis 3 Female/Characters/Cailin HD/Materials Iray/Cailin 01 Skin.duf" ]
+	},
+	{
+		"name": "Cathy",
+		"paths": [ "/People/Genesis 3 Female/Characters/Cathy/Materials Iray/Cathy 01 Skin.duf" ]
+	},
+	{
+		"name": "Anna",
+		"paths": [ "/People/Genesis 3 Female/Characters/Anna/Materials Iray/Anna 01 Skin.duf" ]
+	},
+	{
+		"name": "Jolina",
+		"paths": [ "/People/Genesis 3 Female/Characters/Jolina/Materials Iray 4.9/Jolina 01 Skin.duf" ]
+	},
+	{
+		"name": "Sasha",
+		"paths": [ "/People/Genesis 3 Female/Characters/Sasha HD/Materials/Iray/01 Sasha Skin Iray.duf" ]
+	},
+	{
+		"name": "Nyarai",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Saiyaness/Nyarai/Materials/Nyarai All Iray.duf",
+			"/patches/nyarai-glossy-roughness.duf"
+		]
+	},
+	{
+		"name": "Priya",
+		"paths": [
+			"/People/Genesis 3 Female/Characters/Saiyaness/Priya/Materials/Priya Iray.duf",
+			"/People/Genesis 3 Female/Characters/Saiyaness/Priya/Materials/Iray/Priya Gens 01.duf"
+		]
+	}
+]

@@ -75,14 +75,15 @@ public class ImporterMain : IDisposable {
 
 				var figureDumper = figureDumperLoader.LoadDumper(figureName);
 				
-				var figureConfDir = pathManager.GetConfDirForFigure(figureName);
-				MaterialSetImportConfiguration[] materialSetConfigurations = MaterialSetImportConfiguration.Load(figureConfDir);
-				ShapeImportConfiguration[] shapeImportConfigurations = ShapeImportConfiguration.Load(figureConfDir);
+				MaterialSetImportConfiguration[] materialSetConfigurations = MaterialSetImportConfiguration.Load(figureConf.Directory);
+				ShapeImportConfiguration[] shapeImportConfigurations = ShapeImportConfiguration.Load(figureConf.Directory);
 
 				var figureDestDir = destDir.Subdirectory("figures").Subdirectory(figureName);
 
-				figureDumper.DumpFigure(shapeImportConfigurations, figureDestDir);
-
+				if (figureConf.IsPrimary) {
+					figureDumper.DumpFigure(shapeImportConfigurations, figureDestDir);
+				}
+				
 				foreach (var materialSetConf in materialSetConfigurations) {
 					if (!settings.ShouldImportMaterialSet(figureConf.Name, materialSetConf.name)) {
 						continue;
@@ -91,7 +92,9 @@ public class ImporterMain : IDisposable {
 					figureDumper.DumpMaterialSet(settings, textureProcessorSharer, figureDestDir, materialSetConf);
 				}
 
-				figureDumper.DumpBaseShape(figureDestDir);
+				if (figureConf.IsPrimary) {
+					figureDumper.DumpBaseShape(figureDestDir);
+				}
 
 				foreach (var shapeConf in shapeImportConfigurations) {
 					if (!settings.ShouldImportShape(figureConf.Name, shapeConf.name)) {
