@@ -38,7 +38,8 @@ public class ChannelShaker {
 	public static ChannelShaker InitializeFromShapes(ImporterPathManager pathManager, Figure figure) {
 		var shaker = new ChannelShaker(figure.ChannelSystem);
 
-		ShapeImportConfiguration[] shapeConfigurations = ShapeImportConfiguration.Load(pathManager, figure.Name);
+		var figureConfDir = pathManager.GetConfDirForFigure(figure.Name);
+		ShapeImportConfiguration[] shapeConfigurations = ShapeImportConfiguration.Load(figureConfDir);
 		foreach (var conf in shapeConfigurations) {
 			foreach (var entry in conf.morphs) {
 				string channelName = entry.Key + "?value";

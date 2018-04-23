@@ -106,26 +106,4 @@ class MaterialSetDumper {
 		var materialSettings = DumpMaterialSet(settings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, baseConfiguration, configuration, sharedTextureProcessor);
 		ScatteringDumper.Dump(pathManager, figure, materialSettings.PerMaterialSettings, configuration.name);
 	}
-
-	public static void DumpAllForFigure(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Figure figure, TextureProcessorSharer textureProcessorSharer) {
-		MaterialSetImportConfiguration[] configurations = MaterialSetImportConfiguration.Load(pathManager, figure.Name);
-
-		var baseConf = configurations.Single(conf => conf.name == "Base");
-		
-		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
-		TextureProcessor sharedTextureProcessor = surfaceProperties.ShareTextures != null ?
-			textureProcessorSharer.GetSharedProcessor(surfaceProperties.ShareTextures) : null;
-
-		foreach (var conf in configurations) {
-			if (conf == baseConf) {
-				continue;
-			}
-
-			if (!settings.ShouldImportMaterialSet(figure.Name, conf.name)) {
-				continue;
-			}
-
-			DumpMaterialSetAndScattering(settings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, baseConf, conf, sharedTextureProcessor);
-		}
-	}
 }

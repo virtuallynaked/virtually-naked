@@ -92,13 +92,18 @@ public class ImportSettings {
 		if (shapes == null) {
 			return shapeName != "Base";
 		} else {
-			return figureSettings.Shapes.Contains(shapeName);
+			return shapes.Contains(shapeName);
 		}
 	}
 
 	public bool ShouldImportMaterialSet(string figureName, string materialSetName) {
 		var figureSettings = Figures[figureName];
-		return figureSettings.MaterialSets == null || figureSettings.MaterialSets.Contains(materialSetName);
+		var materialSets = figureSettings.MaterialSets;
+		if (materialSets == null) {
+			return materialSetName != "Base";
+		} else {
+			return materialSets.Contains(materialSetName);
+		}
 	}
 }
 

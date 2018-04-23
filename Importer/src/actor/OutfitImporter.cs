@@ -54,7 +54,8 @@ public class OutfitImporter {
 				foreach (var entry2 in materialSetsByFigureName) {
 					var figureName = entry2.Key;
 					var materialSetName = entry2.Value;
-					var materialSetsConfs = MaterialSetImportConfiguration.Load(pathManager, figureName);
+					var figureConfDir = pathManager.GetConfDirForFigure(figureName);
+					var materialSetsConfs = MaterialSetImportConfiguration.Load(figureConfDir);
 					materialSetsConfs.Where(conf => conf.name == materialSetName).Single(); 
 				}
 

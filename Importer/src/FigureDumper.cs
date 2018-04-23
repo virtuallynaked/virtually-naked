@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using SharpDX.Direct3D11;
 
 public class FigureDumperLoader {
@@ -35,7 +36,12 @@ public class FigureDumperLoader {
 			parentFigure :
 			figureRecipeLoader.LoadFigureRecipe(figureName, parentFigureRecipe).Bake(parentFigure);
 
-		return new FigureDumper(fileLocator, objectLocator, pathManager, device, shaderCache, parentFigure, figure);
+		var figureConfDir = pathManager.GetConfDirForFigure(figure.Name);
+		MaterialSetImportConfiguration baseMaterialSetConfiguration = MaterialSetImportConfiguration.Load(figureConfDir).Single(conf => conf.name == "Base");
+		ShapeImportConfiguration baseShapeImportConfiguration = ShapeImportConfiguration.Load(figureConfDir).SingleOrDefault(conf => conf.name == "Base");
+
+		ShapeDumper shapeDumper = new ShapeDumper(fileLocator, device, shaderCache, pathManager, parentFigure, figure, baseShapeImportConfiguration);
+		return new FigureDumper(fileLocator, objectLocator, pathManager, device, shaderCache, parentFigure, figure, baseMaterialSetConfiguration, baseShapeImportConfiguration, shapeDumper);
 	}
 }
 
@@ -47,8 +53,11 @@ public class FigureDumper {
 	private readonly ShaderCache shaderCache;
 	private readonly Figure parentFigure;
 	private readonly Figure figure;
+	private readonly MaterialSetImportConfiguration baseMaterialSetImportConfiguration;
+	private readonly ShapeImportConfiguration baseShapeImportConfiguration;
+	private readonly ShapeDumper shapeDumper;
 
-	public FigureDumper(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure) {
+	public FigureDumper(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure, MaterialSetImportConfiguration baseMaterialSetImportConfiguration, ShapeImportConfiguration baseShapeImportConfiguration, ShapeDumper shapeDumper) {
 		this.device = device;
 		this.shaderCache = shaderCache;
 		this.fileLocator = fileLocator;
@@ -56,6 +65,9 @@ public class FigureDumper {
 		this.pathManager = pathManager;
 		this.parentFigure = parentFigure;
 		this.figure = figure;
+		this.baseMaterialSetImportConfiguration = baseMaterialSetImportConfiguration;
+		this.baseShapeImportConfiguration = baseShapeImportConfiguration;
+		this.shapeDumper = shapeDumper;
 	}
 
 	public void DumpFigure() {
@@ -66,17 +78,29 @@ public class FigureDumper {
 		if (figure == parentFigure) {
 			AnimationDumper.DumpAllAnimations(pathManager, parentFigure);
 		}
-				
+		
 		SystemDumper.DumpFigure(pathManager, figure, channelsToInclude);
 		GeometryDumper.DumpFigure(pathManager, figure);
 		UVSetDumper.DumpFigure(pathManager, figure);
 	}
 
-	public void DumpMaterialSets(ImportSettings importSettings, TextureProcessorSharer textureProcessorSharer) {
-		MaterialSetDumper.DumpAllForFigure(importSettings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, textureProcessorSharer);
+	public void DumpMaterialSet(ImportSettings importSettings, TextureProcessorSharer textureProcessorSharer, MaterialSetImportConfiguration conf) {
+		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
+		TextureProcessor sharedTextureProcessor = surfaceProperties.ShareTextures != null ?
+			textureProcessorSharer.GetSharedProcessor(surfaceProperties.ShareTextures) : null;
+		
+		MaterialSetDumper.DumpMaterialSetAndScattering(importSettings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, baseMaterialSetImportConfiguration, conf, sharedTextureProcessor);
+
+		if (conf.useCustomOcclusion) {
+			shapeDumper.DumpOcclusionForMaterialSet(conf.name);
+		}
 	}
 
-	public void DumperShapes(ImportSettings importSettings) {
-		ShapeDumper.DumpAllForFigure(importSettings, fileLocator, device, shaderCache, pathManager, parentFigure, figure);
+	public void DumpShape(ShapeImportConfiguration conf) {
+		shapeDumper.Dump(conf);
+	}
+
+	public void DumpBaseShape() {
+		shapeDumper.DumpUnmorphed();
 	}
 }

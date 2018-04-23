@@ -90,11 +90,11 @@ public class OccluderParametersCalculator : IDisposable {
 	private FigureGroup figureGroup;
 	private FigureOcclusionCalculator occlusionCalculator;
 	
-	public OccluderParametersCalculator(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, ImporterPathManager pathManager, Figure figure, ChannelInputs shapeInputs) {
+	public OccluderParametersCalculator(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure figure, float[] faceTransparencies, ChannelInputs shapeInputs) {
 		this.figure = figure;
 		this.shapeInputs = shapeInputs;
 		figureGroup = new FigureGroup(figure);
-		var faceTransparenciesGroup = new FaceTransparenciesGroup(FaceTransparencies.For(pathManager, figure));
+		var faceTransparenciesGroup = new FaceTransparenciesGroup(faceTransparencies);
 		occlusionCalculator = new FigureOcclusionCalculator(fileLocator, device, shaderCache, figureGroup, faceTransparenciesGroup);
 	}
 
