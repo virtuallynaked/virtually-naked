@@ -45,13 +45,15 @@ public class ImporterMain : IDisposable {
 			settings = ImportSettings.MakeFromViewerInitialSettings();
 		}
 		
+		var contentDestDir = CommonPaths.WorkDir.Subdirectory("content");
+
 		var contentPackConfs = ContentPackImportConfiguration.LoadAll(CommonPaths.ConfDir);
 		var pathManager = ImporterPathManager.Make(contentPackConfs);
 		
 		var figureDumperLoader = new FigureDumperLoader(fileLocator, objectLocator, pathManager, device, shaderCache);
 
 		foreach (var contentPackConf in contentPackConfs) {
-			var destDir = pathManager.GetDestDirForContentPack(contentPackConf.Name);
+			var destDir = contentDestDir.Subdirectory(contentPackConf.Name);
 
 			if (contentPackConf.IsCore) {
 				new UiImporter(destDir).Run();
@@ -77,7 +79,7 @@ public class ImporterMain : IDisposable {
 				MaterialSetImportConfiguration[] materialSetConfigurations = MaterialSetImportConfiguration.Load(figureConfDir);
 				ShapeImportConfiguration[] shapeImportConfigurations = ShapeImportConfiguration.Load(figureConfDir);
 
-				var figureDestDir = pathManager.GetDestDirForFigure(figureName);
+				var figureDestDir = destDir.Subdirectory("figures").Subdirectory(figureName);
 
 				figureDumper.DumpFigure(shapeImportConfigurations, figureDestDir);
 

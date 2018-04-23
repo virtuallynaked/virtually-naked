@@ -24,13 +24,4 @@ public class ImporterPathManager {
 		var contentPackName = figureNameToContentPackNameDict[figureName];
 		return CommonPaths.ConfDir.Subdirectory(contentPackName).Subdirectory("figures").Subdirectory(figureName);
 	}
-	
-	public DirectoryInfo GetDestDirForContentPack(string contentPackName) {
-		return CommonPaths.WorkDir.Subdirectory("content").Subdirectory(contentPackName);
-	}
-
-	public DirectoryInfo GetDestDirForFigure(string figureName) {
-		var contentPackName = figureNameToContentPackNameDict[figureName];
-		return GetDestDirForContentPack(contentPackName).Subdirectory("figures").Subdirectory(figureName);
-	}
 }
