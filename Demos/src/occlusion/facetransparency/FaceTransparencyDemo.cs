@@ -33,7 +33,8 @@ public class FaceTransparencyDemo : IDemoApp {
 		FigureRecipe livHairRecipe = loader.LoadFigureRecipe("liv-hair", null);
 		var livHairFigure = livHairRecipe.Bake(parentFigure);
 
-		var processor = new FaceTransparencyProcessor(device, shaderCache, pathManager, livHairFigure);
+		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, livHairFigure);
+		var processor = new FaceTransparencyProcessor(device, shaderCache, livHairFigure, surfaceProperties);
 
 		for (int surfaceIdx = 0; surfaceIdx < livHairFigure.Geometry.SurfaceCount; ++surfaceIdx) {
 			string surfaceName = livHairFigure.Geometry.SurfaceNames[surfaceIdx];

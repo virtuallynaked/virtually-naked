@@ -35,11 +35,9 @@ public class ChannelShaker {
 		return false;
 	}
 	
-	public static ChannelShaker InitializeFromShapes(ImporterPathManager pathManager, Figure figure) {
+	public static ChannelShaker InitializeFromShapes(Figure figure, ShapeImportConfiguration[] shapeConfigurations) {
 		var shaker = new ChannelShaker(figure.ChannelSystem);
 
-		var figureConfDir = pathManager.GetConfDirForFigure(figure.Name);
-		ShapeImportConfiguration[] shapeConfigurations = ShapeImportConfiguration.Load(figureConfDir);
 		foreach (var conf in shapeConfigurations) {
 			foreach (var entry in conf.morphs) {
 				string channelName = entry.Key + "?value";
@@ -51,8 +49,8 @@ public class ChannelShaker {
 		return shaker;
 	}
 
-	public static bool[] MakeChannelsToIncludeFromShapes(ImporterPathManager pathManager, Figure figure) {
-		var shaker = InitializeFromShapes(pathManager, figure);
+	public static bool[] MakeChannelsToIncludeFromShapes(Figure figure, ShapeImportConfiguration[] shapeConfigurations) {
+		var shaker = InitializeFromShapes(figure, shapeConfigurations);
 		return figure.Channels
 			.Select(channel => shaker.IsChannelUsed(channel))
 			.ToArray();

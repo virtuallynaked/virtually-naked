@@ -34,11 +34,11 @@ private static InputElement[] InputElements = new[] {
 	private readonly PixelShader maxingPixelShader;
 	private readonly States states;
 
-	public FaceTransparencyProcessor(Device device, ShaderCache shaderCache, ImporterPathManager pathManager, Figure figure) {
+	public FaceTransparencyProcessor(Device device, ShaderCache shaderCache, Figure figure, SurfaceProperties surfaceProperties) {
 		this.device = device;
 		this.figure = figure;
+		this.surfaceProperties = surfaceProperties;
 
-		surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 		faceCount = figure.Geometry.Faces.Length;
 		faceTransparencies = new float[faceCount];
 

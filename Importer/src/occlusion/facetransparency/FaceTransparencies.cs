@@ -1,12 +1,10 @@
+using System.IO;
 using System.Linq;
 
 public static class FaceTransparencies {
-	public static float[] For(ImporterPathManager pathManager, Figure figure) {
-		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
-
+	public static float[] For(Figure figure, SurfaceProperties surfaceProperties, DirectoryInfo figureDestDir) {
 		if (surfaceProperties.MaterialSetForOpacities != null) {
-			var figureDir = pathManager.GetDestDirForFigure(figure.Name);
-			var materialSetDir = figureDir.Subdirectory("material-sets").Subdirectory(surfaceProperties.MaterialSetForOpacities);
+			var materialSetDir = figureDestDir.Subdirectory("material-sets").Subdirectory(surfaceProperties.MaterialSetForOpacities);
 			var transparenciesFile = materialSetDir.File("face-transparencies.array");
 			return transparenciesFile.ReadArray<float>();
 		}

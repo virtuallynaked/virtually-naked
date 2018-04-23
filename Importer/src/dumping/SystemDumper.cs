@@ -3,21 +3,20 @@ using System;
 using System.IO;
 
 public class SystemDumper {
-	private readonly ImporterPathManager pathManager;
 	private readonly Figure figure;
+	private readonly SurfaceProperties surfaceProperties;
 	private readonly bool[] channelsToInclude;
-	private readonly DirectoryInfo targetDirectory;
+	private readonly DirectoryInfo figureDestDir;
 
-	public SystemDumper(ImporterPathManager pathManager, Figure figure, bool[] channelsToInclude) {
-		this.pathManager = pathManager;
+	public SystemDumper(Figure figure, SurfaceProperties surfaceProperties, bool[] channelsToInclude, DirectoryInfo figureDestDir) {
 		this.figure = figure;
+		this.surfaceProperties = surfaceProperties;
 		this.channelsToInclude = channelsToInclude;
-
-		this.targetDirectory = pathManager.GetDestDirForFigure(figure.Name);
+		this.figureDestDir = figureDestDir;
 	}
 
 	private void Dump<T>(string filename, Func<T> factoryFunc) {
-		var fileInfo = targetDirectory.File(filename);
+		var fileInfo = figureDestDir.File(filename);
 
 		if (fileInfo.Exists) {
 			return;
@@ -25,7 +24,7 @@ public class SystemDumper {
 
 		T obj = factoryFunc();
 		
-		targetDirectory.CreateWithParents();
+		figureDestDir.CreateWithParents();
 		Persistance.Save(fileInfo, obj);
 	}
 	
@@ -53,9 +52,8 @@ public class SystemDumper {
 	}
 
 	public void DumpAll() {
-		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
-		targetDirectory.CreateWithParents();
-		Persistance.Save(targetDirectory.File("surface-properties.dat"), surfaceProperties);
+		figureDestDir.CreateWithParents();
+		Persistance.Save(figureDestDir.File("surface-properties.dat"), surfaceProperties);
 		
 		Dump("shaper-parameters.dat", () => figure.MakeShaperParameters(channelsToInclude));
 		Dump("channel-system-recipe.dat", () => figure.MakeChannelSystemRecipe());
@@ -69,7 +67,7 @@ public class SystemDumper {
 		}
 	}
 
-	public static void DumpFigure(ImporterPathManager pathManager, Figure figure, bool[] channelsToInclude) {
-		new SystemDumper(pathManager, figure, channelsToInclude).DumpAll();
+	public static void DumpFigure(Figure figure, SurfaceProperties surfaceProperties, bool[] channelsToInclude, DirectoryInfo figureDestDir) {
+		new SystemDumper(figure, surfaceProperties, channelsToInclude, figureDestDir).DumpAll();
 	}
 }

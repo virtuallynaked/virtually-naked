@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using SharpDX.Direct3D11;
 
@@ -10,8 +11,10 @@ public class FigureDumperLoader {
 	private readonly ShaderCache shaderCache;
 
 	private readonly FigureRecipeLoader figureRecipeLoader;
+
 	private readonly FigureRecipe parentFigureRecipe;
 	private readonly Figure parentFigure;
+	private readonly float[] parentFaceTransparencies;
 
 	public FigureDumperLoader(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Device device, ShaderCache shaderCache) {
 		this.fileLocator = fileLocator;
@@ -26,9 +29,12 @@ public class FigureDumperLoader {
 		FigureRecipe genitaliaRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
 		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
 		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(null);
+		SurfaceProperties genesis3FemaleSurfaceProperties = SurfacePropertiesJson.Load(pathManager, genesis3FemaleWithGenitalia);
+		float[] genesis3FemaleFaceTransparencies = FaceTransparencies.For(genesis3FemaleWithGenitalia, genesis3FemaleSurfaceProperties, null);
 
 		parentFigureRecipe = genesis3FemaleRecipe;
 		parentFigure = genesis3FemaleWithGenitalia;
+		parentFaceTransparencies = genesis3FemaleFaceTransparencies;
 	}
 
 	public FigureDumper LoadDumper(string figureName) {
@@ -39,68 +45,67 @@ public class FigureDumperLoader {
 		var figureConfDir = pathManager.GetConfDirForFigure(figure.Name);
 		MaterialSetImportConfiguration baseMaterialSetConfiguration = MaterialSetImportConfiguration.Load(figureConfDir).Single(conf => conf.name == "Base");
 		ShapeImportConfiguration baseShapeImportConfiguration = ShapeImportConfiguration.Load(figureConfDir).SingleOrDefault(conf => conf.name == "Base");
+		SurfaceProperties surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 
-		ShapeDumper shapeDumper = new ShapeDumper(fileLocator, device, shaderCache, pathManager, parentFigure, figure, baseShapeImportConfiguration);
-		return new FigureDumper(fileLocator, objectLocator, pathManager, device, shaderCache, parentFigure, figure, baseMaterialSetConfiguration, baseShapeImportConfiguration, shapeDumper);
+		ShapeDumper shapeDumper = new ShapeDumper(fileLocator, device, shaderCache, parentFigure, parentFaceTransparencies, figure, surfaceProperties, baseShapeImportConfiguration);
+		return new FigureDumper(fileLocator, objectLocator, device, shaderCache, parentFigure, figure, surfaceProperties, baseMaterialSetConfiguration, baseShapeImportConfiguration, shapeDumper);
 	}
 }
 
 public class FigureDumper {
 	private readonly ContentFileLocator fileLocator;
 	private readonly DsonObjectLocator objectLocator;
-	private readonly ImporterPathManager pathManager;
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
 	private readonly Figure parentFigure;
 	private readonly Figure figure;
+	private readonly SurfaceProperties surfaceProperties;
 	private readonly MaterialSetImportConfiguration baseMaterialSetImportConfiguration;
 	private readonly ShapeImportConfiguration baseShapeImportConfiguration;
 	private readonly ShapeDumper shapeDumper;
 
-	public FigureDumper(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure, MaterialSetImportConfiguration baseMaterialSetImportConfiguration, ShapeImportConfiguration baseShapeImportConfiguration, ShapeDumper shapeDumper) {
+	public FigureDumper(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Device device, ShaderCache shaderCache, Figure parentFigure, Figure figure, SurfaceProperties surfaceProperties, MaterialSetImportConfiguration baseMaterialSetImportConfiguration, ShapeImportConfiguration baseShapeImportConfiguration, ShapeDumper shapeDumper) {
 		this.device = device;
 		this.shaderCache = shaderCache;
 		this.fileLocator = fileLocator;
 		this.objectLocator = objectLocator;
-		this.pathManager = pathManager;
 		this.parentFigure = parentFigure;
 		this.figure = figure;
+		this.surfaceProperties =surfaceProperties;
 		this.baseMaterialSetImportConfiguration = baseMaterialSetImportConfiguration;
 		this.baseShapeImportConfiguration = baseShapeImportConfiguration;
 		this.shapeDumper = shapeDumper;
 	}
 
-	public void DumpFigure() {
+	public void DumpFigure(ShapeImportConfiguration[] shapeConfigurations, DirectoryInfo figureDestDir) {
 		Console.WriteLine($"Dumping {figure.Name}...");
-
-		bool[] channelsToInclude = figure != parentFigure ? ChannelShaker.MakeChannelsToIncludeFromShapes(pathManager, figure) : null;
-
+		
 		if (figure == parentFigure) {
-			AnimationDumper.DumpAllAnimations(pathManager, parentFigure);
+			AnimationDumper.DumpAllAnimations(parentFigure, figureDestDir);
 		}
 		
-		SystemDumper.DumpFigure(pathManager, figure, channelsToInclude);
-		GeometryDumper.DumpFigure(pathManager, figure);
-		UVSetDumper.DumpFigure(pathManager, figure);
+		bool[] channelsToInclude = figure != parentFigure ? ChannelShaker.MakeChannelsToIncludeFromShapes(figure, shapeConfigurations) : null;
+		SystemDumper.DumpFigure(figure, surfaceProperties, channelsToInclude, figureDestDir);
+		GeometryDumper.DumpFigure(figure, surfaceProperties, figureDestDir);
+		UVSetDumper.DumpFigure(figure, surfaceProperties, figureDestDir);
 	}
 
-	public void DumpMaterialSet(ImportSettings importSettings, TextureProcessorSharer textureProcessorSharer, MaterialSetImportConfiguration conf) {
-		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
+	public void DumpMaterialSet(ImportSettings importSettings, TextureProcessorSharer textureProcessorSharer, DirectoryInfo figureDestDir, MaterialSetImportConfiguration conf) {
 		TextureProcessor sharedTextureProcessor = surfaceProperties.ShareTextures != null ?
 			textureProcessorSharer.GetSharedProcessor(surfaceProperties.ShareTextures) : null;
 		
-		MaterialSetDumper.DumpMaterialSetAndScattering(importSettings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, baseMaterialSetImportConfiguration, conf, sharedTextureProcessor);
+		MaterialSetDumper.DumpMaterialSetAndScattering(importSettings, device, shaderCache, fileLocator, objectLocator, figure, surfaceProperties, baseMaterialSetImportConfiguration, sharedTextureProcessor, figureDestDir, conf);
 
 		if (conf.useCustomOcclusion) {
-			shapeDumper.DumpOcclusionForMaterialSet(conf.name);
+			shapeDumper.DumpOcclusionForMaterialSet(figureDestDir, conf.name);
 		}
 	}
 
-	public void DumpShape(ShapeImportConfiguration conf) {
-		shapeDumper.Dump(conf);
+	public void DumpShape(DirectoryInfo figureDestDir, ShapeImportConfiguration conf) {
+		shapeDumper.DumpShape(figureDestDir, conf);
 	}
 
-	public void DumpBaseShape() {
-		shapeDumper.DumpUnmorphed();
+	public void DumpBaseShape(DirectoryInfo figureDestDir) {
+		shapeDumper.DumpUnmorphed(figureDestDir);
 	}
 }

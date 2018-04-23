@@ -8,27 +8,23 @@ public class ShapeDumper {
 	private readonly ContentFileLocator fileLocator;
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
-	private readonly ImporterPathManager pathManager;
 	private readonly Figure parentFigure;
+	private readonly float[] parentFaceTransparencies;
 	private readonly Figure figure;
+	private readonly SurfaceProperties surfaceProperties;
 	private readonly ShapeImportConfiguration baseConfiguration;
-	private readonly DirectoryInfo figureDirectory;
 	
-	public ShapeDumper(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, ImporterPathManager pathManager, Figure parentFigure, Figure figure, ShapeImportConfiguration baseConfiguration) {
+	public ShapeDumper(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, float[] parentFaceTransparencies, Figure figure, SurfaceProperties surfaceProperties, ShapeImportConfiguration baseConfiguration) {
 		this.fileLocator = fileLocator;
 		this.device = device;
 		this.shaderCache = shaderCache;
-		this.pathManager = pathManager;
 		this.parentFigure = parentFigure;
+		this.parentFaceTransparencies = parentFaceTransparencies;
 		this.figure = figure;
+		this.surfaceProperties = surfaceProperties;
 		this.baseConfiguration = baseConfiguration;
-		this.figureDirectory = pathManager.GetDestDirForFigure(figure.Name);
 	}
 	
-	private DirectoryInfo GetShapeDirectory(string shapeName) {
-		return figureDirectory.Subdirectory("shapes").Subdirectory(shapeName);
-	}
-
 	private ChannelInputs MakeShapeInputs(ShapeImportConfiguration shapeImportConfiguration) {
 		ChannelInputs inputs = figure.MakeDefaultChannelInputs();
 		
@@ -49,16 +45,16 @@ public class ShapeDumper {
 		return inputs;
 	}
 		
-	public void Dump(ShapeImportConfiguration shapeImportConfiguration) {
-		DirectoryInfo shapeDirectory = GetShapeDirectory(shapeImportConfiguration.name);
+	public void DumpShape(DirectoryInfo figureDestDir, ShapeImportConfiguration shapeImportConfiguration) {
+		DirectoryInfo shapeDirectory = figureDestDir.Subdirectory("shapes").Subdirectory(shapeImportConfiguration.name);
 		
 		//generate inputs
 		var shapeInputs = MakeShapeInputs(shapeImportConfiguration);
-				
+		
 		DumpInputs(shapeDirectory, shapeInputs);
 		DumpParentOverrides(shapeDirectory, shapeImportConfiguration);
 
-		var faceTransparencies = FaceTransparencies.For(pathManager, figure);
+		var faceTransparencies = FaceTransparencies.For(figure, surfaceProperties, figureDestDir);
 
 		if (figure == parentFigure) {
 			DumpOccluderParameters(shapeDirectory, shapeInputs, faceTransparencies);
@@ -67,21 +63,21 @@ public class ShapeDumper {
 		}
     }
 
-	public void DumpUnmorphed() {
-		DirectoryInfo directory = figureDirectory.Subdirectory("occlusion");
+	public void DumpUnmorphed(DirectoryInfo figureDestDir) {
 		var shapeInputs = figure.MakeDefaultChannelInputs();
 
 		if (baseConfiguration != null) {
-			DumpInputs(figureDirectory, MakeShapeInputs(null));
-			DumpParentOverrides(figureDirectory, baseConfiguration);
+			DumpInputs(figureDestDir, MakeShapeInputs(null));
+			DumpParentOverrides(figureDestDir, baseConfiguration);
 		}
 
-		var faceTransparencies = FaceTransparencies.For(pathManager, figure);
-		DumpSimpleOcclusion(directory, shapeInputs, faceTransparencies);
+		DirectoryInfo occlusionDirectory = figureDestDir.Subdirectory("occlusion");
+		var faceTransparencies = FaceTransparencies.For(figure, surfaceProperties, figureDestDir);
+		DumpSimpleOcclusion(occlusionDirectory, shapeInputs, faceTransparencies);
 	}
 
-	public void DumpOcclusionForMaterialSet(string materialSetName) {
-		DirectoryInfo directory = figureDirectory.Subdirectory("material-sets").Subdirectory(materialSetName);
+	public void DumpOcclusionForMaterialSet(DirectoryInfo figureDestDir, string materialSetName) {
+		DirectoryInfo directory = figureDestDir.Subdirectory("material-sets").Subdirectory(materialSetName);
 		float[] faceTransparencies = directory.File("face-transparencies.array").ReadArray<float>();
 		var shapeInputs = figure.MakeDefaultChannelInputs();
 		DumpSimpleOcclusion(directory, shapeInputs, faceTransparencies);
@@ -165,8 +161,6 @@ public class ShapeDumper {
 			figureGroup = new FigureGroup(figure);
 			faceTransparenciesGroup = new FaceTransparenciesGroup(faceTransparencies);
 		} else {
-			var parentFaceTransparencies = FaceTransparencies.For(pathManager, parentFigure);
-
 			figureGroup = new FigureGroup(parentFigure, figure);
 			faceTransparenciesGroup = new FaceTransparenciesGroup(parentFaceTransparencies, faceTransparencies);
 		}

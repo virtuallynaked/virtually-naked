@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 
 class MaterialSetDumper {
-	private static MultiMaterialSettings DumpMaterialSet(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Figure figure, MaterialSetImportConfiguration baseConfiguration, MaterialSetImportConfiguration configuration, TextureProcessor sharedTextureProcessor) {
-		DirectoryInfo figureDirectory = pathManager.GetDestDirForFigure(figure.Name);
-		DirectoryInfo materialsSetsDirectory = figureDirectory.Subdirectory("material-sets");
+	private static MultiMaterialSettings DumpMaterialSet(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, SurfaceProperties surfaceProperties, MaterialSetImportConfiguration baseConfiguration, DirectoryInfo figureDestDir, MaterialSetImportConfiguration configuration, TextureProcessor sharedTextureProcessor) {
+		DirectoryInfo materialsSetsDirectory = figureDestDir.Subdirectory("material-sets");
 		DirectoryInfo materialSetDirectory = materialsSetsDirectory.Subdirectory(configuration.name);
 		FileInfo materialSettingsFileInfo = materialSetDirectory.File("material-settings.dat");
 		FileInfo faceTransparenciesFileInfo = materialSetDirectory.File("face-transparencies.array");
@@ -30,7 +29,7 @@ class MaterialSetDumper {
 	
 		var textureProcessor = sharedTextureProcessor ?? localTextureProcessor;
 
-		var faceTransparencyProcessor = new FaceTransparencyProcessor(device, shaderCache, pathManager, figure);
+		var faceTransparencyProcessor = new FaceTransparencyProcessor(device, shaderCache, figure, surfaceProperties);
 
 		IMaterialImporter materialImporter;
 		if (figure.Name.EndsWith("-hair")) {
@@ -101,9 +100,9 @@ class MaterialSetDumper {
 		return multiMaterialSettings;
 	}
 
-	public static void DumpMaterialSetAndScattering(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager, Figure figure,
-		MaterialSetImportConfiguration baseConfiguration, MaterialSetImportConfiguration configuration, TextureProcessor sharedTextureProcessor) {
-		var materialSettings = DumpMaterialSet(settings, device, shaderCache, fileLocator, objectLocator, pathManager, figure, baseConfiguration, configuration, sharedTextureProcessor);
-		ScatteringDumper.Dump(pathManager, figure, materialSettings.PerMaterialSettings, configuration.name);
+	public static void DumpMaterialSetAndScattering(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, SurfaceProperties surfaceProperties,
+		MaterialSetImportConfiguration baseConfiguration, TextureProcessor sharedTextureProcessor,  DirectoryInfo figureDestDir, MaterialSetImportConfiguration configuration) {
+		var materialSettings = DumpMaterialSet(settings, device, shaderCache, fileLocator, objectLocator, figure, surfaceProperties, baseConfiguration, figureDestDir, configuration, sharedTextureProcessor);
+		ScatteringDumper.Dump(figure, surfaceProperties, materialSettings.PerMaterialSettings, figureDestDir, configuration.name);
 	}
 }

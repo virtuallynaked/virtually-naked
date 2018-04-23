@@ -2,20 +2,20 @@ using System;
 using System.IO;
 
 public class GeometryDumper {
-	public static void DumpFigure(ImporterPathManager pathManager, Figure figure) {
-		var refinementDirectory = pathManager.GetDestDirForFigure(figure.Name).Subdirectory("refinement");
+	public static void DumpFigure(Figure figure, SurfaceProperties surfaceProperties, DirectoryInfo figureDestDir) {
+		var refinementDirectory = figureDestDir.Subdirectory("refinement");
 				
-		GeometryDumper dumper = new GeometryDumper(pathManager, figure, refinementDirectory);
+		GeometryDumper dumper = new GeometryDumper(figure, surfaceProperties, refinementDirectory);
 		dumper.DumpRefinement();
 	}
 
-	private readonly ImporterPathManager pathManager;
 	private readonly Figure figure;
+	private readonly SurfaceProperties surfaceProperties;
 	private readonly DirectoryInfo refinementDirectory;
 
-	private GeometryDumper(ImporterPathManager pathManager, Figure figure, DirectoryInfo refinementDirectory) {
-		this.pathManager = pathManager;
+	private GeometryDumper(Figure figure, SurfaceProperties surfaceProperties, DirectoryInfo refinementDirectory) {
 		this.figure = figure;
+		this.surfaceProperties = surfaceProperties;
 		this.refinementDirectory = refinementDirectory;
 	}
 
@@ -49,8 +49,6 @@ public class GeometryDumper {
 	}
 	
 	private void DumpRefinement() {
-		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
-
 		DumpControl();
 
 		DumpRefinementLevel(0);
