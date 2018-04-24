@@ -21,6 +21,12 @@ class FigureImporter {
 		recipe.Channels.Add(correctionSynthesizer.SynthesizeChannel(hdCorrectionInitialValue));
 		recipe.Morphs.Add(correctionSynthesizer.SynthesizeMorph());
 		
+		if (parentRecipe == null) {
+			var scaleControlSynthesizer = new ScaleControlChannelSynthesizer(recipe.Bones);
+			recipe.Channels.Add(scaleControlSynthesizer.SynthesizeChannel());
+			recipe.Formulas.Add(scaleControlSynthesizer.SynthesizeFormula());
+		}
+
 		if (parentRecipe != null) {
 			Geometry parentGeometry = parentRecipe.Geometry.Bake();
 			recipe.Automorpher = AutomorpherRecipe.Make(parentGeometry, geometry);

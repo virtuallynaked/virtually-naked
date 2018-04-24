@@ -1,4 +1,5 @@
 [0.8]
+	Minor: Added a scale control to the menu under "Shaping/Full Body/Scale"
 
 [0.7]
 	Major: Added clothing
