@@ -1,8 +1,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Product>Virtually Naked</Product>
-    <AssemblyVersion>0.7</AssemblyVersion>
-    <InformationalVersion>0.7</InformationalVersion>
-    <FileVersion>0.7.0.0</FileVersion>
+    <AssemblyVersion>0.8</AssemblyVersion>
+    <InformationalVersion>0.8</InformationalVersion>
+    <FileVersion>0.8.0.0</FileVersion>
   </PropertyGroup>
 </Project>
