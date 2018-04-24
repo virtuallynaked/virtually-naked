@@ -29,3 +29,17 @@ float3 normalFromBumpGradient(float strength, float2 bumpGradientTexValue) {
 	float z = sqrt(1 - dot(bumpGradient, bumpGradient));
 	return float3(bumpGradient, z);
 }
+
+//apply a premultiplied-alpha layer to an opaque base
+float3 applyLayer(float3 base, float4 layer) {
+	return base * (1 - layer.a) + layer.rgb;
+}
+
+//apply a premultiplied-alpha layer to a premultiplied-alpha base
+//This obeys the following identities:
+//  apply[0, l] == l
+//  apply[b, 0] == b
+//  apply[b, apply[l1, l2]] == apply[apply[b, l1], l2]
+float4 applyLayer(float4 base, float4 layer) {
+	return base * (1 - layer.a) + layer;
+}

@@ -34,13 +34,13 @@ float3 addTopCoat(PixelInput input, float3 baseResult) {
 		glossGrazingWeight *= SAMPLE_FLOAT_TEX(TopCoatCurveGrazing);
 	}
 
-	float3 result = addGenericGloss(
+	float4 topCoatLayer = calculateGenericGlossLayer(
 		input, topCoatNormal,
-		baseResult,
 		glossRoughness,
 		glossNormalColor, glossGrazingColor,
 		glossNormalWeight, glossGrazingWeight
 	);
+	float3 result = applyLayer(baseResult, topCoatLayer);
 
 	return result;
 }

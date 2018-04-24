@@ -101,23 +101,23 @@ float3 calculateBaseResult(PixelInput input) {
 		glossGrazingWeight = normalizedGlossWeight;
 	}
 
-	float3 result = addGenericGloss(
+	float4 glossLayer = calculateGenericGlossLayer(
 		input, baseNormal,
-		diffuse_bsdf_result,
 		glossRoughness,
 		glossNormalColor, glossGrazingColor,
 		glossNormalWeight, glossGrazingWeight
 	);
+	float3 result = applyLayer(diffuse_bsdf_result, glossLayer);
 
 	if (BaseMixingMode == BaseMixingMode_PBR_MetallicityRoughness) {
 		float metallicWeight = SAMPLE_FLOAT_TEX(MetallicWeight);
 		float3 baseColor = SAMPLE_COLOR_TEX(BaseColor);
-		result = addGenericGloss(
+		float4 metallicLayer = calculateGenericGlossLayer(
 			input, baseNormal,
-			result,
 			glossRoughness,
 			baseColor, baseColor,
 			metallicWeight, metallicWeight);
+		result = applyLayer(result, metallicLayer);
 	}
 
 	return result;
