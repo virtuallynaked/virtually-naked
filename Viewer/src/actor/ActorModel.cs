@@ -21,7 +21,7 @@ public class ActorModel {
 		this.animation = animation;
 		this.behavior = behavior;
 				
-		inputs = mainDefinition.ChannelSystem.MakeZeroChannelInputs();
+		inputs = mainDefinition.ChannelSystem.MakeDefaultChannelInputs();
 		
 		//hack to turn on eCTRLConfident at start
 		mainDefinition.ChannelSystem.ChannelsByName["eCTRLConfident?value"].SetValue(inputs, 1);
@@ -46,7 +46,7 @@ public class ActorModel {
 	public void ResetShape() {
 		foreach (Channel channel in mainDefinition.ChannelSystem.Channels) {
 			if (IsShapeChannel(channel)) {
-				inputs.RawValues[channel.Index] = 0;
+				inputs.RawValues[channel.Index] = channel.InitialValue;
 			}
 		}
 		ShapeReset?.Invoke();
@@ -55,7 +55,7 @@ public class ActorModel {
 	public void ResetPose() {
 		foreach (Channel channel in mainDefinition.ChannelSystem.Channels) {
 			if (!IsShapeChannel(channel) && !IsExpressionChannel(channel)) {
-				inputs.RawValues[channel.Index] = 0;
+				inputs.RawValues[channel.Index] = channel.InitialValue;
 			}
 		}
 		PoseReset?.Invoke();
@@ -67,7 +67,7 @@ public class ActorModel {
 			foreach (Channel channel in mainDefinition.ChannelSystem.Channels) {
 				int idx = channel.Index;
 				double userValue = inputs.RawValues[idx];
-				if (userValue != 0) {
+				if (userValue != channel.InitialValue) {
 					userValues.Add(channel.Name, userValue);
 				}
 			}
@@ -78,8 +78,11 @@ public class ActorModel {
 
 			foreach (Channel channel in mainDefinition.ChannelSystem.Channels) {
 				int idx = channel.Index;
-				userValues.TryGetValue(channel.Name, out double userValue);
-				inputs.RawValues[idx] = userValue;
+				if (userValues.TryGetValue(channel.Name, out double userValue)) {
+					inputs.RawValues[idx] = userValue;
+				} else {
+					inputs.RawValues[idx] = channel.InitialValue;
+				}
 			}
 		}
 	}

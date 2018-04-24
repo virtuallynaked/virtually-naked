@@ -48,7 +48,8 @@ public class ActorBehavior {
 		ChannelInputs inputs = new ChannelInputs(shapeInputs);
 		
 		for (int idx = 0; idx < inputs.RawValues.Length; ++idx) {
-			inputs.RawValues[idx] += model.Inputs.RawValues[idx];
+			double initialValue = model.MainDefinition.ChannelSystem.Channels[idx].InitialValue;
+			inputs.RawValues[idx] += (model.Inputs.RawValues[idx] - initialValue);
 		}
 
 		dragHandle.Update(updateParameters);
