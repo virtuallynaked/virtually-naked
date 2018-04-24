@@ -44,10 +44,12 @@ float4 calculateUnifiedResult(PixelInput input) {
 
 	float3 result = calculateBaseResult(input);
 
-	result = addTopCoat(input, result);
-
 	float4 premultipliedAlphaResult = float4(result, 1);
 	premultipliedAlphaResult = applyRefraction(input, premultipliedAlphaResult);
+
+	float4 topCoatLayer = calculateTopCoatLayer(input);
+	premultipliedAlphaResult = applyLayer(premultipliedAlphaResult, topCoatLayer);
+
 	premultipliedAlphaResult *= opacity;
 
 	return premultipliedAlphaResult;

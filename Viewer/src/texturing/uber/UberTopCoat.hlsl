@@ -1,4 +1,4 @@
-float3 addTopCoat(PixelInput input, float3 baseResult) {
+float4 calculateTopCoatLayer(PixelInput input) {
 	float3 baseNormal = combineNormals(
 		SAMPLE_NORMAL_TEX(NormalMap),
 		SAMPLE_BUMP_TEX(BumpStrength));
@@ -40,7 +40,5 @@ float3 addTopCoat(PixelInput input, float3 baseResult) {
 		glossNormalColor, glossGrazingColor,
 		glossNormalWeight, glossGrazingWeight
 	);
-	float3 result = applyLayer(baseResult, topCoatLayer);
-
-	return result;
+	return topCoatLayer;
 }
