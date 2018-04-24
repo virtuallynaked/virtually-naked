@@ -1,5 +1,7 @@
 [0.8]
+	Major: Added eye color and makeup options to menu under "Characters/Character Details"
 	Minor: Added a scale control to the menu under "Shaping/Full Body/Scale"
+	Minor: Small improvements to eye rendering (but there's still more work to do in this area)
 
 [0.7]
 	Major: Added clothing
