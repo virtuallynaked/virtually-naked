@@ -13,13 +13,27 @@
     "main": {
       "name": "genesis-3-female",
       "shape": "Mei Lin",
-      "material-set": "Mei Lin"
+      "material-set": "Mei Lin",
+      "material-variants": {
+        "Makeup": "Makeup 01",
+        "Eye Color": "Eye Color 01"
+      }
     },
     "hair": {
       "name": "liv-hair",
       "shape": "Style 05",
       "material-set": "05"
     },
+    "clothing": [
+      {
+        "name": "bandeau-bikini-top",
+        "material-set": "Crimson"
+      },
+      {
+        "name": "bandeau-bikini-bottoms",
+        "material-set": "Crimson"
+      }
+    ],
     "animation": "idle",
     "behaviour": {
       "lookAtPlayer": true
