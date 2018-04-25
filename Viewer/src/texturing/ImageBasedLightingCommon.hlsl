@@ -50,8 +50,8 @@ float3 sampleGlossyIllumination(PixelInput input, float3 tangentSpaceNormal, flo
 	float wCeil = ceil(w);
 	float wFrac = w - wFloor;
 
-	float3 illuminationFloor = glossyEnvironmentCube.SampleLevel(trilinearSampler, float4(mul(reflectionDirection, environmentMirror), wFloor), 0).rgb;
-	float3 illuminationCeil = glossyEnvironmentCube.SampleLevel(trilinearSampler, float4(mul(reflectionDirection, environmentMirror), wCeil), 0).rgb;
+	float3 illuminationFloor = glossyEnvironmentCube.Sample(trilinearSampler, float4(mul(reflectionDirection, environmentMirror), wFloor)).rgb;
+	float3 illuminationCeil = glossyEnvironmentCube.Sample(trilinearSampler, float4(mul(reflectionDirection, environmentMirror), wCeil)).rgb;
 	float3 illumination = lerp(illuminationFloor, illuminationCeil, wFrac);
 	
 	//apply occlusion
