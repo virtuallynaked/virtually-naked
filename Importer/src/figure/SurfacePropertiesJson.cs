@@ -24,11 +24,7 @@ public class SurfacePropertiesJson {
 		[JsonProperty(PropertyName = "precompute-scattering", DefaultValueHandling = DefaultValueHandling.Populate)]
 		[DefaultValue(false)]
 		public bool precomputeScattering;
-
-		[JsonProperty(PropertyName = "share-textures")]
-		[DefaultValue(null)]
-		public string shareTextures;
-
+		
 		[JsonProperty(PropertyName = "material-set-for-opacities")]
 		[DefaultValue(null)]
 		public string materialSetForOpacities;
@@ -62,11 +58,9 @@ public class SurfacePropertiesJson {
 		}
 
 		bool precomputeScattering = proxy.precomputeScattering;
-
-		string shareTextures = proxy.shareTextures;
-
+		
 		string materialSetForOpacities = proxy.materialSetForOpacities;
 
-		return new SurfaceProperties(subdivisionLevel, renderOrder, opacities, precomputeScattering, shareTextures, materialSetForOpacities);
+		return new SurfaceProperties(subdivisionLevel, renderOrder, opacities, precomputeScattering, materialSetForOpacities);
 	}
 }

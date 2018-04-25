@@ -6,9 +6,7 @@ public class MaterialSet : IDisposable {
 	public static MaterialSet LoadActive(Device device, ShaderCache shaderCache, TextureCache textureCache, IArchiveDirectory dataDir, IArchiveDirectory figureDir, MaterialSetAndVariantOption materialSetOption, SurfaceProperties surfaceProperties) {
 		var materialSetDirectory = materialSetOption.MaterialSet.Directory;
 
-		var texturesDirectory = surfaceProperties.ShareTextures != null ?
-			dataDir.Subdirectory("textures").Subdirectory(surfaceProperties.ShareTextures) :
-			materialSetDirectory;
+		var texturesDirectory = dataDir.Subdirectory("textures");
 		
 		var textureLoader = new TextureLoader(device, textureCache, texturesDirectory);
 

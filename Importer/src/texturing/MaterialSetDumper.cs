@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 class MaterialSetDumper {
-	private static MultiMaterialSettings DumpMaterialSet(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, SurfaceProperties surfaceProperties, MaterialSetImportConfiguration baseConfiguration, DirectoryInfo figureDestDir, MaterialSetImportConfiguration configuration, TextureProcessor sharedTextureProcessor) {
+	private static MultiMaterialSettings DumpMaterialSet(ImportSettings settings, Device device, ShaderCache shaderCache, ContentFileLocator fileLocator, DsonObjectLocator objectLocator, Figure figure, SurfaceProperties surfaceProperties, MaterialSetImportConfiguration baseConfiguration, DirectoryInfo figureDestDir, MaterialSetImportConfiguration configuration, TextureProcessor textureProcessor) {
 		DirectoryInfo materialsSetsDirectory = figureDestDir.Subdirectory("material-sets");
 		DirectoryInfo materialSetDirectory = materialsSetsDirectory.Subdirectory(configuration.name);
 		FileInfo materialSettingsFileInfo = materialSetDirectory.File("material-settings.dat");
@@ -20,15 +20,6 @@ class MaterialSetDumper {
 			aggregator.IncludeDuf(doc.Root);
 		}
 		
-		TextureProcessor localTextureProcessor;
-		if (sharedTextureProcessor == null) {
-			localTextureProcessor = new TextureProcessor(device, shaderCache, materialSetDirectory, settings.CompressTextures);
-		} else {
-			localTextureProcessor = null;
-		}
-	
-		var textureProcessor = sharedTextureProcessor ?? localTextureProcessor;
-
 		var faceTransparencyProcessor = new FaceTransparencyProcessor(device, shaderCache, figure, surfaceProperties);
 
 		IMaterialImporter materialImporter;
@@ -89,9 +80,7 @@ class MaterialSetDumper {
 		textureProcessor.RegisterAction(() => {
 			Persistance.Save(materialSettingsFileInfo, multiMaterialSettings);
 		});
-
-		localTextureProcessor?.ImportAll();
-
+		
 		var faceTranparencies = faceTransparencyProcessor.FaceTransparencies;
 		faceTransparenciesFileInfo.WriteArray(faceTranparencies);
 

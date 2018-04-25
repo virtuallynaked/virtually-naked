@@ -48,7 +48,8 @@ public class TextureLoader : IDisposable {
 		}
 
 		if (!cache.TryGetValue(name, out var textureView)) {
-			var imageFile = texturesDirectory.File(name + ".dds");
+			var path = (name + ".dds").Split('/');
+			var imageFile = texturesDirectory.File(path);
 			textureView = textureCache.Get(imageFile);
 			cache.Add(name, textureView);
 		}

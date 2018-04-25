@@ -64,7 +64,8 @@ public class ImporterMain : IDisposable {
 				OutfitImporter.Import(pathManager, outfitConf.File, destDir);
 			}
 
-			var textureProcessorSharer = new TextureProcessorSharer(device, shaderCache, settings.CompressTextures, destDir);
+			var texturesDir = destDir.Subdirectory("textures").Subdirectory(contentPackConf.Name);
+			var textureProcessor = new TextureProcessor(device, shaderCache, texturesDir, contentPackConf.Name, settings.CompressTextures);
 
 			foreach (var figureConf in contentPackConf.Figures) {
 				string figureName = figureConf.Name;
@@ -89,7 +90,7 @@ public class ImporterMain : IDisposable {
 						continue;
 					}
 
-					figureDumper.DumpMaterialSet(settings, textureProcessorSharer, figureDestDir, materialSetConf);
+					figureDumper.DumpMaterialSet(settings, textureProcessor, figureDestDir, materialSetConf);
 				}
 
 				if (figureConf.IsPrimary) {
@@ -106,7 +107,7 @@ public class ImporterMain : IDisposable {
 				}
 			}
 
-			textureProcessorSharer.Finish();
+			textureProcessor.ImportAll();
 		}
 	}
 }

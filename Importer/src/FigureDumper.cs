@@ -90,11 +90,8 @@ public class FigureDumper {
 		UVSetDumper.DumpFigure(figure, surfaceProperties, figureDestDir);
 	}
 
-	public void DumpMaterialSet(ImportSettings importSettings, TextureProcessorSharer textureProcessorSharer, DirectoryInfo figureDestDir, MaterialSetImportConfiguration conf) {
-		TextureProcessor sharedTextureProcessor = surfaceProperties.ShareTextures != null ?
-			textureProcessorSharer.GetSharedProcessor(surfaceProperties.ShareTextures) : null;
-		
-		MaterialSetDumper.DumpMaterialSetAndScattering(importSettings, device, shaderCache, fileLocator, objectLocator, figure, surfaceProperties, baseMaterialSetImportConfiguration, sharedTextureProcessor, figureDestDir, conf);
+	public void DumpMaterialSet(ImportSettings importSettings, TextureProcessor textureProcessor, DirectoryInfo figureDestDir, MaterialSetImportConfiguration conf) {
+		MaterialSetDumper.DumpMaterialSetAndScattering(importSettings, device, shaderCache, fileLocator, objectLocator, figure, surfaceProperties, baseMaterialSetImportConfiguration, textureProcessor, figureDestDir, conf);
 
 		if (conf.useCustomOcclusion) {
 			shapeDumper.DumpOcclusionForMaterialSet(figureDestDir, conf.name);

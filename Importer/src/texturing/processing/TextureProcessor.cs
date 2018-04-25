@@ -69,15 +69,17 @@ public class TextureProcessor {
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
 	private readonly DirectoryInfo destinationFolder;
+	private readonly string path;
 	private readonly bool compress;
 	
 	private readonly Dictionary<string, TextureProcessingSettings> settingsByName = new Dictionary<string, TextureProcessingSettings>();
 	private readonly List<Action> actions = new List<Action>();
 
-	public TextureProcessor(Device device, ShaderCache shaderCache, DirectoryInfo destinationFolder, bool compress) {
+	public TextureProcessor(Device device, ShaderCache shaderCache, DirectoryInfo destinationFolder, string path, bool compress) {
 		this.device = device;
 		this.shaderCache = shaderCache;
 		this.destinationFolder = destinationFolder;
+		this.path = path;
 		this.compress = compress;
 	}
 
@@ -186,7 +188,7 @@ public class TextureProcessor {
 			settings.Merge(textureFile, type, isLinear, mask);
 		}
 
-		return name;
+		return path + "/" + name;
 	}
 
 	public void ImportAll() {
