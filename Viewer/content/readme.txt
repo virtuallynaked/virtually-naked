@@ -1,4 +1,4 @@
-VIRTUALLY NAKED 0.8
+VIRTUALLY NAKED 0.9
 -------------------
 
 The goal of Virtually Naked is photorealistic rendering of naked people
