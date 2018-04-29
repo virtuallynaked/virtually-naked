@@ -1,13 +1,14 @@
+using System.Collections.Immutable;
 using System.Linq;
 
 class FigureImporter {
-	public static FigureRecipe ImportFor(string figureName, DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue) {
+	public static FigureRecipe ImportFor(string figureName, DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue, ImmutableHashSet<string> visibleProducts) {
 		var geometryRecipe = GeometryImporter.ImportForFigure(locator, figureUris);
 
 		FigureRecipe recipe = new FigureRecipe {
 			Name = figureName,
 			Geometry = geometryRecipe,
-			Channels = ChannelImporter.ImportForFigure(locator, figureUris).ToList(),
+			Channels = ChannelImporter.ImportForFigure(locator, figureUris, visibleProducts).ToList(),
 			Formulas = FormulaImporter.ImportForFigure(locator, figureUris).ToList(),
 			Bones = BoneImporter.ImportForFigure(locator, figureUris).ToList(),
 			Morphs = MorphImporter.ImportForFigure(locator, figureUris).ToList(),

@@ -23,7 +23,8 @@ public class FigureRecipeLoader {
 				objectLocator,
 				importProperties.Uris,
 				parentRecipe,
-				importProperties.HdCorrectionInitialValue);
+				importProperties.HdCorrectionInitialValue,
+				importProperties.VisibleProducts);
 			
 			Persistance.Save(figureRecipeFile, recipeToPersist);
 		}

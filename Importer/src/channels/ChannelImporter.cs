@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 public class ChannelImporter {
 	private readonly DsonObjectLocator locator;
@@ -14,7 +15,7 @@ public class ChannelImporter {
 
 	public IEnumerable<ChannelRecipe> ChannelRecipes => channelRecipes;
 
-	public void Import(DsonTypes.Channel channel, string expectedId, string name, string pathPrefix) {
+	public void Import(DsonTypes.Channel channel, string expectedId, string name, string pathPrefix, bool forceHidden = false) {
 		if (channel.id != expectedId) {
 			throw new InvalidOperationException("channel has unexpected id");
 		}
@@ -34,7 +35,7 @@ public class ChannelImporter {
 			Max = channel.max,
 			Clamped = channel.clamped,
 			Locked = channel.locked,
-			Visible = channel.visible,
+			Visible = channel.visible && !forceHidden,
 			Path = path
 		};
 
@@ -64,7 +65,7 @@ public class ChannelImporter {
 		Import(node.general_scale, "general_scale", node.name + "?scale/general", pathPrefix);
 	}
 
-	public void ImportFrom(DsonTypes.Modifier modifier) {
+	public void ImportFrom(DsonTypes.Modifier modifier, bool forceHidden) {
 		if (modifier.channel == null) {
 			return;
 		}
@@ -100,7 +101,7 @@ public class ChannelImporter {
 			name = scope + ":" + name;
 		}
 		
-		Import(modifier.channel, "value", name + "?value", pathPrefix);
+		Import(modifier.channel, "value", name + "?value", pathPrefix, forceHidden);
 	}
 
 	public void ImportFrom(DsonTypes.Node[] nodes) {
@@ -113,27 +114,28 @@ public class ChannelImporter {
 		}
 	}
 
-	public void ImportFrom(DsonTypes.Modifier[] modifiers) {
+	public void ImportFrom(DsonTypes.Modifier[] modifiers, bool forceHidden) {
 		if (modifiers == null) {
 			return;
 		}
 
 		foreach (var modifier in modifiers) {
-			ImportFrom(modifier);
+			ImportFrom(modifier, forceHidden);
 		}
 	}
 
-	public void ImportFrom(DsonTypes.DsonDocument doc) {
+	public void ImportFrom(DsonTypes.DsonDocument doc, bool forceModifiersHidden) {
 		ImportFrom(doc.Root.node_library);
-		ImportFrom(doc.Root.modifier_library);
+		ImportFrom(doc.Root.modifier_library, forceModifiersHidden);
 	}
 
-	public static IEnumerable<ChannelRecipe> ImportForFigure(DsonObjectLocator locator, FigureUris figureUris) {
+	public static IEnumerable<ChannelRecipe> ImportForFigure(DsonObjectLocator locator, FigureUris figureUris, ImmutableHashSet<string> visibleProducts) {
 		ChannelImporter importer = new ChannelImporter(locator, figureUris.RootNodeId);
 
-		importer.ImportFrom(locator.LocateRoot(figureUris.DocumentUri));
+		importer.ImportFrom(locator.LocateRoot(figureUris.DocumentUri), false);
 		foreach (DsonTypes.DsonDocument doc in locator.GetAllDocumentsUnderPath(figureUris.MorphsBasePath)) {
-			importer.ImportFrom(doc);
+			bool forceModifiersHidden = visibleProducts != null && !visibleProducts.Contains(doc.Product);
+			importer.ImportFrom(doc, forceModifiersHidden);
 		}
 
 		return importer.ChannelRecipes;

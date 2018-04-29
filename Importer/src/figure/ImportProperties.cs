@@ -1,5 +1,7 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 
 public class ImportProperties {
@@ -29,6 +31,9 @@ public class ImportProperties {
 		[JsonProperty(PropertyName = "hd-correction-initial-value", DefaultValueHandling = DefaultValueHandling.Populate)]
 		[DefaultValue(0)]
 		public double hdCorrectionInitialValue;
+
+		[JsonProperty(PropertyName = "visible-products")]
+		public string[] visibleProducts;
 	}
 		
 	public static ImportProperties Load(ImporterPathManager pathManager, string figureName) {
@@ -45,15 +50,19 @@ public class ImportProperties {
 			urisProxy.geometryId,
 			urisProxy.rootNodeId,
 			urisProxy.skinBindingId);
+
+		var visibleProducts = proxy.visibleProducts?.ToImmutableHashSet();
 		
-		return new ImportProperties(uris, proxy.hdCorrectionInitialValue);
+		return new ImportProperties(uris, proxy.hdCorrectionInitialValue, visibleProducts);
 	}
 
 	public FigureUris Uris { get; }
 	public double HdCorrectionInitialValue { get; }
+	public ImmutableHashSet<string> VisibleProducts { get; }
 
-	public ImportProperties(FigureUris uris, double hdCorrectionInitialValue) {
+	public ImportProperties(FigureUris uris, double hdCorrectionInitialValue, ImmutableHashSet<string> visibleProducts) {
 		Uris = uris;
 		HdCorrectionInitialValue = hdCorrectionInitialValue;
+		VisibleProducts = visibleProducts;
 	}
 }

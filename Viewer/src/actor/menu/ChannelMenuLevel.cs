@@ -23,11 +23,6 @@ public class ChannelMenuLevel : IMenuLevel {
 			rootLevel.Add(channel, pathArray, 0);
 		}
 
-		rootLevel.Extract(new string[] {"Shapes", "People"});
-		rootLevel.Extract(new string[] {"Shapes", "Full Body", "People"});
-		rootLevel.Extract(new string[] {"Shapes", "Head", "People"});
-		rootLevel.Extract(new string[] {"Shapes", "Shape"});
-
 		return rootLevel;
 	}
 

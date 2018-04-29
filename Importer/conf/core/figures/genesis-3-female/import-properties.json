@@ -5,5 +5,11 @@
 		"root-node-id": "Genesis3Female",
 		"geometry-id": "Genesis3Female-1",
 		"skin-binding-id": "SkinBinding"
-	}
+	},
+	"visible-products": [
+		"Genesis3FemaleStarterEssentials",
+		"Genesis3FemaleBodyMorphs",
+		"Genesis3FemaleHeadMorphs",
+		"Genesis3FemaleExpressions"
+	]
 }
