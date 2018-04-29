@@ -137,7 +137,7 @@ public class MaterialBag {
 		}
 		
 		string texturePath = Uri.UnescapeDataString(imageUrl);
-		FileInfo textureFile = new FileInfo(fileLocator.Locate(texturePath));
+		FileInfo textureFile = fileLocator.Locate(texturePath);
 
 		return new RawImageInfo {
 			file = textureFile,

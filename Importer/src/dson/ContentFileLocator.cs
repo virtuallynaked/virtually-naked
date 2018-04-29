@@ -47,7 +47,7 @@ public class ContentFileLocator {
 			= "/data/DAZ 3D/Genesis 3/Female/Morphs/DAZ 3D/Head/PHMCrowsFeetHDL.dsf"
 	};
 
-    private readonly Dictionary<string, string> contentLocations = new Dictionary<string, string>();
+    private readonly Dictionary<string, FileInfo> contentLocations = new Dictionary<string, FileInfo>();
 
     public ContentFileLocator() {
         foreach (DirectoryInfo contentPackageDirectory in DazAssetsDir.GetDirectories()) {
@@ -69,7 +69,7 @@ public class ContentFileLocator {
 					throw new InvalidOperationException("unexpected content file not inside content directory: " + fullPath);
 				}
 				string relativePath = fullPath.Substring(contentPackageDirectory.FullName.Length).Replace("\\", "/").ToLowerInvariant();
-				contentLocations[relativePath] = fullPath;
+				contentLocations[relativePath] = contentFile;
 			}
 			return;
 		}
@@ -86,22 +86,22 @@ public class ContentFileLocator {
                 throw new InvalidOperationException("unexpected folder in manifest: " + prefix);
             }
 
-            contentLocations["/" + suffix.ToLowerInvariant()] = Path.Combine(contentPackageDirectory.FullName, path);
+            contentLocations["/" + suffix.ToLowerInvariant()] = contentPackageDirectory.File(path);
         }
     }
 
 	private void ImportPatches(DirectoryInfo patchDirectory) {
 		foreach (FileInfo file in patchDirectory.GetFiles()) {
-			contentLocations["/patches/" + file.Name] = file.FullName;
+			contentLocations["/patches/" + file.Name] = file;
 		}
 	}
 
-	public string Locate(string path, bool throwIfMissing = true) {
+	public FileInfo Locate(string path, bool throwIfMissing = true) {
 		if (PathCorrections.TryGetValue(path, out var correctedPath)) {
 			path = correctedPath;
 		}
 
-        if (!contentLocations.TryGetValue(path.ToLowerInvariant(), out string fullPath)) {
+        if (!contentLocations.TryGetValue(path.ToLowerInvariant(), out FileInfo fullPath)) {
 			if (throwIfMissing) {
 	            throw new InvalidOperationException("missing content file: " + path);
 			}

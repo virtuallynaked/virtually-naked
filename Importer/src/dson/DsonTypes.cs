@@ -16,8 +16,8 @@ namespace DsonTypes {
 			BaseUri = documentPath;
 		}
 				
-        public static DsonDocument LoadFromFile(DsonObjectLocator locator, string contentPath, string documentPath) {
-            using (StreamReader reader = File.OpenText(contentPath)) {
+        public static DsonDocument LoadFromFile(DsonObjectLocator locator, FileInfo contentFile, string documentPath) {
+            using (StreamReader reader = contentFile.OpenText()) {
                 using (JsonReader jsonReader = new JsonTextReader(reader)) {
 					DsonDocument document = new DsonDocument(locator, documentPath);
 

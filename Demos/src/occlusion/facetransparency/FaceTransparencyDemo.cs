@@ -39,19 +39,19 @@ public class FaceTransparencyDemo : IDemoApp {
 		for (int surfaceIdx = 0; surfaceIdx < livHairFigure.Geometry.SurfaceCount; ++surfaceIdx) {
 			string surfaceName = livHairFigure.Geometry.SurfaceNames[surfaceIdx];
 
-			string textureFileName;
+			FileInfo textureFile;
 			if (surfaceName == "Hairband") {
 				continue;
 			} else if (surfaceName == "Cap") {
-				textureFileName = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivCapT.jpg");
+				textureFile = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivCapT.jpg");
 			} else {
-				textureFileName = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivHairT.png");
+				textureFile = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivHairT.png");
 			}
 
 			RawFloatTexture opacityTexture = new RawFloatTexture {
 				value = 1,
 				image = new RawImageInfo {
-					file = new FileInfo(textureFileName),
+					file = textureFile,
 					gamma = 1
 				}
 			};

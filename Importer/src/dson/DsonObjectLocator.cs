@@ -54,7 +54,7 @@ public class DsonObjectLocator {
 	
 	private FragmentCollection LocateCollection(string documentPath, bool throwIfMissing = true) {
 		if (!documentCache.TryGetValue(documentPath, out FragmentCollection fragments)) {
-            string contentFile = fileLocator.Locate(documentPath, throwIfMissing);
+            var contentFile = fileLocator.Locate(documentPath, throwIfMissing);
 			if (contentFile == null) {
 				return null;
 			}
