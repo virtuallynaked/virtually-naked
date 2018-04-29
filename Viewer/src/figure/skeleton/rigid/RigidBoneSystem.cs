@@ -68,12 +68,12 @@ public class RigidBoneSystem {
 	}
 	
 	public void WriteInputs(ChannelInputs channelInputs, ChannelOutputs channelOutputs, RigidBoneSystemInputs inputs) {
-		source.RootBone.Translation.SetEffectiveValue(channelInputs, channelOutputs, inputs.RootTranslation, SetMask.ApplyClampAndVisibleOnly);
+		source.RootBone.Translation.SetEffectiveValue(channelInputs, channelOutputs, inputs.RootTranslation, SetMask.ApplyClamp);
 		for (int boneIdx = 0; boneIdx < bones.Length; ++boneIdx) {
 			var bone = bones[boneIdx];
 			var rotation = inputs.Rotations[boneIdx];
 			var rotationAngles = MathExtensions.RadiansToDegrees(bone.RotationOrder.ToTwistSwingAngles(rotation));
-			bone.Source.Rotation.SetEffectiveValue(channelInputs, channelOutputs, rotationAngles, SetMask.ApplyClampAndVisibleOnly);
+			bone.Source.Rotation.SetEffectiveValue(channelInputs, channelOutputs, rotationAngles, SetMask.ApplyClamp);
 		}
 	}
 

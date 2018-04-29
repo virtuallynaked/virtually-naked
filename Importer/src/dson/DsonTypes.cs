@@ -257,6 +257,8 @@ namespace DsonTypes {
         [DefaultValue(true)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public bool visible;
+
+        public bool locked;
 		
         public double value;
         public double current_value;

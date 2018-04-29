@@ -54,7 +54,7 @@ public class ChannelTriplet {
 	}
 	
 	private static void ExtractMinMax(Channel channel, int idx, ref Vector3 min, ref Vector3 max) {
-		if (!channel.Visible) {
+		if (channel.Locked) {
 			min[idx] = (float) channel.InitialValue;
 			max[idx] = (float) channel.InitialValue;
 		} else if (!channel.Clamped) {

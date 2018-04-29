@@ -33,6 +33,7 @@ public class ChannelImporter {
 			Min = channel.min,
 			Max = channel.max,
 			Clamped = channel.clamped,
+			Locked = channel.locked,
 			Visible = channel.visible,
 			Path = path
 		};

@@ -103,17 +103,17 @@ public class Bone {
 
 	public void SetRotation(ChannelOutputs orientationOutputs, ChannelInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
 		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(orientationOutputs, objectSpaceRotation, applyClamp);
-		Rotation.SetValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
+		Rotation.SetValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClamp : SetMask.Any);
 	}
 
 	public void AddRotation(ChannelOutputs orientationOutputs, ChannelInputs inputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
 		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(orientationOutputs, objectSpaceRotation, applyClamp);
-		Rotation.AddValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
+		Rotation.AddValue(inputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClamp : SetMask.Any);
 	}
 
 	public void SetEffectiveRotation(ChannelInputs inputs, ChannelOutputs outputs, Quaternion objectSpaceRotation, bool applyClamp = true) {
 		Vector3 rotationAnglesDegrees = ConvertRotationToAngles(outputs, objectSpaceRotation, applyClamp);
-		Rotation.SetEffectiveValue(inputs, outputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClampAndVisibleOnly : SetMask.Any);
+		Rotation.SetEffectiveValue(inputs, outputs, rotationAnglesDegrees, applyClamp ? SetMask.ApplyClamp : SetMask.Any);
 	}
 	
 	public void SetTranslation(ChannelInputs inputs, Vector3 translation, SetMask mask = SetMask.Any) {

@@ -7,7 +7,7 @@ public class ChannelEvaluatorTest {
 	private static readonly ChannelInputs EmptyInputs = new ChannelInputs(new double[] {});
 
 	private void AssertFormulaEquals(double expectedResult, Formula formula) {
-		Channel channel = new Channel("foo", 0, null, 0, 0, 0, false, false, null);
+		Channel channel = new Channel("foo", 0, null, 0, 0, 0, false, false, false, null);
 		channel.AttachSumFormula(formula);
 		List<Channel> channels = new List<Channel> { channel };
 		var evaluator = new ChannelEvaluator(channels);
@@ -75,7 +75,7 @@ public class ChannelEvaluatorTest {
 
 	[TestMethod]
 	public void TestRawValue() {
-		Channel channel = new Channel("foo", 0, null, 0, 0, 0, false, false, null);
+		Channel channel = new Channel("foo", 0, null, 0, 0, 0, false, false, false, null);
 		List<Channel> channels = new List<Channel> { channel };
 		var evaluator = new ChannelEvaluator(channels);
 		var inputs = new ChannelInputs(new double[] { 42 });
@@ -85,8 +85,8 @@ public class ChannelEvaluatorTest {
 
 	[TestMethod]
 	public void TestPushChannel() {
-		Channel channel0 = new Channel("foo", 0, null, 0, 0, 0, false, false, null);
-		Channel channel1 = new Channel("bar", 1, null, 0, 0, 0, false, false, null);
+		Channel channel0 = new Channel("foo", 0, null, 0, 0, 0, false, false, false, null);
+		Channel channel1 = new Channel("bar", 1, null, 0, 0, 0, false, false, false, null);
 
 		channel0.AttachSumFormula(new Formula(new IOperation[] {
 			new PushChannelOperation(channel1)

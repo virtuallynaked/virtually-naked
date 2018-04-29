@@ -10,6 +10,7 @@ public class ChannelRecipe {
 	public double Max { get; set; }
 	public bool Clamped { get; set; }
 	public bool Visible { get; set; }
+	public bool Locked { get; set; }
 	public string Path { get; set; }
 
 	public void Bake(List<Channel> channels, Dictionary<string, Channel> parentChannels) {
@@ -25,7 +26,7 @@ public class ChannelRecipe {
 			parentChannel = null;
 		}
 
-		Channel channel = new Channel(Name, index, parentChannel, InitialValue, Min, Max, Clamped, Visible, Path);
+		Channel channel = new Channel(Name, index, parentChannel, InitialValue, Min, Max, Clamped, Visible, Locked, Path);
 		channels.Add(channel);
 	}
 	

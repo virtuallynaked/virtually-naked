@@ -11,12 +11,13 @@ public class Channel {
 	public double Max {get;}
 	public bool Clamped {get;}
 	public bool Visible {get;}
+	public bool Locked {get;}
 	public string Path {get;}
 	
 	private List<Formula> sumFormulas = new List<Formula>();
 	private List<Formula> multiplyFormulas = new List<Formula>();
 	
-	public Channel(string name, int index, Channel parentChannel, double initialValue, double min, double max, bool clamped, bool visible, string path) {
+	public Channel(string name, int index, Channel parentChannel, double initialValue, double min, double max, bool clamped, bool visible, bool locked, string path) {
 		bool isJoint = path != null && path.StartsWith("/Joints/");
 		bool overrideLimit = isJoint && OverrideLimitsOnJoints;
 
@@ -27,7 +28,8 @@ public class Channel {
 		Min = min;
 		Max = max;
 		Clamped = clamped && !overrideLimit;
-		Visible = visible || overrideLimit;
+		Visible = visible;
+		Locked = locked || overrideLimit;
 		Path = path;
 	}
 	
@@ -43,7 +45,7 @@ public class Channel {
 	}
 	
 	public void SetValue(ChannelInputs inputs, double value, SetMask mask = SetMask.Any) {
-		if (mask.HasFlag(SetMask.VisibleOnly) && !Visible) {
+		if (Locked) {
 			return;
 		}
 		if (mask.HasFlag(SetMask.ApplyClamp) && Clamped) {
@@ -59,7 +61,7 @@ public class Channel {
 	}
 
 	public void SetEffectiveValue(ChannelInputs inputs, ChannelOutputs outputsForDelta, double value, SetMask mask = SetMask.Any) {
-		if (mask.HasFlag(SetMask.VisibleOnly) && !Visible) {
+		if (Locked) {
 			return;
 		}
 

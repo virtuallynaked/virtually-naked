@@ -7,7 +7,7 @@ class BoneSystemBuilder {
 	private List<Bone> bones = new List<Bone>();
 
 	private Channel AddChannel(string name, double initialValue) {
-		var channel = new Channel(name, channels.Count, null, initialValue, 0, 0, false, true, name);
+		var channel = new Channel(name, channels.Count, null, initialValue, 0, 0, false, true, false, name);
 		channels.Add(channel);
 		return channel;
 	}
