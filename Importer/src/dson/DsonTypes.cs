@@ -8,18 +8,20 @@ namespace DsonTypes {
 		private DsonRoot root;
 
 		public DsonObjectLocator Locator {get; }
+		public string Product { get; }
 		public string BaseUri {get; }
 		public DsonRoot Root => root;
 
-		private DsonDocument(DsonObjectLocator locator, string documentPath) {
+		private DsonDocument(DsonObjectLocator locator, string product, string documentPath) {
 			Locator = locator;
+			Product = product;
 			BaseUri = documentPath;
 		}
 				
-        public static DsonDocument LoadFromFile(DsonObjectLocator locator, FileInfo contentFile, string documentPath) {
-            using (StreamReader reader = contentFile.OpenText()) {
+        public static DsonDocument LoadFromFile(DsonObjectLocator locator, ContentFileLocator.ContentLocation contentFile, string documentPath) {
+            using (StreamReader reader = contentFile.File.OpenText()) {
                 using (JsonReader jsonReader = new JsonTextReader(reader)) {
-					DsonDocument document = new DsonDocument(locator, documentPath);
+					DsonDocument document = new DsonDocument(locator, contentFile.Product, documentPath);
 
 					var serializer = JsonSerializer.CreateDefault();
 					serializer.Converters.Add(new DsonObjectReferenceConverter(document));

@@ -43,9 +43,9 @@ public class FaceTransparencyDemo : IDemoApp {
 			if (surfaceName == "Hairband") {
 				continue;
 			} else if (surfaceName == "Cap") {
-				textureFile = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivCapT.jpg");
+				textureFile = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivCapT.jpg").File;
 			} else {
-				textureFile = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivHairT.png");
+				textureFile = fileLocator.Locate("/Runtime/Textures/outoftouch/!hair/OOTHairblending2/Liv/OOTUtilityLivHairT.png").File;
 			}
 
 			RawFloatTexture opacityTexture = new RawFloatTexture {

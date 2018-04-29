@@ -47,7 +47,17 @@ public class ContentFileLocator {
 			= "/data/DAZ 3D/Genesis 3/Female/Morphs/DAZ 3D/Head/PHMCrowsFeetHDL.dsf"
 	};
 
-    private readonly Dictionary<string, FileInfo> contentLocations = new Dictionary<string, FileInfo>();
+	public class ContentLocation {
+		public string Product { get; }
+		public FileInfo File { get; }
+
+		public ContentLocation(string product, FileInfo file) {
+			Product = product;
+			File = file;
+		}
+	}
+
+    private readonly Dictionary<string, ContentLocation> contentLocations = new Dictionary<string, ContentLocation>();
 
     public ContentFileLocator() {
         foreach (DirectoryInfo contentPackageDirectory in DazAssetsDir.GetDirectories()) {
@@ -57,6 +67,8 @@ public class ContentFileLocator {
     }
     
     private void ParseManifest(DirectoryInfo contentPackageDirectory) {
+		string productName = contentPackageDirectory.Name;
+
         string manifestPath = Path.Combine(contentPackageDirectory.FullName, "Manifest.dsx");
         
 		if (!File.Exists(manifestPath)) {
@@ -69,7 +81,7 @@ public class ContentFileLocator {
 					throw new InvalidOperationException("unexpected content file not inside content directory: " + fullPath);
 				}
 				string relativePath = fullPath.Substring(contentPackageDirectory.FullName.Length).Replace("\\", "/").ToLowerInvariant();
-				contentLocations[relativePath] = contentFile;
+				contentLocations[relativePath] = new ContentLocation(productName, contentFile);
 			}
 			return;
 		}
@@ -86,27 +98,27 @@ public class ContentFileLocator {
                 throw new InvalidOperationException("unexpected folder in manifest: " + prefix);
             }
 
-            contentLocations["/" + suffix.ToLowerInvariant()] = contentPackageDirectory.File(path);
+            contentLocations["/" + suffix.ToLowerInvariant()] = new ContentLocation(productName, contentPackageDirectory.File(path));
         }
     }
 
 	private void ImportPatches(DirectoryInfo patchDirectory) {
 		foreach (FileInfo file in patchDirectory.GetFiles()) {
-			contentLocations["/patches/" + file.Name] = file;
+			contentLocations["/patches/" + file.Name] = new ContentLocation(null, file);
 		}
 	}
 
-	public FileInfo Locate(string path, bool throwIfMissing = true) {
+	public ContentLocation Locate(string path, bool throwIfMissing = true) {
 		if (PathCorrections.TryGetValue(path, out var correctedPath)) {
 			path = correctedPath;
 		}
 
-        if (!contentLocations.TryGetValue(path.ToLowerInvariant(), out FileInfo fullPath)) {
+        if (!contentLocations.TryGetValue(path.ToLowerInvariant(), out var contentLocation)) {
 			if (throwIfMissing) {
 	            throw new InvalidOperationException("missing content file: " + path);
 			}
         }
-        return fullPath;
+        return contentLocation;
     }
 
 	public IEnumerable<string> GetAllUnderPath(string path) {
