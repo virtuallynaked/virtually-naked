@@ -99,6 +99,13 @@ class FormulaImporter {
 		string resolvedObjectUri = doc.ResolveUri(objectUri);
 
 		DsonTypes.DsonObject obj = doc.Locator.Locate(resolvedObjectUri);
+		if (obj is DsonTypes.Modifier modifer) {
+			if (modifer.channel.target_channel != null) {
+				//Redirect alias channels to their target
+				return ConvertChannelUri(doc, modifer.channel.target_channel);
+			}
+		}
+
 		string objectName = obj.name;
 		if (obj.id == scope) {
 			//leave out the scope if it's redundant
