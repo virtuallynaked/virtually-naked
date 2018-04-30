@@ -139,12 +139,6 @@
 		}
 	},
 	{
-		"name": "Bethany",
-		"morphs": {
-			"CTRLBethany7": 1.0
-		}
-	},
-	{
 		"name": "Camile",
 		"morphs": {
 			"CTRL-FWSACamile": 1.0,
