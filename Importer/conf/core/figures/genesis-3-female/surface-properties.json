@@ -1,6 +1,6 @@
 {
 	"subdivision-level": 2,
-	"render-order": [ "Cornea", "EyeMoisture", "Eyelashes" ],
+	"render-order": [ "Sclera", "Cornea", "EyeMoisture", "Eyelashes" ],
 	"opacities": {
 		"Eyelashes": 0.2,
 		"EyeMoisture": 0,
