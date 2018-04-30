@@ -1,0 +1,57 @@
+[
+	{
+		"name": "Karen",
+		"paths": [
+			"/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 All Maps.duf"
+		],
+		"variant-categories": [{
+		    "name": "Eye Color",
+			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],
+			"variants": [{
+				"name": "Eye Color 01",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Eyes 01.duf"]
+			}, {
+				"name": "Eye Color 02",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Eyes 02.duf" ]
+			}, {
+				"name": "Eye Color 03",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Eyes 03.duf" ]
+			}, {
+				"name": "Eye Color 04",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Eyes 04.duf" ]
+			}]
+		}, {
+		    "name": "Eyelashes",
+			"surfaces": [ "Eyelashes" ],
+			"variants": [{
+				"name": "Eyelashes 01",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Eyelashes 01.duf" ]
+			}, {
+				"name": "Eyelashes 02",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Eyelashes 02.duf" ]
+			}]
+		}, {
+		    "name": "Makeup",
+			"surfaces": [ "Face", "Lips", "Ears", "EyeSocket" ],
+			"variants": [{
+				"name": "Makeup 01",
+				"paths": [ /* use default */ ]
+			}, {
+				"name": "Makeup 02",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Face 02.duf" ]
+			}, {
+				"name": "Makeup 03",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Face 03.duf" ]
+			}, {
+				"name": "Makeup 04",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Face 04.duf" ]
+			}, {
+				"name": "Makeup 05",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Face 05.duf" ]
+			}, {
+				"name": "Makeup 06",
+				"paths": [ "/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Face 06.duf" ]
+			}]
+		}]
+	}
+]
