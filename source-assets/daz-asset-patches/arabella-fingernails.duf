@@ -1,0 +1,22 @@
+{
+	"file_version" : "0.6.0.0",
+	"asset_info" : {
+		"id" : "/daz-asset-patches/arabella-fingernails.duf",
+		"type" : "preset_material",
+		"contributor" : {
+			"author" : "virtuallynaked",
+			"email" : "",
+			"website" : ""
+		},
+		"revision" : "1.0",
+		"modified" : "2018-05-11T21:47:24Z"
+	},
+	"scene" : {
+		"animations" : [
+			{
+				"url" : "Genesis3Female#materials/Fingernails:?extra/studio_material_channels/channels/SSS%20Reflectance%20Tint/value",
+				"keys" : [ [ 0, [ 1, 0.9411765, 0.8431373 ] ] ]
+			}
+		]
+	}
+}
