@@ -1,0 +1,128 @@
+[
+	{
+		"name": "Honey",
+		"morphs": {
+			"CTRL-FWHoney": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Lien",
+		"morphs": {
+			"CTRL-FWLien": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Phoenix",
+		"morphs": {
+			"CTRL-FWPhoenix": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Adaline",
+		"morphs": {
+			"CTRL-FWSAAdaline": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Cai",
+		"morphs": {
+			"CTRL-FWSACai": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Camile",
+		"morphs": {
+			"CTRL-FWSACamile": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Dayanara",
+		"morphs": {
+			"CTRL-FWSADayanara": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Dayna",
+		"morphs": {
+			"CTRL-FWSADayna": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Gillian",
+		"morphs": {
+			"CTRL-FWSAGillian": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Halina",
+		"morphs": {
+			"CTRL-FWSAHalina": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Matti",
+		"morphs": {
+			"CTRL-FWSAMatti": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Rahele",
+		"morphs": {
+			"CTRL-FWSARahele": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Samira",
+		"morphs": {
+			"CTRL-FWSASamira": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Taia",
+		"morphs": {
+			"CTRL-FWSATaia": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Tisha",
+		"morphs": {
+			"CTRL-FWSATisha": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Uma",
+		"morphs": {
+			"CTRL-FWSAUma": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Xin-Qian",
+		"morphs": {
+			"CTRL-FWSAXin-Qian": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Sushmita",
+		"morphs": {
+			"CTRL-FWSushmita": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	}
+]
