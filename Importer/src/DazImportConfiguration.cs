@@ -27,7 +27,11 @@ public class MaterialSetImportConfiguration {
 	}
 
 	public static MaterialSetImportConfiguration[] Load(DirectoryInfo figureConfDir) {
-		string json = figureConfDir.File("materials-sets.json").ReadAllText();
+		var file = figureConfDir.File("materials-sets.json");
+		if (!file.Exists) {
+			return new MaterialSetImportConfiguration[0];
+		}
+		string json = file.ReadAllText();
 		MaterialSetImportConfiguration[] confs = JsonConvert.DeserializeObject<MaterialSetImportConfiguration[]>(json);
 		return confs;
 	}
