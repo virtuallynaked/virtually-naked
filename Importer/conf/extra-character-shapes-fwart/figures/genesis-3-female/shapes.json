@@ -124,5 +124,117 @@
 			"CTRL-FWSushmita": 1.0,
 			"genesis-3-female-hd-correction": 1.0
 		}
+	},
+	{
+		"name": "Ayumi",
+		"morphs": {
+			"CTRL-FSSAyumi": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Catalina",
+		"morphs": {
+			"CTRL-FWCatalina": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Hillary",
+		"morphs": {
+			"CTRL-FWHillary": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Nadine",
+		"morphs": {
+			"CTRL-FWNadine": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Agnes",
+		"morphs": {
+			"CTRL-FWSAAgnes": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Alysa",
+		"morphs": {
+			"CTRL-FWSAAlysa": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Frida",
+		"morphs": {
+			"CTRL-FWSAFrida": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Jenna",
+		"morphs": {
+			"CTRL-FWSAJenna": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Kajiko",
+		"morphs": {
+			"CTRL-FWSAKajiko": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Lexi",
+		"morphs": {
+			"CTRL-FWSALexi": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Mina",
+		"morphs": {
+			"CTRL-FWSAMina": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Nancy",
+		"morphs": {
+			"CTRL-FWSANancy": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Paloma",
+		"morphs": {
+			"CTRL-FWSAPaloma": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Saffron",
+		"morphs": {
+			"CTRL-FWSASaffron": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Shiloh",
+		"morphs": {
+			"CTRL-FWSAShiloh": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
+	},
+	{
+		"name": "Soraya",
+		"morphs": {
+			"CTRL-FSSSoraya": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		}
 	}
 ]
