@@ -1,4 +1,5 @@
 [0.9]
+	Fixed: Screenshots taken through SteamVR were blank in one or both eyes.
 
 [0.8]
 	Major: Added eye color and makeup options to menu under "Characters/Character Details"

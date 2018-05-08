@@ -22,11 +22,11 @@ float3 crushBlacks(float3 c, float a) {
 	return c * factors;
 }
 
-float3 main(float4 screenPosition : SV_POSITION) : SV_TARGET {
+float4 main(float4 screenPosition : SV_POSITION) : SV_TARGET {
 	float3 color = (float3) sourceTexture.Load(int3(screenPosition.xy, 0));
 	color *= exposureAdjustment;
 	color = burnHighlights(color, burnHighlightsParameter);
 	color = crushBlacks(color, crushBlacksParameter);
 
-	return color;
+	return float4(color, 1);
 }
