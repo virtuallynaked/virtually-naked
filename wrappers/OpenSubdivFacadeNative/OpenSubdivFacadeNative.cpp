@@ -80,6 +80,10 @@ namespace OpenSubdivFacadeNative {
 			return refiner->GetLevel(maxLevel);
 		}
 
+		const Far::TopologyLevel& GetRefinedTopology(int level) {
+			return refiner->GetLevel(level);
+		}
+
 		const std::vector<Stencil>& GetStencils(StencilKind kind) {
 			if (kind == LevelStencils) {
 				EnsureLevelStencils();
@@ -158,6 +162,10 @@ namespace OpenSubdivFacadeNative {
 
 		int GetVertexCount() {
 			return GetRefinedTopology().GetNumVertices();
+		}
+
+		int GetVertexCount(int level) {
+			return GetRefinedTopology(level).GetNumVertices();
 		}
 
 		int GetEdgeCount() {
@@ -264,6 +272,10 @@ namespace OpenSubdivFacadeNative {
 					weightIdx += 1;
 				}
 			}
+		}
+
+		void FillRefinedValues(int level, Vector3* previousLevelValues, Vector3* refinedValues) {
+			primvarRefiner->Interpolate(level, previousLevelValues, refinedValues);
 		}
 	};
 
