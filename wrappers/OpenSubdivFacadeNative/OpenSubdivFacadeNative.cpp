@@ -75,12 +75,7 @@ namespace OpenSubdivFacadeNative {
 			primvarRefiner->Limit(levelStencils, limitStencils, limitDuStencils, limitDvStencils);
 		}
 
-		const Far::TopologyLevel& GetRefinedTopology() {
-			int maxLevel = refiner->GetMaxLevel();
-			return refiner->GetLevel(maxLevel);
-		}
-
-		const Far::TopologyLevel& GetRefinedTopology(int level) {
+		const Far::TopologyLevel& GetTopology(int level) {
 			return refiner->GetLevel(level);
 		}
 
@@ -156,24 +151,20 @@ namespace OpenSubdivFacadeNative {
 			primvarRefiner = std::make_unique<Far::PrimvarRefiner>(*refiner);
 		}
 
-		int GetFaceCount() {
-			return GetRefinedTopology().GetNumFaces();
+		int GetFaceCount(int level) {
+			return GetTopology(level).GetNumFaces();
 		}
-
-		int GetVertexCount() {
-			return GetRefinedTopology().GetNumVertices();
-		}
-
+		
 		int GetVertexCount(int level) {
-			return GetRefinedTopology(level).GetNumVertices();
+			return GetTopology(level).GetNumVertices();
 		}
 
-		int GetEdgeCount() {
-			return GetRefinedTopology().GetNumEdges();
+		int GetEdgeCount(int level) {
+			return GetTopology(level).GetNumEdges();
 		}
 
-		void FillFaces(Quad* quads) {
-			const Far::TopologyLevel& topology = GetRefinedTopology();
+		void FillFaces(int level, Quad* quads) {
+			const Far::TopologyLevel& topology = GetTopology(level);
 
 			int count = topology.GetNumFaces();
 			for (int faceIdx = 0; faceIdx < count; ++faceIdx) {
@@ -199,7 +190,7 @@ namespace OpenSubdivFacadeNative {
 
 		void FillFaceMap(int* faceMap) {
 			int maxLevel = refiner->GetMaxLevel();
-			const Far::TopologyLevel& topology = GetRefinedTopology();
+			const Far::TopologyLevel& topology = GetTopology(maxLevel);
 
 			int count = topology.GetNumFaces();
 			for (int faceIdx = 0; faceIdx < count; ++faceIdx) {
@@ -212,7 +203,8 @@ namespace OpenSubdivFacadeNative {
 		}
 
 		void FillAdjacentVertices(ArraySegment* segments, int* packedAdjacentVertices) {
-			const Far::TopologyLevel& topology = GetRefinedTopology();
+			int maxLevel = refiner->GetMaxLevel();
+			const Far::TopologyLevel& topology = GetTopology(maxLevel);
 
 			int segmentIdx = 0;
 			int packedAdjacentVerticesIdx = 0;
@@ -237,7 +229,8 @@ namespace OpenSubdivFacadeNative {
 		}
 
 		void FillVertexRules(int* rules) {
-			const Far::TopologyLevel& topology = GetRefinedTopology();
+			int maxLevel = refiner->GetMaxLevel();
+			const Far::TopologyLevel& topology = GetTopology(maxLevel);
 
 			int vertexCount = topology.GetNumVertices();
 			for (int vertexIdx = 0; vertexIdx < vertexCount; ++vertexIdx) {

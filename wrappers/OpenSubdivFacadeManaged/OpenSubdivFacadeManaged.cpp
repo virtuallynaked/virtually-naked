@@ -21,10 +21,13 @@ namespace OpenSubdivFacade {
 	public ref class Refinement
 	{
 	private:
+		int maxLevel;
 		OpenSubdivFacadeNative::RefinerFacade* refiner;
 
 	public:
 		Refinement(QuadTopology^ controlTopology, int level) {
+			maxLevel = level;
+
 			pin_ptr<Quad> facesPinned = &controlTopology->Faces[0];
 
 			refiner = OpenSubdivFacadeNative::MakeRefinerFacade(
@@ -39,19 +42,23 @@ namespace OpenSubdivFacade {
 		}
 
 		QuadTopology^ GetTopology() {
-			int vertexCount = refiner->GetVertexCount();
-			int faceCount = refiner->GetFaceCount();
+			return GetTopology(maxLevel);
+		}
+
+		QuadTopology^ GetTopology(int level) {
+			int vertexCount = refiner->GetVertexCount(level);
+			int faceCount = refiner->GetFaceCount(level);
 
 			array<Quad>^ faces = gcnew array<Quad>(faceCount);
 			pin_ptr<Quad> facesPinned = &faces[0];
 
-			refiner->FillFaces((OpenSubdivFacadeNative::Quad*) facesPinned);
+			refiner->FillFaces(level, (OpenSubdivFacadeNative::Quad*) facesPinned);
 
 			return gcnew QuadTopology(vertexCount, faces);
 		}
 
 		array<int>^ GetFaceMap() {
-			int faceCount = refiner->GetFaceCount();
+			int faceCount = refiner->GetFaceCount(maxLevel);
 
 			array<int>^ faceMap = gcnew array<int>(faceCount);
 			pin_ptr<int> faceMapPinned = &faceMap[0];
@@ -62,8 +69,8 @@ namespace OpenSubdivFacade {
 		}
 
 		PackedLists<int>^ GetAdjacentVertices() {
-			int vertexCount = refiner->GetVertexCount();
-			int edgeCount = refiner->GetEdgeCount();
+			int vertexCount = refiner->GetVertexCount(maxLevel);
+			int edgeCount = refiner->GetEdgeCount(maxLevel);
 
 			array<ArraySegment>^ segments = gcnew array<ArraySegment>(vertexCount);
 			array<int>^ packedAdjacentVertices = gcnew array<int>(edgeCount * 2);
@@ -77,7 +84,7 @@ namespace OpenSubdivFacade {
 		}
 
 		array<VertexRule>^ GetVertexRules() {
-			int vertexCount = refiner->GetVertexCount();
+			int vertexCount = refiner->GetVertexCount(maxLevel);
 
 			array<VertexRule>^ rules = gcnew array<VertexRule>(vertexCount);
 			pin_ptr<VertexRule> rulesPinned = &rules[0];
@@ -89,7 +96,7 @@ namespace OpenSubdivFacade {
 		PackedLists<WeightedIndex>^ GetStencils(StencilKind kind) {
 			OpenSubdivFacadeNative::StencilKind nativeKind = (OpenSubdivFacadeNative::StencilKind) kind;
 
-			int vertexCount = refiner->GetVertexCount();
+			int vertexCount = refiner->GetVertexCount(maxLevel);
 			int weightedIndexCount = refiner->GetStencilWeightCount(nativeKind);
 
 			array<ArraySegment>^ segments = gcnew array<ArraySegment>(vertexCount);

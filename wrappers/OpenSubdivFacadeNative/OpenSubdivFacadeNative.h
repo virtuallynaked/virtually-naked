@@ -50,11 +50,10 @@ namespace OpenSubdivFacadeNative {
 
 	class RefinerFacade {
 	public:
-		virtual int GetFaceCount() = 0;
-		virtual int GetVertexCount() = 0;
+		virtual int GetFaceCount(int level) = 0;
 		virtual int GetVertexCount(int level) = 0;
-		virtual int GetEdgeCount() = 0;
-		virtual void FillFaces(Quad* quads) = 0;
+		virtual int GetEdgeCount(int level) = 0;
+		virtual void FillFaces(int level, Quad* quads) = 0;
 		virtual void FillFaceMap(int* faceMap) = 0;
 		virtual void FillAdjacentVertices(ArraySegment* segments, int* adjacentVertices) = 0;
 		virtual void FillVertexRules(int* rules) = 0;
