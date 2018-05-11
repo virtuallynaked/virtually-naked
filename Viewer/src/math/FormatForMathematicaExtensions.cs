@@ -1,6 +1,10 @@
 using SharpDX;
 
 public static class FormatForMathematicaExtensions {
+	public static string FormatForMathematica(this Vector2 v) {
+		return "{" + v.X + ", " + v.Y + "}";
+	}
+
 	public static string FormatForMathematica(this Vector3 v) {
 		return "{" + v.X + ", " + v.Y + ", " + v.Z + "}";
 	}
