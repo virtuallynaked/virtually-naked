@@ -127,5 +127,22 @@ namespace OpenSubdivFacade {
 
 			return refinedValues;
 		}
+
+		/*
+		* Refine values from (level - 1) to level.
+		*/
+		array<SharpDX::Vector2>^ Refine(int level, array<SharpDX::Vector2>^ previousLevelValues) {
+			int refineVertexCount = refiner->GetVertexCount(level);
+			array<SharpDX::Vector2>^ refinedValues = gcnew array<SharpDX::Vector2>(refineVertexCount);
+
+			pin_ptr<SharpDX::Vector2> previousLevelValuesPinned = &previousLevelValues[0];
+			pin_ptr<SharpDX::Vector2> refinedValuesPinned = &refinedValues[0];
+			refiner->FillRefinedValues(
+				level,
+				(OpenSubdivFacadeNative::Vector2*) previousLevelValuesPinned,
+				(OpenSubdivFacadeNative::Vector2*) refinedValuesPinned);
+
+			return refinedValues;
+		}
 	};
 }

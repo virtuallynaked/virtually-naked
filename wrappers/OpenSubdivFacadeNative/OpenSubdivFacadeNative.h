@@ -48,6 +48,21 @@ namespace OpenSubdivFacadeNative {
 		}
 	};
 
+	struct Vector2 {
+		float x;
+		float y;
+
+		void Clear() {
+			x = 0;
+			y = 0;
+		}
+
+		void AddWithWeight(const Vector2& accumulator, float weight) {
+			x += weight * accumulator.x;
+			y += weight * accumulator.y;
+		}
+	};
+
 	class RefinerFacade {
 	public:
 		virtual int GetFaceCount(int level) = 0;
@@ -60,6 +75,7 @@ namespace OpenSubdivFacadeNative {
 		virtual int GetStencilWeightCount(StencilKind kind) = 0;
 		virtual void FillStencils(StencilKind kind, ArraySegment* segments, WeightedIndex* weights) = 0;
 		virtual void FillRefinedValues(int level, Vector3* previousLevelValues, Vector3* refinedValues) = 0;
+		virtual void FillRefinedValues(int level, Vector2* previousLevelValues, Vector2* refinedValues) = 0;
 	};
 
 	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel);
