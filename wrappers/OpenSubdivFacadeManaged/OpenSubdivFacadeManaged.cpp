@@ -18,6 +18,13 @@ namespace OpenSubdivFacade {
 		Corner = (1 << 3)
 	};
 
+	generic<typename T>
+	public value struct LimitValues {
+		array<T>^ values;
+		array<T>^ tangents1;
+		array<T>^ tangents2;
+	};
+
 	public ref class Refinement
 	{
 	private:
@@ -143,6 +150,60 @@ namespace OpenSubdivFacade {
 				(OpenSubdivFacadeNative::Vector2*) refinedValuesPinned);
 
 			return refinedValues;
+		}
+
+		/*
+		 * Refine values from maxLevel to limit surface (including tangents).
+		 */
+		LimitValues<SharpDX::Vector3> Limit(array<SharpDX::Vector3>^ maxLevelValues) {
+			int vertexCount = maxLevelValues->Length;
+			array<SharpDX::Vector3>^ limitValues = gcnew array<SharpDX::Vector3>(vertexCount);
+			array<SharpDX::Vector3>^ tan1Values = gcnew array<SharpDX::Vector3>(vertexCount);
+			array<SharpDX::Vector3>^ tan2Values = gcnew array<SharpDX::Vector3>(vertexCount);
+
+			pin_ptr<SharpDX::Vector3> maxLevelValuesPinned = &maxLevelValues[0];
+			pin_ptr<SharpDX::Vector3> limitValuesPinned = &limitValues[0];
+			pin_ptr<SharpDX::Vector3> tan1ValuesPinned = &tan1Values[0];
+			pin_ptr<SharpDX::Vector3> tan2ValuesPinned = &tan2Values[0];
+			refiner->FillLimitValues(
+				(OpenSubdivFacadeNative::Vector3*) maxLevelValuesPinned,
+				(OpenSubdivFacadeNative::Vector3*) limitValuesPinned,
+				(OpenSubdivFacadeNative::Vector3*) tan1ValuesPinned,
+				(OpenSubdivFacadeNative::Vector3*) tan2ValuesPinned);
+
+			LimitValues<SharpDX::Vector3> result;
+			result.values = limitValues;
+			result.tangents1 = tan1Values;
+			result.tangents2 = tan2Values;
+
+			return result;
+		}
+
+		/*
+		 * Refine values from maxLevel to limit surface (including tangents).
+		 */
+		LimitValues<SharpDX::Vector2> Limit(array<SharpDX::Vector2>^ maxLevelValues) {
+			int vertexCount = maxLevelValues->Length;
+			array<SharpDX::Vector2>^ limitValues = gcnew array<SharpDX::Vector2>(vertexCount);
+			array<SharpDX::Vector2>^ tan1Values = gcnew array<SharpDX::Vector2>(vertexCount);
+			array<SharpDX::Vector2>^ tan2Values = gcnew array<SharpDX::Vector2>(vertexCount);
+
+			pin_ptr<SharpDX::Vector2> maxLevelValuesPinned = &maxLevelValues[0];
+			pin_ptr<SharpDX::Vector2> limitValuesPinned = &limitValues[0];
+			pin_ptr<SharpDX::Vector2> tan1ValuesPinned = &tan1Values[0];
+			pin_ptr<SharpDX::Vector2> tan2ValuesPinned = &tan2Values[0];
+			refiner->FillLimitValues(
+				(OpenSubdivFacadeNative::Vector2*) maxLevelValuesPinned,
+				(OpenSubdivFacadeNative::Vector2*) limitValuesPinned,
+				(OpenSubdivFacadeNative::Vector2*) tan1ValuesPinned,
+				(OpenSubdivFacadeNative::Vector2*) tan2ValuesPinned);
+
+			LimitValues<SharpDX::Vector2> result;
+			result.values = limitValues;
+			result.tangents1 = tan1Values;
+			result.tangents2 = tan2Values;
+
+			return result;
 		}
 	};
 }

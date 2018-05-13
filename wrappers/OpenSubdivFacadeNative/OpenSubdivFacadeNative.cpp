@@ -274,6 +274,14 @@ namespace OpenSubdivFacadeNative {
 		void FillRefinedValues(int level, Vector2* previousLevelValues, Vector2* refinedValues) {
 			primvarRefiner->Interpolate(level, previousLevelValues, refinedValues);
 		}
+
+		void FillLimitValues(Vector3* maxLevelValues, Vector3* limitValues, Vector3* tan1Values, Vector3* tan2Values) {
+			primvarRefiner->Limit(maxLevelValues, limitValues, tan1Values, tan2Values);
+		}
+
+		void FillLimitValues(Vector2* maxLevelValues, Vector2* limitValues, Vector2* tan1Values, Vector2* tan2Values) {
+			primvarRefiner->Limit(maxLevelValues, limitValues, tan1Values, tan2Values);
+		}
 	};
 
 	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel) {

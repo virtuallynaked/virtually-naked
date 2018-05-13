@@ -76,6 +76,8 @@ namespace OpenSubdivFacadeNative {
 		virtual void FillStencils(StencilKind kind, ArraySegment* segments, WeightedIndex* weights) = 0;
 		virtual void FillRefinedValues(int level, Vector3* previousLevelValues, Vector3* refinedValues) = 0;
 		virtual void FillRefinedValues(int level, Vector2* previousLevelValues, Vector2* refinedValues) = 0;
+		virtual void FillLimitValues(Vector3* maxLevelValues, Vector3* limitValues, Vector3* tan1Values, Vector3* tan2Values) = 0;
+		virtual void FillLimitValues(Vector2* maxLevelValues, Vector2* limitValues, Vector2* tan1Values, Vector2* tan2Values) = 0;
 	};
 
 	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel);
