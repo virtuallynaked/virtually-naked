@@ -205,5 +205,31 @@ namespace OpenSubdivFacade {
 
 			return result;
 		}
+
+		array<SharpDX::Vector3>^ RefineFully(array<SharpDX::Vector3>^ controlValues) {
+			array<SharpDX::Vector3>^ values = controlValues;
+			for (int level = 1; level <= maxLevel; ++level) {
+				values = Refine(level, values);
+			}
+			return values;
+		}
+
+		array<SharpDX::Vector2>^ RefineFully(array<SharpDX::Vector2>^ controlValues) {
+			array<SharpDX::Vector2>^ values = controlValues;
+			for (int level = 1; level <= maxLevel; ++level) {
+				values = Refine(level, values);
+			}
+			return values;
+		}
+
+		LimitValues<SharpDX::Vector3> LimitFully(array<SharpDX::Vector3>^ controlValues) {
+			array<SharpDX::Vector3>^ refinedValues = RefineFully(controlValues);
+			return Limit(refinedValues);
+		}
+
+		LimitValues<SharpDX::Vector2> LimitFully(array<SharpDX::Vector2>^ controlValues) {
+			array<SharpDX::Vector2>^ refinedValues = RefineFully(controlValues);
+			return Limit(refinedValues);
+		}
 	};
 }
