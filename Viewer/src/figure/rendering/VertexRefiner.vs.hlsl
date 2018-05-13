@@ -24,8 +24,7 @@ struct SpatialVertexInfo {
 struct TexturedVertexInfo {
 	uint spatialInfoIdx;
 	float2 texCoord;
-	float2 texCoordDu;
-	float2 texCoordDv;
+	float2 tangentUCoeffs;
 };
 
 StructuredBuffer<ArraySegment> stencilSegments : register(t0);
@@ -62,28 +61,17 @@ SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 	return refinedVertexInfo;
 }
 
+float3 normalizeNonZero(float3 v) {
+	float lengthSquared = dot(v, v);
+	return lengthSquared == 0 ? v : v * rsqrt(lengthSquared);
+}
+
 RefinedVertex combineTextureAndSpatialInfo(TexturedVertexInfo info, SpatialVertexInfo spatialInfo) {
 	float3 positionDs = spatialInfo.positionDu;
 	float3 positionDt = spatialInfo.positionDv;
 
 	float3 normal = normalize(cross(positionDs, positionDt));
-
-	float2 texCoordDs = info.texCoordDu;
-	float2 texCoordDt = info.texCoordDv;
-
-	float us = texCoordDs[0];
-	float vs = texCoordDs[1];
-	float ut = texCoordDt[0];
-	float vt = texCoordDt[1];
-
-	//a constant factor of (ut*vs - us*vt) is omitted since it will drop out when these results get normalized later
-	float3 positionDu = (vs * positionDt - vt * positionDs);
-	float3 positionDv = (ut * positionDs - us * positionDt);
-
-	float3 positionDuLength = length(positionDu);
-	float3 tangent = positionDuLength > 0 ? (positionDu / positionDuLength) : 0;
-
-	// dot(tangent, spatialInfo.normal) should be zero at this point
+	float3 tangent = normalizeNonZero(info.tangentUCoeffs.x * positionDs + info.tangentUCoeffs.y * positionDt);
 
 	RefinedVertex refinedVertex;
 	refinedVertex.position = spatialInfo.position;

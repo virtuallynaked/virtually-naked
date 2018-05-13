@@ -1,18 +1,15 @@
 using OpenSubdivFacade;
 using SharpDX;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using static SharpDX.Vector3;
 
 public class UVSetDumper {
 	public static void DumpFigure(Figure figure, SurfaceProperties surfaceProperties, DirectoryInfo figureDestDir) {
-		DirectoryInfo refinementDirectory = figureDestDir.Subdirectory("refinement").Subdirectory("level-" + surfaceProperties.SubdivisionLevel);
-		Quad[] spatialFaces = refinementDirectory.File("faces.array").ReadArray<Quad>();
-		SubdivisionTopologyInfo spatialTopologyInfo = Persistance.Load<SubdivisionTopologyInfo>(UnpackedArchiveFile.Make(refinementDirectory.File("topology-info.dat")));
-		
 		DirectoryInfo uvSetsDirectory = figureDestDir.Subdirectory("uv-sets");
-		UVSetDumper dumper = new UVSetDumper(figure, surfaceProperties, uvSetsDirectory, spatialFaces, spatialTopologyInfo);
+		UVSetDumper dumper = new UVSetDumper(figure, surfaceProperties, uvSetsDirectory);
 		foreach (var pair in figure.UvSets) {
 			dumper.Dump(pair.Key, pair.Value);
 		}
@@ -21,33 +18,16 @@ public class UVSetDumper {
 	private readonly Figure figure;
 	private readonly SurfaceProperties surfaceProperties;
 	private readonly DirectoryInfo uvSetsDirectory;
-	private readonly Quad[] spatialFaces;
-	private readonly SubdivisionTopologyInfo spatialTopologyInfo;
 
 	public UVSetDumper(
 		Figure figure,
 		SurfaceProperties surfaceProperties,
-		DirectoryInfo uvSetsDirectory,
-		Quad[] spatialFaces, SubdivisionTopologyInfo spatialTopologyInfo) {
+		DirectoryInfo uvSetsDirectory) {
 		this.figure = figure;
 		this.surfaceProperties = surfaceProperties;
 		this.uvSetsDirectory = uvSetsDirectory;
-		this.spatialFaces = spatialFaces;
-		this.spatialTopologyInfo = spatialTopologyInfo;
 	}
 		
-	private MultisurfaceQuadTopology ExtractTexturedTopology(MultisurfaceQuadTopology spatialTopology, UvSet uvSet) {
-		Quad[] texuredFaces = uvSet.Faces;
-		int texturedVertexCount = uvSet.Uvs.Length;
-		
-		return new MultisurfaceQuadTopology(
-			spatialTopology.Type,
-			texturedVertexCount,
-			spatialTopology.SurfaceCount,
-			texuredFaces,
-			spatialTopology.SurfaceMap);
-	}
-	
 	public static int[] CalculateTextureToSpatialIndexMap(QuadTopology texturedTopology, Quad[] spatialFaces) {
 		int faceCount = texturedTopology.Faces.Length;
 		if (spatialFaces.Length != faceCount) {
@@ -74,54 +54,7 @@ public class UVSetDumper {
 
 		return spatialIdxMap;
 	}
-	
-	private static Tuple<Vector2, Vector2> RemapTangents(
-		List<int> spatialNeighbours, VertexRule spatialVertexRule,
-		List<int> neighbours, VertexRule vertexRule,
-		Vector2 ds, Vector2 dt) {
-		int spatialValence = spatialNeighbours.Count;
-		int valence = neighbours.Count;
-
-		if (spatialVertexRule == vertexRule && spatialNeighbours.SequenceEqual(neighbours)) {
-			//no remapping required
-			return Tuple.Create(ds, dt);
-		}
 		
-		if (neighbours.Count == 0) {
-			//disconnected vertex, so no tangents
-			return Tuple.Create(Vector2.Zero, Vector2.Zero);
-		}
-
-		
-		/*
-		if (vertexRule != VertexRule.Crease) {
-			throw new InvalidOperationException("only texture creases should need remapping");
-		}
-		
-		if (spatialValence <= 2) {
-			throw new InvalidOperationException("spatial corners should never remapping");
-		}
-		*/
-
-		if (spatialValence == 4 && spatialVertexRule == VertexRule.Smooth && valence == 3) {
-			int leadingNeighbourSpatialIdx = spatialNeighbours.IndexOf(neighbours[0]);
-
-			if (leadingNeighbourSpatialIdx == 0) {
-				return Tuple.Create(ds, dt);
-			} else if (leadingNeighbourSpatialIdx == 1) {
-				return Tuple.Create(-dt, ds);
-			} else if (leadingNeighbourSpatialIdx == 2) {
-				return Tuple.Create(-ds, -dt);
-			} else if (leadingNeighbourSpatialIdx == 3) {
-				return Tuple.Create(dt, -ds);
-			} else {
-				throw new InvalidOperationException("impossible");
-			}
-		} else {
-			return Tuple.Create(Vector2.Zero, Vector2.Zero);
-		}
-	}
-	
 	public void Dump(string name, UvSet uvSet) {
 		DirectoryInfo uvSetDirectory = uvSetsDirectory.Subdirectory(name);
 		if (uvSetDirectory.Exists) {
@@ -130,49 +63,157 @@ public class UVSetDumper {
 
 		Console.WriteLine($"Dumping uv-set {name}...");
 		
-		MultisurfaceQuadTopology spatialTopology = figure.Geometry.AsTopology();
-		MultisurfaceQuadTopology texturedControlTopology = ExtractTexturedTopology(spatialTopology, uvSet);
-		var texturedRefinementResult = texturedControlTopology.Refine(surfaceProperties.SubdivisionLevel);
-		var texturedTopology = texturedRefinementResult.Mesh.Topology;
-		var texturedTopologyInfo = texturedRefinementResult.TopologyInfo;
-		var derivStencils = texturedRefinementResult.Mesh.Stencils;
-		
-		var stencils = derivStencils.Map(stencil => new WeightedIndex(stencil.Index, stencil.Weight));
-		var duStencils = derivStencils.Map(stencil => new WeightedIndex(stencil.Index, stencil.DuWeight));
-		var dvStencils = derivStencils.Map(stencil => new WeightedIndex(stencil.Index, stencil.DvWeight));
+		int subdivisionLevel = surfaceProperties.SubdivisionLevel;
 
-		Vector2[] controlTextureCoords = uvSet.Uvs;
-		Vector2[] textureCoords = new Subdivider(stencils).Refine(controlTextureCoords, new Vector2Operators());
-		Vector2[] textureCoordDus = new Subdivider(duStencils).Refine(controlTextureCoords, new Vector2Operators());
-		Vector2[] textureCoordDvs = new Subdivider(dvStencils).Refine(controlTextureCoords, new Vector2Operators());
+		var geometry = figure.Geometry;
+		var spatialControlTopology = new QuadTopology(geometry.VertexCount, geometry.Faces);
+		var spatialControlPositions = geometry.VertexPositions;
+
+		QuadTopology spatialTopology;
+		LimitValues<Vector3> spatialLimitPositions;
+		using (var refinement = new Refinement(spatialControlTopology, subdivisionLevel)) {
+			spatialTopology = refinement.GetTopology();
+			spatialLimitPositions = refinement.LimitFully(spatialControlPositions);
+		}
 		
-		int[] spatialIdxMap = CalculateTextureToSpatialIndexMap(texturedTopology, spatialFaces);
+		var texturedControlTopology = new QuadTopology(uvSet.Uvs.Length, uvSet.Faces);
+		Vector2[] controlTextureCoords = uvSet.Uvs;
+
+		int[] controlSpatialIdxMap = CalculateTextureToSpatialIndexMap(texturedControlTopology, spatialControlTopology.Faces);
+		Vector3[] texturedControlPositions = controlSpatialIdxMap
+			.Select(spatialIdx => spatialControlPositions[spatialIdx])
+			.ToArray();
+
+		QuadTopology texturedTopology;
+		LimitValues<Vector3> texturedLimitPositions;
+		LimitValues<Vector2> limitTextureCoords;
+		using (var refinement = new Refinement(texturedControlTopology, surfaceProperties.SubdivisionLevel)) {
+			texturedTopology = refinement.GetTopology();
+			texturedLimitPositions = refinement.LimitFully(texturedControlPositions);
+			limitTextureCoords = refinement.LimitFully(controlTextureCoords);
+		}
+
+		Vector2[] textureCoords;
+		if (geometry.Type == GeometryType.SubdivisionSurface) {
+			textureCoords = limitTextureCoords.values;
+		} else {
+			if (subdivisionLevel != 0) {
+				throw new InvalidOperationException("polygon meshes cannot be subdivided");
+			}
+			Debug.Assert(limitTextureCoords.values.Length == controlTextureCoords.Length);
+
+			textureCoords = controlTextureCoords;
+		}
+				
+		int[] spatialIdxMap = CalculateTextureToSpatialIndexMap(texturedTopology, spatialTopology.Faces);
 
 		TexturedVertexInfo[] texturedVertexInfos = Enumerable.Range(0, textureCoords.Length)
 			.Select(idx => {
 				int spatialVertexIdx = spatialIdxMap[idx];
 				Vector2 textureCoord = textureCoords[idx];
-				Vector2 du = textureCoordDus[idx];
-				Vector2 dv = textureCoordDvs[idx];
 
-				List<int> spatialNeighbours = spatialTopologyInfo.AdjacentVertices.GetElements(spatialVertexIdx).ToList();
-				var spatialVertexRule = spatialTopologyInfo.VertexRules[spatialVertexIdx];
-
-				List<int> neighbours = texturedTopologyInfo.AdjacentVertices.GetElements(idx).Select(i => spatialIdxMap[i]).ToList();
-				var vertexRule = texturedTopologyInfo.VertexRules[idx];
-
-				Tuple<Vector2, Vector2> remappedTangents = RemapTangents(spatialNeighbours, spatialVertexRule, neighbours, vertexRule, du, dv);
+				Vector3 positionDu = CalculatePositionDu(
+					limitTextureCoords.tangents1[idx],
+					limitTextureCoords.tangents2[idx],
+					texturedLimitPositions.tangents1[idx],
+					texturedLimitPositions.tangents2[idx]);
 				
+				Vector3 spatialPositionTan1 = spatialLimitPositions.tangents1[spatialVertexIdx];
+				Vector3 spatialPositionTan2 = spatialLimitPositions.tangents2[spatialVertexIdx];
+				
+				Vector2 tangentUCoeffs = CalculateTangentSpaceRemappingCoeffs(spatialPositionTan1, spatialPositionTan2, positionDu);
+				
+				DebugUtilities.AssertFinite(tangentUCoeffs.X);
+				DebugUtilities.AssertFinite(tangentUCoeffs.Y);
+
+				tangentUCoeffs = -tangentUCoeffs; //even number of sign errors
 				return new TexturedVertexInfo(
 					spatialVertexIdx,
 					textureCoord,
-					remappedTangents.Item1,
-					remappedTangents.Item2);
+					tangentUCoeffs);
 			})
 			.ToArray();
 
 		uvSetDirectory.CreateWithParents();
 		uvSetDirectory.File("textured-faces.array").WriteArray(texturedTopology.Faces);
 		uvSetDirectory.File("textured-vertex-infos.array").WriteArray(texturedVertexInfos);
+	}
+
+	private float NormalizationFactor(float lengthSquared) {
+		return lengthSquared == 0 ? 1 : (float) (1 / Math.Sqrt(lengthSquared));
+	}
+
+	private void Normalize(ref float x, ref float y) {
+		float m = NormalizationFactor(x * x + y * y);
+		x *= m;
+		y *= m;
+	}
+
+	/**
+	 * Calculate the derivative of position with respect to U given the derivatives of UV and position with
+	 * respect to a shared coordinate system (S,T).
+	 */
+	private Vector3 CalculatePositionDu(Vector2 dUVdS, Vector2 dUVdT, Vector3 dPdS, Vector3 dPdT) {
+		/*
+		Derivation in Mathematica:
+			p[s_, t_] := p0 + ps*s + pt*t
+			u[s_, t_] := u0 + us*s + ut*t
+			v[s_, t_] := v0 + vs*s + vt*t
+			soln = Solve[u[s, t] == U && v[s, t] == V, {s, t}]
+			P = p[s, t] /. soln
+			D[P, U] // FullSimplify
+			> {(pt*vs - ps*vt)/(ut*vs - us*vt)}
+		*/
+		
+		float us = dUVdS.X;
+		float vs = dUVdS.Y;
+		float ut = dUVdT.X;
+		float vt = dUVdT.Y;
+		Normalize(ref us, ref ut);
+		Normalize(ref vs, ref vt);
+		
+		Vector3 ps = dPdS;
+		Vector3 pt = dPdT;
+
+		float denom = (ut*vs - us*vt);
+		if (denom == 0) {
+			return Vector3.Zero;
+		}
+		Vector3 dPdU = Vector3.Normalize((pt*vs - ps*vt) / denom);
+		return dPdU;
+	}
+	
+	/**
+	 * Given two vectors (from1, from2) forming a tangent-plane find a pair of coefficients (a,b) such
+	 * that a * from1 + b * from2 == to.
+	 * 
+	 * Note that the system is overdetermined and 'to' might not lie exactly in a plane. In this case, the least
+	 * squares solution is returned.
+	 */
+	private Vector2 CalculateTangentSpaceRemappingCoeffs(Vector3 from1, Vector3 from2, Vector3 to) {
+		float normalizationFactor1 = NormalizationFactor(from1.LengthSquared());
+		float normalizationFactor2 = NormalizationFactor(from2.LengthSquared());
+
+		from1 = from1 * normalizationFactor1;
+		from2 = from2 * normalizationFactor2;
+
+		float a11 = Dot(from1, from1);
+		float a12 = Dot(from1, from2);
+		float a21 = Dot(from2, from1);
+		float a22 = Dot(from2, from2);
+
+		float b1 = Dot(from1, to);
+		float b2 = Dot(from2, to);
+
+		float det = a11 * a22 - a12 * a21;
+		if (MathUtil.IsZero(det)) {
+			return Vector2.Zero;
+		}
+
+		float m1 = (a22 * b1 - a12 * b2) * normalizationFactor1;
+		float m2 = (a11 * b2 - a21 * b1) * normalizationFactor2;
+		Normalize(ref m1, ref m2);
+
+		return new Vector2(m1, m2);
 	}
 }
