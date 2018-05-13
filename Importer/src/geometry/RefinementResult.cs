@@ -6,16 +6,13 @@ using System.Linq;
 public class RefinementResult {
 	public static readonly RefinementResult Empty = new RefinementResult(
 		SubdivisionMesh.Empty,
-		SubdivisionTopologyInfo.Empty,
 		new int[0]);
 
 	public SubdivisionMesh Mesh { get; }
-	public SubdivisionTopologyInfo TopologyInfo { get; }
 	public int[] ControlFaceMap { get; }
 
-	public RefinementResult(SubdivisionMesh mesh, SubdivisionTopologyInfo topologyInfo, int[] controlFaceMap) {
+	public RefinementResult(SubdivisionMesh mesh, int[] controlFaceMap) {
 		Mesh = mesh;
-		TopologyInfo = topologyInfo;
 		ControlFaceMap = controlFaceMap;
 	}
 
@@ -26,18 +23,13 @@ public class RefinementResult {
 
 		PackedLists<WeightedIndex> limitStencils, limitDuStencils, limitDvStencils;
 		QuadTopology refinedTopology;
-		SubdivisionTopologyInfo refinedTopologyInfo;
 		int[] controlFaceMap;
 		using (var refinement = new Refinement(controlTopology, refinementLevel)) {
 			limitStencils = refinement.GetStencils(StencilKind.LimitStencils);
 			limitDuStencils = refinement.GetStencils(StencilKind.LimitDuStencils);
 			limitDvStencils = refinement.GetStencils(StencilKind.LimitDvStencils);
 			refinedTopology = refinement.GetTopology();
-
-			var adjacentVertices = refinement.GetAdjacentVertices();
-			var rules = refinement.GetVertexRules();
-			refinedTopologyInfo = new SubdivisionTopologyInfo(adjacentVertices, rules);
-
+			
 			controlFaceMap = refinement.GetFaceMap();
 		}
 
@@ -56,22 +48,18 @@ public class RefinementResult {
 		PackedLists<WeightedIndexWithDerivatives> stencils = WeightedIndexWithDerivatives.Merge(limitStencils, limitDuStencils, limitDvStencils);
 		var refinedMesh = new SubdivisionMesh(controlTopology.VertexCount, refinedTopology, stencils);
 		
-		return new RefinementResult(refinedMesh, refinedTopologyInfo, controlFaceMap);
+		return new RefinementResult(refinedMesh, controlFaceMap);
 	}
 
 	public static RefinementResult Combine(RefinementResult resultA, RefinementResult resultB) {
 		SubdivisionMesh combinedMesh = SubdivisionMesh.Combine(
 			resultA.Mesh,
 			resultB.Mesh);
-
-		SubdivisionTopologyInfo combinedTopologyInfo = SubdivisionTopologyInfo.Combine(
-			resultA.TopologyInfo,
-			resultB.TopologyInfo);
-
+		
 		int[] combinedControlFaceMap = Enumerable.Concat(
 			resultA.ControlFaceMap,
 			resultB.ControlFaceMap).ToArray();
 
-		return new RefinementResult(combinedMesh, combinedTopologyInfo, combinedControlFaceMap);
+		return new RefinementResult(combinedMesh, combinedControlFaceMap);
 	}
 }

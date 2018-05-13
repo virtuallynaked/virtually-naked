@@ -20,16 +20,6 @@ public class OpenSubdivFacadeDemo :IDemoApp {
 			}
 			Console.WriteLine();
 			
-			PackedLists<int> adjacentVertices = refinement.GetAdjacentVertices();
-			VertexRule[] vertexRules = refinement.GetVertexRules();
-			Console.WriteLine("adjacent vertices and rules: ");
-			for (int vertexIdx = 0; vertexIdx < topology.VertexCount; ++vertexIdx) {
-				VertexRule vertexRule = vertexRules[vertexIdx];
-
-				Console.WriteLine("\t" + vertexIdx + $": [{vertexRule}] " + String.Join(", ", adjacentVertices.GetElements(vertexIdx)));
-			}
-			Console.WriteLine();
-
 			PackedLists<WeightedIndex> stencils = refinement.GetStencils(StencilKind.LimitStencils);
 			Console.WriteLine("stencils: ");
 			for (int vertexIdx = 0; vertexIdx < stencils.Count; ++vertexIdx) {

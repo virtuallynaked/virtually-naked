@@ -43,7 +43,6 @@ public class GeometryDumper {
 		var refinementResult = topology.Refine(level);
 		
 		targetDirectory.Create();
-		Persistance.Save(targetDirectory.File("topology-info.dat"), refinementResult.TopologyInfo);
 		SubdivisionMeshPersistance.Save(targetDirectory, refinementResult.Mesh);
 		targetDirectory.File("control-face-map.array").WriteArray(refinementResult.ControlFaceMap);
 	}

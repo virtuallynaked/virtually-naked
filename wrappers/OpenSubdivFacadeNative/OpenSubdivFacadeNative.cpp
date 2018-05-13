@@ -201,43 +201,7 @@ namespace OpenSubdivFacadeNative {
 				faceMap[faceIdx] = parentFaceIdx;
 			}
 		}
-
-		void FillAdjacentVertices(ArraySegment* segments, int* packedAdjacentVertices) {
-			int maxLevel = refiner->GetMaxLevel();
-			const Far::TopologyLevel& topology = GetTopology(maxLevel);
-
-			int segmentIdx = 0;
-			int packedAdjacentVerticesIdx = 0;
-
-			int vertexCount = topology.GetNumVertices();
-			for (int vertexIdx = 0; vertexIdx < vertexCount; ++vertexIdx) {
-				const auto& adjacentEdgeIndices = topology.GetVertexEdges(vertexIdx);
-				int adjacentEdgeCount = (int) adjacentEdgeIndices.size();
-
-				segments[segmentIdx].offset = packedAdjacentVerticesIdx;
-				segments[segmentIdx].count = adjacentEdgeCount;
-				segmentIdx += 1;
-
-				for (int i = 0; i < adjacentEdgeCount; ++i) {
-					const auto& edgeVertices = topology.GetEdgeVertices(adjacentEdgeIndices[i]);
-					int adjacentVertex = edgeVertices[0] == vertexIdx ? edgeVertices[1] : edgeVertices[0];
-
-					packedAdjacentVertices[packedAdjacentVerticesIdx] = adjacentVertex;
-					packedAdjacentVerticesIdx += 1;
-				}
-			}
-		}
-
-		void FillVertexRules(int* rules) {
-			int maxLevel = refiner->GetMaxLevel();
-			const Far::TopologyLevel& topology = GetTopology(maxLevel);
-
-			int vertexCount = topology.GetNumVertices();
-			for (int vertexIdx = 0; vertexIdx < vertexCount; ++vertexIdx) {
-				rules[vertexIdx] = topology.GetVertexRule(vertexIdx);
-			}
-		}
-
+		
 		int GetStencilWeightCount(StencilKind kind) {
 			const std::vector<Stencil>& stencils = GetStencils(kind);
 

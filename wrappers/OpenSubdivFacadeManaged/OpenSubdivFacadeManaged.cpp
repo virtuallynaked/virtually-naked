@@ -74,32 +74,7 @@ namespace OpenSubdivFacade {
 
 			return faceMap;
 		}
-
-		PackedLists<int>^ GetAdjacentVertices() {
-			int vertexCount = refiner->GetVertexCount(maxLevel);
-			int edgeCount = refiner->GetEdgeCount(maxLevel);
-
-			array<ArraySegment>^ segments = gcnew array<ArraySegment>(vertexCount);
-			array<int>^ packedAdjacentVertices = gcnew array<int>(edgeCount * 2);
-			pin_ptr<ArraySegment> segmentsPinned = &segments[0];
-			pin_ptr<int> packedAdjacentVerticesPinned = &packedAdjacentVertices[0];
-			refiner->FillAdjacentVertices(
-				(OpenSubdivFacadeNative::ArraySegment*) segmentsPinned,
-				(int*) packedAdjacentVerticesPinned);
-
-			return gcnew PackedLists<int>(segments, packedAdjacentVertices);
-		}
-
-		array<VertexRule>^ GetVertexRules() {
-			int vertexCount = refiner->GetVertexCount(maxLevel);
-
-			array<VertexRule>^ rules = gcnew array<VertexRule>(vertexCount);
-			pin_ptr<VertexRule> rulesPinned = &rules[0];
-			refiner->FillVertexRules((int*) rulesPinned);
-
-			return rules;
-		}
-
+		
 		PackedLists<WeightedIndex>^ GetStencils(StencilKind kind) {
 			OpenSubdivFacadeNative::StencilKind nativeKind = (OpenSubdivFacadeNative::StencilKind) kind;
 

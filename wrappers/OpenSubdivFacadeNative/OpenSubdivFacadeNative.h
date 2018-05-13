@@ -70,8 +70,6 @@ namespace OpenSubdivFacadeNative {
 		virtual int GetEdgeCount(int level) = 0;
 		virtual void FillFaces(int level, Quad* quads) = 0;
 		virtual void FillFaceMap(int* faceMap) = 0;
-		virtual void FillAdjacentVertices(ArraySegment* segments, int* adjacentVertices) = 0;
-		virtual void FillVertexRules(int* rules) = 0;
 		virtual int GetStencilWeightCount(StencilKind kind) = 0;
 		virtual void FillStencils(StencilKind kind, ArraySegment* segments, WeightedIndex* weights) = 0;
 		virtual void FillRefinedValues(int level, Vector3* previousLevelValues, Vector3* refinedValues) = 0;
