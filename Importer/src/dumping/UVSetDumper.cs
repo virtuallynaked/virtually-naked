@@ -87,7 +87,7 @@ public class UVSetDumper {
 		QuadTopology texturedTopology;
 		LimitValues<Vector3> texturedLimitPositions;
 		LimitValues<Vector2> limitTextureCoords;
-		using (var refinement = new Refinement(texturedControlTopology, surfaceProperties.SubdivisionLevel)) {
+		using (var refinement = new Refinement(texturedControlTopology, surfaceProperties.SubdivisionLevel, BoundaryInterpolation.EdgeAndCorner)) {
 			texturedTopology = refinement.GetTopology();
 			texturedLimitPositions = refinement.LimitFully(texturedControlPositions);
 			limitTextureCoords = refinement.LimitFully(controlTextureCoords);

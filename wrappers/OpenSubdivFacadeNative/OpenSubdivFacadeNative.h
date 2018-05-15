@@ -8,6 +8,12 @@ namespace OpenSubdivFacadeNative {
 		LimitDvStencils
 	};
 
+	enum BoundaryInterpolation { //must match Sdc::Options::VtxBoundaryInterpolation
+		None = 0,
+		EdgeOnly = 1,
+		EdgeAndCorner = 2
+	};
+
 	struct Quad {
 		int index0;
 		int index1;
@@ -78,5 +84,5 @@ namespace OpenSubdivFacadeNative {
 		virtual void FillLimitValues(Vector2* maxLevelValues, Vector2* limitValues, Vector2* tan1Values, Vector2* tan2Values) = 0;
 	};
 
-	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel);
+	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel, BoundaryInterpolation boundaryInterpolation);
 }

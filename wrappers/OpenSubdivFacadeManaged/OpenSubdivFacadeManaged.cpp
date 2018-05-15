@@ -3,6 +3,12 @@
 #include "..\OpenSubdivFacadeNative\OpenSubdivFacadeNative.h"
 
 namespace OpenSubdivFacade {
+	public enum class BoundaryInterpolation {
+		None,
+		EdgeOnly,
+		EdgeAndCorner
+	};
+
 	public enum class StencilKind {
 		LevelStencils,
 		LimitStencils,
@@ -32,7 +38,10 @@ namespace OpenSubdivFacade {
 		OpenSubdivFacadeNative::RefinerFacade* refiner;
 
 	public:
-		Refinement(QuadTopology^ controlTopology, int level) {
+		Refinement(QuadTopology^ controlTopology, int level) : Refinement(controlTopology, level, BoundaryInterpolation::EdgeOnly) {
+		}
+
+		Refinement(QuadTopology^ controlTopology, int level, BoundaryInterpolation boundaryInterpolation) {
 			maxLevel = level;
 
 			pin_ptr<Quad> facesPinned = &controlTopology->Faces[0];
@@ -41,7 +50,8 @@ namespace OpenSubdivFacade {
 				controlTopology->VertexCount,
 				controlTopology->Faces->Length,
 				(OpenSubdivFacadeNative::Quad*) facesPinned,
-				level);
+				level,
+				(OpenSubdivFacadeNative::BoundaryInterpolation) boundaryInterpolation);
 		}
 
 		~Refinement() {

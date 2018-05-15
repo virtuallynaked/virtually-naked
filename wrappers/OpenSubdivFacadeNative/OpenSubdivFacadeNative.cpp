@@ -102,11 +102,11 @@ namespace OpenSubdivFacadeNative {
 		}
 
 	public:
-		RefinerFacadeImpl(int vertexCount, int faceCount, const Quad* faces, int refinementLevel) {
+		RefinerFacadeImpl(int vertexCount, int faceCount, const Quad* faces, int refinementLevel, BoundaryInterpolation boundaryInterpolation) {
 			Sdc::SchemeType type = OpenSubdiv::Sdc::SCHEME_CATMARK;
 
 			Sdc::Options options;
-			options.SetVtxBoundaryInterpolation(Sdc::Options::VTX_BOUNDARY_EDGE_ONLY);
+			options.SetVtxBoundaryInterpolation((Sdc::Options::VtxBoundaryInterpolation) boundaryInterpolation);
 			options.SetFVarLinearInterpolation(Sdc::Options::FVAR_LINEAR_NONE);
 
 			std::vector<int> numVertsPerFace;
@@ -248,10 +248,10 @@ namespace OpenSubdivFacadeNative {
 		}
 	};
 
-	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel) {
+	RefinerFacade* MakeRefinerFacade(int vertexCount, int faceCount, const Quad* faces, int refinementLevel, BoundaryInterpolation boundaryInterpolation) {
 #ifdef _DEBUG
 		fprintf(stderr, "%s\n", "WARNING: Using OpenSubdiv Debug build");
 #endif
-		return new RefinerFacadeImpl(vertexCount, faceCount, faces, refinementLevel);
+		return new RefinerFacadeImpl(vertexCount, faceCount, faces, refinementLevel, boundaryInterpolation);
 	}
 }
