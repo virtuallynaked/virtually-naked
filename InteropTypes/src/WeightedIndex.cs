@@ -9,4 +9,9 @@ public struct WeightedIndex {
 		Index = index;
 		Weight = weight;
 	}
+
+	override
+	public string ToString() {
+		return $"{{{Index}: {Weight}}}";
+	}
 }
