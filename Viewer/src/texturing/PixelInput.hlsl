@@ -27,7 +27,7 @@ PixelInput preparePixelInput(VertexOutput vertexOutput, bool isFrontFace) {
 	input.eyeDirection = normalize(vertexOutput.positions.objectRelativeEyePosition);
 	
 	float3 normal = normalize(vertexOutput.normal);
-	float3 tangent = -normalizeNonZero(vertexOutput.tangent - normal * dot(vertexOutput.tangent, normal));
+	float3 tangent = normalizeNonZero(vertexOutput.tangent - normal * dot(vertexOutput.tangent, normal));
 
 	input.texcoord = vertexOutput.texcoord;
 

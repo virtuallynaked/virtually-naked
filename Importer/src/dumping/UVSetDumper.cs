@@ -126,7 +126,6 @@ public class UVSetDumper {
 				DebugUtilities.AssertFinite(tangentUCoeffs.X);
 				DebugUtilities.AssertFinite(tangentUCoeffs.Y);
 
-				tangentUCoeffs = -tangentUCoeffs; //even number of sign errors
 				return new TexturedVertexInfo(
 					spatialVertexIdx,
 					textureCoord,
