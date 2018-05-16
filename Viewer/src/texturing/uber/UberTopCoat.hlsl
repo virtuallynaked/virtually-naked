@@ -1,7 +1,4 @@
-float4 calculateTopCoatLayer(PixelInput input) {
-	float3 baseNormal = combineNormals(
-		SAMPLE_NORMAL_TEX(NormalMap),
-		SAMPLE_BUMP_TEX(BumpStrength));
+float4 calculateTopCoatLayer(PixelInput input, float3 baseNormal) {
 	float3 topCoatNormal = combineNormals(
 		baseNormal,
 		SAMPLE_BUMP_TEX(TopCoatBump));

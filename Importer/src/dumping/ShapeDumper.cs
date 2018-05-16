@@ -45,9 +45,11 @@ public class ShapeDumper {
 		return inputs;
 	}
 		
-	public void DumpShape(DirectoryInfo figureDestDir, ShapeImportConfiguration shapeImportConfiguration) {
+	public void DumpShape(TextureProcessor textureProcessor, DirectoryInfo figureDestDir, ShapeImportConfiguration shapeImportConfiguration) {
 		DirectoryInfo shapeDirectory = figureDestDir.Subdirectory("shapes").Subdirectory(shapeImportConfiguration.name);
 		
+		DumpNormals(textureProcessor, shapeDirectory, shapeImportConfiguration);
+
 		//generate inputs
 		var shapeInputs = MakeShapeInputs(shapeImportConfiguration);
 		
@@ -62,6 +64,51 @@ public class ShapeDumper {
 			DumpSimpleOcclusion(shapeDirectory, shapeInputs, faceTransparencies);
 		}
     }
+
+	private void DumpNormals(TextureProcessor textureProcessor, DirectoryInfo shapeDirectory, ShapeImportConfiguration shapeImportConfiguration) {
+		var normalsConf = shapeImportConfiguration?.normals;
+		var baseNormalsConf = baseConfiguration?.normals;
+
+		if (normalsConf == null && baseNormalsConf == null) {
+			return;
+		}
+				
+		var recipeFile = shapeDirectory.File("shape-normals.dat");
+		if (recipeFile.Exists) {
+			return;
+		}
+
+		var surfaceGroups = normalsConf?.surfaceGroups ?? baseNormalsConf?.surfaceGroups;
+
+		var uvSetName = normalsConf?.uvSet ?? baseNormalsConf?.uvSet ?? figure.DefaultUvSet.Name;
+		var uvSet = figure.UvSets[uvSetName];
+		
+		var surfaceNames = figure.Geometry.SurfaceNames;
+		Dictionary<string, int> surfaceNameToIdx = Enumerable.Range(0, surfaceNames.Length)
+			.ToDictionary(idx => surfaceNames[idx], idx => idx);
+
+		string[] textureNamesBySurface = Enumerable.Repeat(ShapeNormalsRecipe.DefaultTextureName, surfaceNames.Length).ToArray();
+
+		for (int groupIdx = 0; groupIdx < surfaceGroups.Count; ++groupIdx) {
+			var texturePath = normalsConf?.textures?[groupIdx];
+			if (texturePath == null) {
+				continue;
+			}
+
+			var textureFile = fileLocator.Locate(texturePath).File;
+			foreach (string surfaceName in surfaceGroups[groupIdx]) {
+				int surfaceIdx = surfaceNameToIdx[surfaceName];
+
+				var mask = TextureMask.Make(uvSet, figure.Geometry.SurfaceMap, surfaceIdx);
+				var textureName = textureProcessor.RegisterForProcessing(textureFile, TextureProcessingType.Normal, true, mask);
+				textureNamesBySurface[surfaceIdx] = textureName;
+			}
+		}
+		
+		var recipe = new ShapeNormalsRecipe(uvSetName, textureNamesBySurface);
+		shapeDirectory.CreateWithParents();
+		Persistance.Save(recipeFile, recipe);
+	}
 
 	public void DumpUnmorphed(DirectoryInfo figureDestDir) {
 		var shapeInputs = figure.MakeDefaultChannelInputs();

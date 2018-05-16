@@ -38,6 +38,9 @@ Texture2D TopCoatBumpTex : register(t24);
 //Geometry/Cutout
 Texture2D CutoutOpacityTex : register(t25);
 
+//secondary normal map
+Texture2D SecondaryNormalMapTex : register(t26);
+
 static const int BaseMixingMode_PBR_MetallicityRoughness = 0;
 static const int BaseMixingMode_PBR_SpecularGlossiness = 1;
 static const int BaseMixingMode_Weighted = 2;
@@ -101,3 +104,9 @@ cbuffer cbuffer0 : register(b0) {
 	// Geometry/Cutout
 	float CutoutOpacity;
 };
+
+float3 sampleSecondaryNormalMap(PixelInput input) {
+	float3 secondaryTangentSpaceNormal = 2 * SecondaryNormalMapTex.Sample(anisotropicSampler, input.secondaryTexcoord).rgb - 1;
+	float3 primaryTangentSpaceNormal = convertSecondaryToPrimaryTangentSpace(input, secondaryTangentSpaceNormal);
+	return primaryTangentSpaceNormal;
+}

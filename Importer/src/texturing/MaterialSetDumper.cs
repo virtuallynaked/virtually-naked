@@ -15,7 +15,12 @@ class MaterialSetDumper {
 		
 		var aggregator = new DsonMaterialAggregator(fileLocator, objectLocator);
 		IEnumerable<string> dufPaths = Enumerable.Concat(baseConfiguration.materialsDufPaths, configuration.materialsDufPaths);
+		IEnumerable<string> postDufPaths = Enumerable.Concat(baseConfiguration.postMaterialsDufPaths, configuration.postMaterialsDufPaths);
 		foreach (string path in dufPaths) {
+			DsonTypes.DsonDocument doc = objectLocator.LocateRoot(path);
+			aggregator.IncludeDuf(doc.Root);
+		}
+		foreach (string path in postDufPaths) {
 			DsonTypes.DsonDocument doc = objectLocator.LocateRoot(path);
 			aggregator.IncludeDuf(doc.Root);
 		}
@@ -52,6 +57,10 @@ class MaterialSetDumper {
 					.Select(variantConf => {
 						var variantAggregator = aggregator.Branch();
 						foreach (string path in variantConf.materialsDufPaths) {
+							DsonTypes.DsonDocument doc = objectLocator.LocateRoot(path);
+							variantAggregator.IncludeDuf(doc.Root);
+						}
+						foreach (string path in postDufPaths) {
 							DsonTypes.DsonDocument doc = objectLocator.LocateRoot(path);
 							variantAggregator.IncludeDuf(doc.Root);
 						}

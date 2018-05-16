@@ -3,6 +3,15 @@
 		"name": "Lilith",
 		"morphs": {
 			"CTRLLilith7": 1.0
+		},
+		"normals": {
+			"uv-set": "Lilith 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Lilith7/Lilith7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Lilith7/Lilith7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Lilith7/Lilith7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Lilith7/Lilith7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

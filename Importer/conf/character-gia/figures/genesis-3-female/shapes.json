@@ -3,6 +3,15 @@
 		"name": "Gia",
 		"morphs": {
 			"CTRLGia7": 1.0
+		},
+		"normals": {
+			"uv-set": "Gia 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Gia7/Gia7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Gia7/Gia7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Gia7/Gia7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Gia7/Gia7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

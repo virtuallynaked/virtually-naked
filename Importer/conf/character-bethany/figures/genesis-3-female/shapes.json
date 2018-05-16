@@ -3,6 +3,15 @@
 		"name": "Bethany",
 		"morphs": {
 			"CTRLBethany7": 1.0
+		},
+		"normals": {
+			"uv-set": "Bethany 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Bethany7/Bethany7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Bethany7/Bethany7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Bethany7/Bethany7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Bethany7/Bethany7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

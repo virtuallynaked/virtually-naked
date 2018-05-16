@@ -41,6 +41,9 @@ public class MaterialSetImportConfiguration {
 	[JsonProperty("paths")]
 	public string[] materialsDufPaths;
 
+	[JsonProperty("post-paths")]
+	public string[] postMaterialsDufPaths = { };
+
 	[JsonProperty("use-custom-occlusion")]
 	public bool useCustomOcclusion;
 
@@ -61,9 +64,24 @@ public class ShapeImportConfiguration {
 		}
 	}
 
+	[Serializable]
+	public class Normals {
+		[JsonProperty("surface-groups")]
+		public List<List<String>> surfaceGroups;
+
+		[JsonProperty("uv-set")]
+		public string uvSet;
+
+		[JsonProperty("textures")]
+		public List<String> textures;
+	}
+
 	public string name;
 	public Dictionary<string, double> morphs = new Dictionary<string, double>();
 
 	[JsonProperty("parent-overrides")]
 	public Dictionary<string, double> parentOverrides = new Dictionary<string, double>();
+
+	[JsonProperty("normals")]
+	public Normals normals;
 }

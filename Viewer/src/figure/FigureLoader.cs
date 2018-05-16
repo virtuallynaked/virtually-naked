@@ -4,12 +4,14 @@ public class FigureLoader {
 	private readonly IArchiveDirectory dataDir;
 	private readonly Device device;
 	private readonly ShaderCache shaderCache;
+	private readonly ShapeNormalsLoader shapeNormalsLoader;
 	private readonly FigureRendererLoader figureRendererLoader;
 
-	public FigureLoader(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, FigureRendererLoader figureRendererLoader) {
+	public FigureLoader(IArchiveDirectory dataDir, Device device, ShaderCache shaderCache, ShapeNormalsLoader shapeNormalsLoader, FigureRendererLoader figureRendererLoader) {
 		this.dataDir = dataDir;
 		this.device = device;
 		this.shaderCache = shaderCache;
+		this.shapeNormalsLoader = shapeNormalsLoader;
 		this.figureRendererLoader = figureRendererLoader;
 	}
 
@@ -38,7 +40,7 @@ public class FigureLoader {
 		
 		var controlVertexProvider = ControlVertexProvider.Load(device, shaderCache, definition);
 				
-		var facade = new FigureFacade(device, shaderCache, definition, model, controlVertexProvider, figureRendererLoader);
+		var facade = new FigureFacade(device, shaderCache, definition, model, controlVertexProvider, shapeNormalsLoader, figureRendererLoader);
 		return facade;
 	}
 }

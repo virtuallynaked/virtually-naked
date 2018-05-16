@@ -55,7 +55,9 @@ public class TextureImporter {
 		};
 
 		if (texture.value != 1) {
-			Console.WriteLine("warning: normal map with non-unity multiplier");
+			if (texture.value != 0) {
+				Console.WriteLine("warning: normal map with non-unity multiplier");
+			}
 			texture.value = 1;
 		}
 		return texture;

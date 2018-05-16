@@ -3,6 +3,15 @@
 		"name": "Victoria",
 		"morphs": {
 			"CTRLVictoria7": 1.0
+		},
+		"normals": {
+			"uv-set": "Victoria 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Victoria7/Victoria7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Victoria7/Victoria7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Victoria7/Victoria7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Victoria7/Victoria7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

@@ -5,6 +5,9 @@
 			"/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 All Maps.duf",
 			"/patches/monique-legs-scattering.duf"
 		],
+		"post-paths": [
+			"/People/Genesis 3 Female/Materials/Monique 7/Iray/Monique 7 Normal Maps Off.duf"
+		],
 		"variant-categories": [{
 		    "name": "Eye Color",
 			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],

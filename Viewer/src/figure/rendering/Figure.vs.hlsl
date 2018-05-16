@@ -13,10 +13,13 @@ VertexOutput main(RefinedVertex vIn) {
 	vOut.positions = calculatePositions(worldPosition);
 
 	vOut.normal = mul(vIn.normal, worldMatrixInverseTranspose);
-	vOut.tangent = mul(vIn.tangent, worldMatrixInverseTranspose);
-
-	vOut.texcoord = float2(vIn.texCoord.x % 1, 1 - vIn.texCoord.y);
 	
+	vOut.tangent = mul(vIn.tangent, worldMatrixInverseTranspose);
+	vOut.texcoord = float2(vIn.texCoord.x % 1, 1 - vIn.texCoord.y);
+
+	vOut.secondaryTangent = mul(vIn.secondaryTangent, worldMatrixInverseTranspose);
+	vOut.secondaryTexcoord = float2(vIn.secondaryTexCoord.x % 1, 1 - vIn.secondaryTexCoord.y);
+
 	vOut.occlusion = vIn.occlusion;
 	vOut.scatteredIllumination = vIn.scatteredIllumination;
 

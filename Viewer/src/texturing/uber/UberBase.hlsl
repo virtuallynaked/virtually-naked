@@ -38,11 +38,7 @@ float3 calculateDiffuseAndTranslucency(PixelInput input, float3 baseNormal) {
 	}
 }
 
-float3 calculateBaseResult(PixelInput input) {
-	float3 baseNormal = combineNormals(
-		SAMPLE_NORMAL_TEX(NormalMap),
-		SAMPLE_BUMP_TEX(BumpStrength));
-
+float3 calculateBaseResult(PixelInput input, float3 baseNormal) {
 	float3 diffuse_bsdf_result = calculateDiffuseAndTranslucency(input, baseNormal);
 
 	float3 glossyColor = SAMPLE_COLOR_TEX(GlossyColor);

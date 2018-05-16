@@ -3,6 +3,15 @@
 		"name": "Karen",
 		"morphs": {
 			"CTRLKaren7": 1.0
+		},
+		"normals": {
+			"uv-set": "Karen 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Karen7/Karen7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Karen7/Karen7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Karen7/Karen7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Karen7/Karen7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

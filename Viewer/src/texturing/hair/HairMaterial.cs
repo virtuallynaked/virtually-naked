@@ -67,7 +67,7 @@ class HairMaterial : IMaterial {
 		}
 	}
 	
-	public void Apply(DeviceContext context, OutputMode outputMode) {
+	public void Apply(DeviceContext context, OutputMode outputMode, ShaderResourceView secondaryNormalMap) {
 		context.PixelShader.Set(PickShader(outputMode));
 		context.PixelShader.SetShaderResources(ShaderSlots.MaterialTextureStart, textureViews);
 		context.PixelShader.SetConstantBuffer(ShaderSlots.MaterialConstantBufferStart, constantBuffer);

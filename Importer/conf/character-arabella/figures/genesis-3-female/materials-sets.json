@@ -5,6 +5,9 @@
 			"/People/Genesis 3 Female/Materials/Arabella 7/Iray/Arabella 7 All Maps.duf",
 			"/patches/arabella-fingernails.duf"
 		],
+		"post-paths": [
+			"/People/Genesis 3 Female/Materials/Arabella 7/Iray/Arabella 7 Normal Maps Off.duf"
+		],
 		"variant-categories": [{
 		    "name": "Eye Color",
 			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],

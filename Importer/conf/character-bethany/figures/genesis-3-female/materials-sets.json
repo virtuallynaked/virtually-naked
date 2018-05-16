@@ -5,6 +5,9 @@
 			"/People/Genesis 3 Female/Materials/Bethany 7/Iray/Bethany 7 All MAT.duf",
 			"/patches/bethany-genitalia.duf"
 		],
+		"post-paths": [
+			"/People/Genesis 3 Female/Materials/Bethany 7/Iray/Bethany 7 Normal Maps Off.duf"
+		],
 		"variant-categories": [{
 		    "name": "Eye Color",
 			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],

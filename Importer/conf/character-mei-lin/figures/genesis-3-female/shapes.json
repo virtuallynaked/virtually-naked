@@ -3,6 +3,15 @@
 		"name": "Mei Lin",
 		"morphs": {
 			"CTRLMeiLin7": 1.0
+		},
+		"normals": {
+			"uv-set": "Mei Lin 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/MeiLin7/MeiLin7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/MeiLin7/MeiLin7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/MeiLin7/MeiLin7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/MeiLin7/MeiLin7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

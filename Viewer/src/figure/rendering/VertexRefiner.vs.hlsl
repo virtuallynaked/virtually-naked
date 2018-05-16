@@ -29,9 +29,10 @@ struct TexturedVertexInfo {
 StructuredBuffer<ArraySegment> stencilSegments : register(t0);
 StructuredBuffer<WeightedIndexWithDerivative> stencilElems : register(t1);
 StructuredBuffer<uint> texturedToSpatialIdxMap : register(t2);
-StructuredBuffer<TexturedVertexInfo> texturedVertexInfos : register(t3);
-StructuredBuffer<ControlVertexInfo> controlVertexInfos : register(t4);
-StructuredBuffer<float3> controlScatteredIlluminations : register(t5);
+StructuredBuffer<TexturedVertexInfo> primaryTexturedVertexInfos : register(t3);
+StructuredBuffer<TexturedVertexInfo> secondaryTexturedVertexInfos : register(t4);
+StructuredBuffer<ControlVertexInfo> controlVertexInfos : register(t5);
+StructuredBuffer<float3> controlScatteredIlluminations : register(t6);
 
 SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 	SpatialVertexInfo refinedVertexInfo;
@@ -66,12 +67,17 @@ float3 normalizeNonZero(float3 v) {
 	return lengthSquared == 0 ? v : v * rsqrt(lengthSquared);
 }
 
-RefinedVertex combineTextureAndSpatialInfo(TexturedVertexInfo info, SpatialVertexInfo spatialInfo) {
+RefinedVertex combineTextureAndSpatialInfo(TexturedVertexInfo info, TexturedVertexInfo secondaryInfo, SpatialVertexInfo spatialInfo) {
 	float3 positionDs = spatialInfo.positionDu;
 	float3 positionDt = spatialInfo.positionDv;
 
 	float3 normal = normalize(cross(positionDs, positionDt));
+
+	float2 texCoord = info.texCoord;
 	float3 tangent = normalizeNonZero(info.tangentUCoeffs.x * positionDs + info.tangentUCoeffs.y * positionDt);
+
+	float2 secondaryTexCoord = secondaryInfo.texCoord;
+	float3 secondaryTangent = normalizeNonZero(secondaryInfo.tangentUCoeffs.x * positionDs + secondaryInfo.tangentUCoeffs.y * positionDt);
 
 	RefinedVertex refinedVertex;
 	refinedVertex.position = spatialInfo.position;
@@ -79,6 +85,8 @@ RefinedVertex combineTextureAndSpatialInfo(TexturedVertexInfo info, SpatialVerte
 	refinedVertex.occlusion = spatialInfo.occlusion;
 	refinedVertex.tangent = tangent;
 	refinedVertex.texCoord = info.texCoord;
+	refinedVertex.secondaryTangent = secondaryTangent;
+	refinedVertex.secondaryTexCoord = secondaryTexCoord;
 	refinedVertex.scatteredIllumination = spatialInfo.scatteredIllumination;
 	return refinedVertex;
 }
@@ -87,6 +95,7 @@ RefinedVertex main(uint vertexIdx : SV_VertexId) {
 	int spatialVertexIdx = texturedToSpatialIdxMap[vertexIdx];
 	SpatialVertexInfo spatialInfo = refineSpatialInfo(spatialVertexIdx);
 
-	TexturedVertexInfo texturedInfo = texturedVertexInfos[vertexIdx];
-	return combineTextureAndSpatialInfo(texturedInfo, spatialInfo);
+	TexturedVertexInfo primaryTexturedInfo = primaryTexturedVertexInfos[vertexIdx];
+	TexturedVertexInfo secondaryTexturedInfo = secondaryTexturedVertexInfos[vertexIdx];
+	return combineTextureAndSpatialInfo(primaryTexturedInfo, secondaryTexturedInfo, spatialInfo);
 }

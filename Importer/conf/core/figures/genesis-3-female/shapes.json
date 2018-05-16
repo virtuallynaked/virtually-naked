@@ -6,6 +6,14 @@
 			"PBMNipples": 1.0,
 			"CTRLgenesis-3-female-genitalia": 1.0,
 			"PHMEyesCorneaBulge": 1.0
+		},
+		"normals": {
+			"surface-groups": [
+				["Ears", "EyeSocket", "Face", "Lips"],
+				["Torso"],
+				["Legs", "Toenails"],
+				["Arms", "Fingernails"]
+			]
 		}
 	}
 ]

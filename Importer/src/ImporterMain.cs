@@ -102,7 +102,7 @@ public class ImporterMain : IDisposable {
 						continue;
 					}
 
-					figureDumper.DumpShape(figureDestDir, shapeConf);
+					figureDumper.DumpShape(textureProcessor, figureDestDir, shapeConf);
 
 				}
 			}

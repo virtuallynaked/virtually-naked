@@ -3,6 +3,15 @@
 		"name": "Olympia",
 		"morphs": {
 			"CTRLOlympia7": 1.0
+		},
+		"normals": {
+			"uv-set": "Olympia 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Olympia7/Olympia7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Olympia7/Olympia7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Olympia7/Olympia7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Olympia7/Olympia7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]

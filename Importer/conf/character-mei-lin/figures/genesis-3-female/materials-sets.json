@@ -2,6 +2,9 @@
 	{
 		"name": "Mei Lin",
 		"paths": [ "/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 All Maps.duf" ],
+		"post-paths": [
+			"/People/Genesis 3 Female/Materials/Mei Lin 7/Iray/Mei Lin 7 Normal Maps Off.duf"
+		],
 		"variant-categories": [{
 		    "name": "Eye Color",
 			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],

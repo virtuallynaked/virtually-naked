@@ -23,8 +23,9 @@ class Scene : IDisposable {
 		renderModelRenderer = new RenderModelRenderer(device, shaderCache, trackedDeviceBufferManager);
 		primitiveRenderer = new MeshRenderer(device, shaderCache, Matrix.Translation(0, 1.25f, 0), GeometricPrimitiveFactory.MakeSphere(0.5f, 100).AsTriMesh());
 
+		var shapeNormalsLoader = new ShapeNormalsLoader(dataDir, device, textureCache);
 		var figureRendererLoader = new FigureRendererLoader(dataDir, device, shaderCache, textureCache);
-		var figureLoader = new FigureLoader(dataDir, device, shaderCache, figureRendererLoader);
+		var figureLoader = new FigureLoader(dataDir, device, shaderCache, shapeNormalsLoader, figureRendererLoader);
 		actor = Actor.Load(dataDir, device, shaderCache, controllerManager, figureLoader);
 		
 		var iblMenu = LightingEnvironmentMenu.MakeMenuLevel(dataDir, iblEnvironment);

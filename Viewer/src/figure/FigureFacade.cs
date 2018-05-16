@@ -10,25 +10,30 @@ public class FigureFacade : IDisposable {
 	private readonly FigureDefinition definition;
 	private readonly FigureModel model;
 	private readonly ControlVertexProvider controlVertexProvider;
+	private readonly ShapeNormalsLoader shapeNormalsLoader;
 	private readonly FigureRendererLoader figureRendererLoader;
 
 	private MaterialSetAndVariantOption currentMaterialSetAndVariant;
+	private Shape currentShape;
+	private ShapeNormals shapeNormals;
 	private FigureRenderer renderer;
 
 	private List<FigureFacade> children = new List<FigureFacade>();
 
 	public IFigureAnimator Animator { get; set; } = null;
 
-	public FigureFacade(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, FigureRendererLoader figureRendererLoader) {
+	public FigureFacade(Device device, ShaderCache shaderCache, FigureDefinition definition, FigureModel model, ControlVertexProvider controlVertexProvider, ShapeNormalsLoader shapeNormalsLoader, FigureRendererLoader figureRendererLoader) {
 		this.definition = definition;
 		this.model = model;
 		this.controlVertexProvider = controlVertexProvider;
+		this.shapeNormalsLoader = shapeNormalsLoader;
 		this.figureRendererLoader = figureRendererLoader;
 	}
 	
 	public void Dispose() {
 		controlVertexProvider.Dispose();
-		renderer.Dispose();
+		shapeNormals?.Dispose();
+		renderer?.Dispose();
 	}
 
 	public FigureDefinition Definition => definition;
@@ -47,6 +52,14 @@ public class FigureFacade : IDisposable {
 
 	public void SyncWithModel() {
 		SyncMaterialSet();
+
+		if (model.Shape != currentShape) {
+			var newShapeNormals = shapeNormalsLoader.Load(definition.Directory, model.Shape);
+			shapeNormals?.Dispose();
+
+			shapeNormals = newShapeNormals;
+			currentShape = model.Shape;
+		}
 
 		var childControlVertexProviders = children
 			.Select(child => child.controlVertexProvider)
@@ -107,7 +120,7 @@ public class FigureFacade : IDisposable {
 			return;
 		}
 
-		renderer.Update(context, lightingEnvironment, controlVertexProvider.ControlVertexInfosView);
+		renderer.Update(context, lightingEnvironment, controlVertexProvider.ControlVertexInfosView, shapeNormals);
 	}
 
 	public class Recipe {

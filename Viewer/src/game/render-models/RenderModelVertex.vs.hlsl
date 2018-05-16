@@ -29,9 +29,12 @@ VertexOutput main(VertexIn vIn) {
 
 	vOut.positions = calculatePositions(worldSpacePosition.xyz);
 	vOut.normal = worldSpaceNormal;
-	vOut.tangent = 0;
 	
+	vOut.tangent = 0;
 	vOut.texcoord = vIn.texcoord;
+
+	vOut.secondaryTangent = 0;
+	vOut.secondaryTexcoord = 0;
 
 	vOut.occlusion = 0;
 	vOut.scatteredIllumination = 0;

@@ -126,6 +126,7 @@ public class UberMaterial : IMaterial {
 	private readonly UberMaterialSettings settings;
 	private readonly Buffer constantBuffer;
 	private readonly ShaderResourceView[] textureViews;
+	private readonly ShaderResourceView defaultBumpTexture;
 	
 	private static void SetColorTexture(TextureLoader textureLoader, ColorTexture colorTexture, out Vector3 value, out ShaderResourceView textureView) {
 		value = colorTexture.value;
@@ -211,15 +212,18 @@ public class UberMaterial : IMaterial {
 		
 		var constantBuffer = Buffer.Create(device, BindFlags.ConstantBuffer, ref constants, usage: ResourceUsage.Immutable);
 		
-		return new UberMaterial(device, shaderCache, settings, constantBuffer, textures.ToArray());
+		var defaultBumpTexture = textureLoader.Load(null, TextureLoader.DefaultMode.Bump);
+
+		return new UberMaterial(device, shaderCache, settings, constantBuffer, textures.ToArray(), defaultBumpTexture);
 	}
 	
-	public UberMaterial(Device device, ShaderCache shaderCache, UberMaterialSettings settings, Buffer constantBuffer, ShaderResourceView[] textureViews) {
+	public UberMaterial(Device device, ShaderCache shaderCache, UberMaterialSettings settings, Buffer constantBuffer, ShaderResourceView[] textureViews, ShaderResourceView defaultBumpTexture) {
 		this.standardShader = shaderCache.GetPixelShader<UberMaterial>(StandardShaderName);
 		this.unorderedTransparencyShader = shaderCache.GetPixelShader<UberMaterial>(UnorderedTransparencyShaderName);
 		this.settings = settings;
 		this.constantBuffer = constantBuffer;
 		this.textureViews = textureViews;
+		this.defaultBumpTexture = defaultBumpTexture;
 	}
 
 	public void Dispose() {
@@ -242,9 +246,10 @@ public class UberMaterial : IMaterial {
 		}
 	} 
 	
-	public void Apply(DeviceContext context, OutputMode outputMode) {
+	public void Apply(DeviceContext context, OutputMode outputMode, ShaderResourceView secondaryNormalMap) {
 		context.PixelShader.Set(PickShader(outputMode));
 		context.PixelShader.SetShaderResources(ShaderSlots.MaterialTextureStart, textureViews);
+		context.PixelShader.SetShaderResource(ShaderSlots.MaterialTextureStart + textureViews.Length, secondaryNormalMap ?? defaultBumpTexture);
 		context.PixelShader.SetConstantBuffer(ShaderSlots.MaterialConstantBufferStart, constantBuffer);
 	}
 

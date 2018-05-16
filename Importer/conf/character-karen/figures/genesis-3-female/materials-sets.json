@@ -4,6 +4,9 @@
 		"paths": [
 			"/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 All Maps.duf"
 		],
+		"post-paths": [
+			"/People/Genesis 3 Female/Materials/Karen 7/Iray/Karen 7 Normal Maps Off.duf"
+		],
 		"variant-categories": [{
 		    "name": "Eye Color",
 			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],

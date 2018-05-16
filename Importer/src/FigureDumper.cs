@@ -98,8 +98,8 @@ public class FigureDumper {
 		}
 	}
 
-	public void DumpShape(DirectoryInfo figureDestDir, ShapeImportConfiguration conf) {
-		shapeDumper.DumpShape(figureDestDir, conf);
+	public void DumpShape(TextureProcessor textureProcessor, DirectoryInfo figureDestDir, ShapeImportConfiguration conf) {
+		shapeDumper.DumpShape(textureProcessor, figureDestDir, conf);
 	}
 
 	public void DumpBaseShape(DirectoryInfo figureDestDir) {

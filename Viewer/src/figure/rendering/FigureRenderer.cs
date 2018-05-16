@@ -17,6 +17,8 @@ public class FigureRenderer : IDisposable {
 	private readonly VertexShader falseDepthVertexShader;
 	private readonly InputLayout inputLayout;
 
+	private ShapeNormals shapeNormals = null;
+
 	public FigureRenderer(
 		Device device, ShaderCache shaderCache, Scatterer scatterer, VertexRefiner vertexRefiner, MaterialSet materialSet, FigureSurface[] surfaces,
 		bool isOneSided, int[] surfaceOrder, bool[] areUnorderedTranparent) {
@@ -45,9 +47,10 @@ public class FigureRenderer : IDisposable {
 		inputLayout.Dispose();
 	}
 		
-	public void Update(DeviceContext context, ImageBasedLightingEnvironment lightingEnvironment, ShaderResourceView controlVertexInfosView) {
+	public void Update(DeviceContext context, ImageBasedLightingEnvironment lightingEnvironment, ShaderResourceView controlVertexInfosView, ShapeNormals shapeNormals) {
+		this.shapeNormals = shapeNormals;
 		scatterer?.Scatter(context, lightingEnvironment, controlVertexInfosView);
-		vertexRefiner.RefineVertices(context, controlVertexInfosView, scatterer?.ScatteredIlluminationView);
+		vertexRefiner.RefineVertices(context, controlVertexInfosView, shapeNormals?.TexturedVertexInfosView, scatterer?.ScatteredIlluminationView);
 	}
 	
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
@@ -68,14 +71,16 @@ public class FigureRenderer : IDisposable {
 				RenderingLayer.UnorderedTransparent :
 				(isOneSided ? RenderingLayer.OneSidedBackToFrontTransparent : RenderingLayer.TwoSidedBackToFrontTransparent);
 
+			ShaderResourceView secondaryNormalMap = shapeNormals?.NormalsMapsBySurface[surfaceIdx];
+
 			if (pass.Layer == opaqueLayer) {
-				material.Apply(context, pass.OutputMode);
+				material.Apply(context, pass.OutputMode, secondaryNormalMap);
 				surface.DrawOpaque(context);
 				material.Unapply(context);
 			}
 
 			if (pass.Layer == transparentLayer) {
-				material.Apply(context, pass.OutputMode);
+				material.Apply(context, pass.OutputMode, secondaryNormalMap);
 				surface.DrawTransparent(context);
 				material.Unapply(context);
 			}

@@ -5,6 +5,9 @@
 			"/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 All MAT.duf",
 			"/patches/victoria-legs-scattering.duf"
 		],
+		"post-paths": [
+			"/People/Genesis 3 Female/Materials/Victoria 7/Iray/Victoria 7 Normal Maps Off.duf"
+		],
 		"variant-categories": [{
 		    "name": "Eye Color",
 			"surfaces": [ "Cornea", "Pupils", "Sclera", "Irises" ],

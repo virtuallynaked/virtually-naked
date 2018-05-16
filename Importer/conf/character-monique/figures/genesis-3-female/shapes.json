@@ -3,6 +3,15 @@
 		"name": "Monique",
 		"morphs": {
 			"CTRLMonique7": 1.0
+		},
+		"normals": {
+			"uv-set": "Monique 7",
+			"textures": [
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Monique7/Monique7_Face_NM_1001.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Monique7/Monique7_Torso_NM_1002.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Monique7/Monique7_Legs_NM_1003.tif",
+				"/Runtime/Textures/DAZ/Characters/Genesis3/Monique7/Monique7_Arms_NM_1004.tif"
+			]
 		}
 	}
 ]
