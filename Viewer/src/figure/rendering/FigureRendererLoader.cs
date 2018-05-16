@@ -33,12 +33,15 @@ public class FigureRendererLoader {
 		Scatterer scatterer = surfaceProperties.PrecomputeScattering ? Scatterer.Load(device, shaderCache, figureDir, materialSetOption.MaterialSet.Label) : null;
 
 		var uvSetName = materials[0].UvSet;
-		IArchiveDirectory uvSetDirectory = figureDir.Subdirectory("uv-sets").Subdirectory(uvSetName);
+		IArchiveDirectory uvSetsDirectory = figureDir.Subdirectory("uv-sets");
+		Quad[] texturedFaces = uvSetsDirectory.File("textured-faces.array").ReadArray<Quad>();
+		int[] texturedToSpatialIdxMap = uvSetsDirectory.File("textured-to-spatial-idx-map.array").ReadArray<int>();
+
+		IArchiveDirectory uvSetDirectory = uvSetsDirectory.Subdirectory(uvSetName);
 
 		var texturedVertexInfos = uvSetDirectory.File("textured-vertex-infos.array").ReadArray<TexturedVertexInfo>();
-		Quad[] texturedFaces = uvSetDirectory.File("textured-faces.array").ReadArray<Quad>();
 		
-		var vertexRefiner = new VertexRefiner(device, shaderCache, mesh, texturedVertexInfos);
+		var vertexRefiner = new VertexRefiner(device, shaderCache, mesh, texturedToSpatialIdxMap, texturedVertexInfos);
 		
 		FigureSurface[] surfaces = FigureSurface.MakeSurfaces(device, materials.Length, texturedFaces, controlFaceMap, surfaceMap, materialSet.FaceTransparencies);
 		

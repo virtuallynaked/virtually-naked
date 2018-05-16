@@ -22,16 +22,16 @@ struct SpatialVertexInfo {
 };
 
 struct TexturedVertexInfo {
-	uint spatialInfoIdx;
 	float2 texCoord;
 	float2 tangentUCoeffs;
 };
 
 StructuredBuffer<ArraySegment> stencilSegments : register(t0);
 StructuredBuffer<WeightedIndexWithDerivative> stencilElems : register(t1);
-StructuredBuffer<TexturedVertexInfo> texturedVertexInfos : register(t2);
-StructuredBuffer<ControlVertexInfo> controlVertexInfos : register(t3);
-StructuredBuffer<float3> controlScatteredIlluminations : register(t4);
+StructuredBuffer<uint> texturedToSpatialIdxMap : register(t2);
+StructuredBuffer<TexturedVertexInfo> texturedVertexInfos : register(t3);
+StructuredBuffer<ControlVertexInfo> controlVertexInfos : register(t4);
+StructuredBuffer<float3> controlScatteredIlluminations : register(t5);
 
 SpatialVertexInfo refineSpatialInfo(uint spatialIdx) {
 	SpatialVertexInfo refinedVertexInfo;
@@ -84,7 +84,9 @@ RefinedVertex combineTextureAndSpatialInfo(TexturedVertexInfo info, SpatialVerte
 }
 
 RefinedVertex main(uint vertexIdx : SV_VertexId) {
-	TexturedVertexInfo info = texturedVertexInfos[vertexIdx];
-	SpatialVertexInfo spatialInfo = refineSpatialInfo(info.spatialInfoIdx);
-	return combineTextureAndSpatialInfo(info, spatialInfo);
+	int spatialVertexIdx = texturedToSpatialIdxMap[vertexIdx];
+	SpatialVertexInfo spatialInfo = refineSpatialInfo(spatialVertexIdx);
+
+	TexturedVertexInfo texturedInfo = texturedVertexInfos[vertexIdx];
+	return combineTextureAndSpatialInfo(texturedInfo, spatialInfo);
 }

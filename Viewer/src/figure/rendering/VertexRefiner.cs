@@ -42,7 +42,7 @@ public class VertexRefiner : IDisposable {
 
 	private readonly Buffer refinedVertexBuffer; // stream-out | vertex
 	
-	public VertexRefiner(Device device, ShaderCache shaderCache, SubdivisionMesh mesh, TexturedVertexInfo[] texturedVertexInfos) {
+	public VertexRefiner(Device device, ShaderCache shaderCache, SubdivisionMesh mesh, int[] texturedToSpatialIdxMap, TexturedVertexInfo[] texturedVertexInfos) {
 		this.refinedVertexCount = texturedVertexInfos.Length;
 
 		var vertexRefinerShaderAndBytecode = shaderCache.GetVertexShader<FigureRenderer>("figure/rendering/VertexRefiner");
@@ -52,6 +52,7 @@ public class VertexRefiner : IDisposable {
 		this.shaderResources = new ShaderResourceView[] {
 			BufferUtilities.ToStructuredBufferView(device, mesh.Stencils.Segments),
 			BufferUtilities.ToStructuredBufferView(device, mesh.Stencils.Elems),
+			BufferUtilities.ToStructuredBufferView(device, texturedToSpatialIdxMap),
 			BufferUtilities.ToStructuredBufferView(device, texturedVertexInfos)
 		};
 

@@ -10,6 +10,7 @@ public class UVSetDumper {
 	public static void DumpFigure(Figure figure, SurfaceProperties surfaceProperties, DirectoryInfo figureDestDir) {
 		DirectoryInfo uvSetsDirectory = figureDestDir.Subdirectory("uv-sets");
 		UVSetDumper dumper = new UVSetDumper(figure, surfaceProperties, uvSetsDirectory);
+		dumper.DumpShared();
 		foreach (var pair in figure.UvSets) {
 			dumper.Dump(pair.Key, pair.Value);
 		}
@@ -27,33 +28,76 @@ public class UVSetDumper {
 		this.surfaceProperties = surfaceProperties;
 		this.uvSetsDirectory = uvSetsDirectory;
 	}
+	
+	public void DumpShared() {
+		var texturedFacesFile = uvSetsDirectory.File("textured-faces.array");
+		var textureToSpatialIdxMapFile = uvSetsDirectory.File("textured-to-spatial-idx-map.array");
+		if (texturedFacesFile.Exists && textureToSpatialIdxMapFile.Exists) {
+			return;
+		}
 		
-	public static int[] CalculateTextureToSpatialIndexMap(QuadTopology texturedTopology, Quad[] spatialFaces) {
-		int faceCount = texturedTopology.Faces.Length;
-		if (spatialFaces.Length != faceCount) {
-			throw new InvalidOperationException("textured and spatial face count mismatch");
+		int subdivisionLevel = surfaceProperties.SubdivisionLevel;
+
+		var geometry = figure.Geometry;
+		var spatialControlTopology = new QuadTopology(geometry.VertexCount, geometry.Faces);
+		QuadTopology spatialTopology;
+		using (var refinement = new Refinement(spatialControlTopology, subdivisionLevel)) {
+			spatialTopology = refinement.GetTopology();
 		}
 
-		int[] spatialIdxMap = new int[texturedTopology.VertexCount];
+		var uvSet = figure.DefaultUvSet;
+		var texturedControlTopology = new QuadTopology(uvSet.Uvs.Length, uvSet.Faces);
+		QuadTopology texturedTopology;
+		using (var refinement = new Refinement(texturedControlTopology, surfaceProperties.SubdivisionLevel, BoundaryInterpolation.EdgeAndCorner)) {
+			texturedTopology = refinement.GetTopology();
+		}
+
+		int[] texturedToSpatialIndexMap = CalculateVertexIndexMap(texturedTopology, spatialTopology.Faces);
+
+		uvSetsDirectory.CreateWithParents();
+		texturedFacesFile.WriteArray(texturedTopology.Faces);
+		textureToSpatialIdxMapFile.WriteArray(texturedToSpatialIndexMap);
+	}
+		
+	public static int[] CalculateVertexIndexMap(QuadTopology sourceTopology, Quad[] destFaces) {
+		int faceCount = sourceTopology.Faces.Length;
+		if (destFaces.Length != faceCount) {
+			throw new InvalidOperationException("face count mismatch");
+		}
+
+		int[] indexMap = new int[sourceTopology.VertexCount];
 		for (int faceIdx = 0; faceIdx < faceCount; ++faceIdx) {
-			Quad texturedFace = texturedTopology.Faces[faceIdx];
-			Quad spatialFace = spatialFaces[faceIdx];
+			Quad sourceFace = sourceTopology.Faces[faceIdx];
+			Quad destFace = destFaces[faceIdx];
 			
 			for (int i = 0; i < Quad.SideCount; ++i) {
-				int texturedIdx = texturedFace.GetCorner(i);
-				int spatialIdx = spatialFace.GetCorner(i);
+				int sourceIdx = sourceFace.GetCorner(i);
+				int destIdx = destFace.GetCorner(i);
 
-				int previousMapping = spatialIdxMap[texturedIdx];
-				if (previousMapping != default(int) && previousMapping != spatialIdx) {
+				int previousMapping = indexMap[sourceIdx];
+				if (previousMapping != default(int) && previousMapping != destIdx) {
 					throw new InvalidOperationException("mapping conflict");
 				}
 
-				spatialIdxMap[texturedIdx] = spatialIdx;
+				indexMap[sourceIdx] = destIdx;
 			}
 		}
 
-		return spatialIdxMap;
+		return indexMap;
 	}
+
+	private UvSet RemapToDefault(UvSet uvSet) {
+		var defaultUvSet = figure.DefaultUvSet;
+		var defaultUvSetTopology = new QuadTopology(defaultUvSet.Uvs.Length, defaultUvSet.Faces);
+		var indexMap = CalculateVertexIndexMap(defaultUvSetTopology, uvSet.Faces);
+
+		Vector2[] remappedUvs = indexMap
+			.Select(idx => uvSet.Uvs[idx])
+			.ToArray();
+
+		return new UvSet(uvSet.Name, remappedUvs, defaultUvSet.Faces);
+	}
+
 		
 	public void Dump(string name, UvSet uvSet) {
 		DirectoryInfo uvSetDirectory = uvSetsDirectory.Subdirectory(name);
@@ -76,10 +120,12 @@ public class UVSetDumper {
 			spatialLimitPositions = refinement.LimitFully(spatialControlPositions);
 		}
 		
+		uvSet = RemapToDefault(uvSet);
+
 		var texturedControlTopology = new QuadTopology(uvSet.Uvs.Length, uvSet.Faces);
 		Vector2[] controlTextureCoords = uvSet.Uvs;
 
-		int[] controlSpatialIdxMap = CalculateTextureToSpatialIndexMap(texturedControlTopology, spatialControlTopology.Faces);
+		int[] controlSpatialIdxMap = CalculateVertexIndexMap(texturedControlTopology, spatialControlTopology.Faces);
 		Vector3[] texturedControlPositions = controlSpatialIdxMap
 			.Select(spatialIdx => spatialControlPositions[spatialIdx])
 			.ToArray();
@@ -105,7 +151,7 @@ public class UVSetDumper {
 			textureCoords = controlTextureCoords;
 		}
 				
-		int[] spatialIdxMap = CalculateTextureToSpatialIndexMap(texturedTopology, spatialTopology.Faces);
+		int[] spatialIdxMap = CalculateVertexIndexMap(texturedTopology, spatialTopology.Faces);
 
 		TexturedVertexInfo[] texturedVertexInfos = Enumerable.Range(0, textureCoords.Length)
 			.Select(idx => {
@@ -127,14 +173,12 @@ public class UVSetDumper {
 				DebugUtilities.AssertFinite(tangentUCoeffs.Y);
 
 				return new TexturedVertexInfo(
-					spatialVertexIdx,
 					textureCoord,
 					tangentUCoeffs);
 			})
 			.ToArray();
 
 		uvSetDirectory.CreateWithParents();
-		uvSetDirectory.File("textured-faces.array").WriteArray(texturedTopology.Faces);
 		uvSetDirectory.File("textured-vertex-infos.array").WriteArray(texturedVertexInfos);
 	}
 
