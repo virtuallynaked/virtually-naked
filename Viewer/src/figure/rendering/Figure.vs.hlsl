@@ -6,20 +6,50 @@ cbuffer bar : register(b1) {
 	float3x3 worldMatrixInverseTranspose;
 }
 
-VertexOutput main(RefinedVertex vIn) {
+struct TexturedVertexInfo {
+	float2 texCoord;
+	float2 tangentUCoeffs;
+};
+
+struct TexturedVertexInfoPair {
+	TexturedVertexInfo primary;
+	TexturedVertexInfo secondary;
+};
+
+StructuredBuffer<TexturedVertexInfoPair> texturedVertexInfos : register(t0);
+
+float2 convertTexcoord(float2 dazTexCoord) {
+	return float2(dazTexCoord.x % 1, 1 - dazTexCoord.y);
+}
+
+float3 normalizeNonZero(float3 v) {
+	float lengthSquared = dot(v, v);
+	return lengthSquared == 0 ? v : v * rsqrt(lengthSquared);
+}
+
+VertexOutput main(uint vertexIdx : SV_VertexId, RefinedVertex vIn) {
 	VertexOutput vOut;
 
 	float3 worldPosition = mul(float4(vIn.position, 1), worldMatrix).xyz;
 	vOut.positions = calculatePositions(worldPosition);
 
-	vOut.normal = mul(vIn.normal, worldMatrixInverseTranspose);
+	float3 objectNormal = normalize(cross(vIn.positionDs, vIn.positionDt));
+	vOut.normal = mul(objectNormal, worldMatrixInverseTranspose);
+
+	TexturedVertexInfoPair texturedVertexInfoPair = texturedVertexInfos[vertexIdx];
+
+	TexturedVertexInfo info = texturedVertexInfoPair.primary;
+	float2 texcoord = info.texCoord;
+	float3 tangent = normalizeNonZero(info.tangentUCoeffs.x * vIn.positionDs + info.tangentUCoeffs.y * vIn.positionDt);
+	vOut.tangent = mul(tangent, worldMatrixInverseTranspose);
+	vOut.texcoord = convertTexcoord(texcoord);
+
+	TexturedVertexInfo secondaryInfo = texturedVertexInfoPair.secondary;
+	float2 secondaryTexcoord = secondaryInfo.texCoord;
+	float3 secondaryTangent = normalizeNonZero(secondaryInfo.tangentUCoeffs.x * vIn.positionDs + secondaryInfo.tangentUCoeffs.y * vIn.positionDt);
+	vOut.secondaryTangent = mul(secondaryTangent, worldMatrixInverseTranspose);
+	vOut.secondaryTexcoord = convertTexcoord(secondaryTexcoord);
 	
-	vOut.tangent = mul(vIn.tangent, worldMatrixInverseTranspose);
-	vOut.texcoord = float2(vIn.texCoord.x % 1, 1 - vIn.texCoord.y);
-
-	vOut.secondaryTangent = mul(vIn.secondaryTangent, worldMatrixInverseTranspose);
-	vOut.secondaryTexcoord = float2(vIn.secondaryTexCoord.x % 1, 1 - vIn.secondaryTexCoord.y);
-
 	vOut.occlusion = vIn.occlusion;
 	vOut.scatteredIllumination = vIn.scatteredIllumination;
 

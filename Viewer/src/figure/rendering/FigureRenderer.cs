@@ -4,6 +4,7 @@ using Device = SharpDX.Direct3D11.Device;
 using System;
 
 public class FigureRenderer : IDisposable {
+	private readonly Device device;
 	private readonly Scatterer scatterer;
 	private readonly VertexRefiner vertexRefiner;
 	private readonly MaterialSet materialSet;
@@ -17,11 +18,15 @@ public class FigureRenderer : IDisposable {
 	private readonly VertexShader falseDepthVertexShader;
 	private readonly InputLayout inputLayout;
 
+	private readonly TexturedVertexInfo[] primaryTexturedVertexInfos;
+	private ShaderResourceView texturedVertexInfoPairsView;
+
 	private ShapeNormals shapeNormals = null;
 
 	public FigureRenderer(
 		Device device, ShaderCache shaderCache, Scatterer scatterer, VertexRefiner vertexRefiner, MaterialSet materialSet, FigureSurface[] surfaces,
-		bool isOneSided, int[] surfaceOrder, bool[] areUnorderedTranparent) {
+		bool isOneSided, int[] surfaceOrder, bool[] areUnorderedTranparent, TexturedVertexInfo[] texturedVertexInfos) {
+		this.device = device;
 		this.scatterer = scatterer;
 		this.vertexRefiner = vertexRefiner;
 		this.materialSet = materialSet;
@@ -35,6 +40,9 @@ public class FigureRenderer : IDisposable {
 		this.vertexShader = vertexShaderAndBytecode;
 		this.inputLayout = new InputLayout(device, vertexShaderAndBytecode.Bytecode, vertexRefiner.RefinedVertexBufferInputElements);
 		falseDepthVertexShader = shaderCache.GetVertexShader<FigureRenderer>("figure/rendering/Figure-FalseDepth");
+
+		primaryTexturedVertexInfos = texturedVertexInfos;
+		texturedVertexInfoPairsView = BufferUtilities.ToStructuredBufferView(device, TexturedVertexInfoPair.Interleave(primaryTexturedVertexInfos, null));
 	}
 		
 	public void Dispose() {
@@ -45,20 +53,29 @@ public class FigureRenderer : IDisposable {
 		}
 		materialSet.Dispose();
 		inputLayout.Dispose();
+		texturedVertexInfoPairsView?.Dispose();
 	}
 		
 	public void Update(DeviceContext context, ImageBasedLightingEnvironment lightingEnvironment, ShaderResourceView controlVertexInfosView, ShapeNormals shapeNormals) {
-		this.shapeNormals = shapeNormals;
+		if (this.shapeNormals != shapeNormals || texturedVertexInfoPairsView == null) {
+			this.shapeNormals = shapeNormals;
+
+			texturedVertexInfoPairsView?.Dispose();
+			var pairs = TexturedVertexInfoPair.Interleave(primaryTexturedVertexInfos, shapeNormals?.TexturedVertexInfos);
+			texturedVertexInfoPairsView = BufferUtilities.ToStructuredBufferView(device, pairs);
+		}
+
 		scatterer?.Scatter(context, lightingEnvironment, controlVertexInfosView);
-		vertexRefiner.RefineVertices(context, controlVertexInfosView, shapeNormals?.TexturedVertexInfosView, scatterer?.ScatteredIlluminationView);
+		vertexRefiner.RefineVertices(context, controlVertexInfosView, scatterer?.ScatteredIlluminationView);
 	}
 	
 	public void RenderPass(DeviceContext context, RenderingPass pass) {
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-        context.InputAssembler.SetVertexBuffers(0, vertexRefiner.RefinedVertexBufferBinding);
 		context.InputAssembler.InputLayout = inputLayout;
-
+        context.InputAssembler.SetVertexBuffers(0, vertexRefiner.RefinedVertexBufferBinding);
+		
 		var vertexShaderForMode = pass.OutputMode == OutputMode.FalseDepth ? falseDepthVertexShader : vertexShader;
+		context.VertexShader.SetShaderResource(0, texturedVertexInfoPairsView);
 		context.VertexShader.Set(vertexShaderForMode);
 		
 		foreach (int surfaceIdx in surfaceOrder) {
@@ -85,5 +102,7 @@ public class FigureRenderer : IDisposable {
 				material.Unapply(context);
 			}
 		}
+
+		context.VertexShader.SetShaderResource(0, null);
 	}
 }

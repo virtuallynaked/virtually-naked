@@ -8,12 +8,14 @@ cbuffer bar : register(b1) {
 
 static const float DepthBias = 0.5; //in centimeters
 
-float4 main(RefinedVertex vIn) : SV_POSITION {
+float4 main(uint vertexIdx : SV_VertexId, RefinedVertex vIn) : SV_POSITION {
 	float3 position = vIn.position;
 	float3 worldPosition = mul(float4(position, 1), worldMatrix).xyz;
 	float4 screenPosition = calculateScreenPosition(worldPosition);
 
-	float3 erodedPosition = vIn.position - DepthBias * vIn.normal;
+	float3 objectNormal = normalize(cross(vIn.positionDs, vIn.positionDt));
+	
+	float3 erodedPosition = vIn.position - DepthBias * objectNormal;
 	float3 erodedWorldPosition = mul(float4(erodedPosition, 1), worldMatrix).xyz;
 	float4 erodedScreenPosition = calculateScreenPosition(erodedWorldPosition);
 	

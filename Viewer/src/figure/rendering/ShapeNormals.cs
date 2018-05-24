@@ -25,7 +25,6 @@ public class ShapeNormalsLoader {
 		IArchiveDirectory uvSetsDirectory = figureDir.Subdirectory("uv-sets");
 		IArchiveDirectory uvSetDirectory = uvSetsDirectory.Subdirectory(uvSetName);
 		var texturedVertexInfos = uvSetDirectory.File("textured-vertex-infos.array").ReadArray<TexturedVertexInfo>();
-		var texturedVertexInfosView = BufferUtilities.ToStructuredBufferView(device, texturedVertexInfos);
 
 		var texturesDirectory = dataDir.Subdirectory("textures");
 		var textureLoader = new TextureLoader(device, textureCache, texturesDirectory);
@@ -34,7 +33,7 @@ public class ShapeNormalsLoader {
 			.Select(name => textureLoader.Load(name, TextureLoader.DefaultMode.Bump))
 			.ToArray();
 
-		return new ShapeNormals(textureLoader, texturedVertexInfosView, normalMapsBySurface);
+		return new ShapeNormals(textureLoader, texturedVertexInfos, normalMapsBySurface);
 	}
 }
 
@@ -52,17 +51,16 @@ public class ShapeNormalsRecipe {
 
 public class ShapeNormals : IDisposable {
 	private readonly TextureLoader textureLoader;
-	public ShaderResourceView TexturedVertexInfosView { get; }
+	public TexturedVertexInfo[] TexturedVertexInfos { get; }
 	public ShaderResourceView[] NormalsMapsBySurface { get; }
 
-	public ShapeNormals(TextureLoader textureLoader, ShaderResourceView texturedVertexInfosView, ShaderResourceView[] normalsMapsBySurface) {
+	public ShapeNormals(TextureLoader textureLoader, TexturedVertexInfo[] texturedVertexInfos, ShaderResourceView[] normalsMapsBySurface) {
 		this.textureLoader = textureLoader;
-		TexturedVertexInfosView = texturedVertexInfosView;
+		TexturedVertexInfos = texturedVertexInfos;
 		NormalsMapsBySurface = normalsMapsBySurface;
 	}
 
 	public void Dispose() {
 		textureLoader.Dispose();
-		TexturedVertexInfosView?.Dispose();
 	}
 }

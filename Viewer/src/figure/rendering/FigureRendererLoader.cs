@@ -41,7 +41,7 @@ public class FigureRendererLoader {
 
 		var texturedVertexInfos = uvSetDirectory.File("textured-vertex-infos.array").ReadArray<TexturedVertexInfo>();
 		
-		var vertexRefiner = new VertexRefiner(device, shaderCache, mesh, texturedToSpatialIdxMap, texturedVertexInfos);
+		var vertexRefiner = new VertexRefiner(device, shaderCache, mesh, texturedToSpatialIdxMap);
 		
 		FigureSurface[] surfaces = FigureSurface.MakeSurfaces(device, materials.Length, texturedFaces, controlFaceMap, surfaceMap, materialSet.FaceTransparencies);
 		
@@ -67,6 +67,6 @@ public class FigureRendererLoader {
 
 		var isOneSided = figureDir.Name == "genesis-3-female"; //hack
 
-		return new FigureRenderer(device, shaderCache, scatterer, vertexRefiner, materialSet, surfaces, isOneSided, surfaceOrder.ToArray(), areUnorderedTransparent);
+		return new FigureRenderer(device, shaderCache, scatterer, vertexRefiner, materialSet, surfaces, isOneSided, surfaceOrder.ToArray(), areUnorderedTransparent, texturedVertexInfos);
 	}
 }
