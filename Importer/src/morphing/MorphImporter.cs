@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 
 public class MorphImporter {
+	private readonly ContentFileLocator fileLocator;
 	private readonly List<MorphRecipe> morphRecipes = new List<MorphRecipe>();
 
-	public MorphImporter() {
+	public MorphImporter(ContentFileLocator fileLocator) {
+		this.fileLocator = fileLocator;
 	}
 
 	public IEnumerable<MorphRecipe> MorphRecipes => morphRecipes;
@@ -35,13 +37,25 @@ public class MorphImporter {
 			deltas[i] = new MorphDelta(vertexIdx, positionOffset);
 		}
 		
-		bool isHd = !String.IsNullOrEmpty(dsonMorph.hd_url);
-
+		var hdUrl = ExtractHdUrl(dsonMorph.hd_url);
+		
 		MorphRecipe recipe = new MorphRecipe {
 			Channel = channel,
-			Deltas = deltas
+			Deltas = deltas,
+			HdUrl = hdUrl
 		};
 		morphRecipes.Add(recipe);
+	}
+
+	private string ExtractHdUrl(string rawUrl) {
+		if (String.IsNullOrEmpty(rawUrl)) {
+			return null;
+		}
+
+		var url = Uri.UnescapeDataString(rawUrl).Replace("//", "/");
+		fileLocator.Locate(url); //confirm the file exists
+
+		return url;
 	}
 
 	public void ImportFrom(DsonTypes.Modifier[] modifiers) {
@@ -58,8 +72,8 @@ public class MorphImporter {
 		ImportFrom(doc.Root.modifier_library);
 	}
 
-	public static IEnumerable<MorphRecipe> ImportForFigure(DsonObjectLocator locator, FigureUris figureUris) {
-		MorphImporter importer = new MorphImporter();
+	public static IEnumerable<MorphRecipe> ImportForFigure(ContentFileLocator fileLocator, DsonObjectLocator locator, FigureUris figureUris) {
+		MorphImporter importer = new MorphImporter(fileLocator);
 		
 		foreach (DsonTypes.DsonDocument doc in locator.GetAllDocumentsUnderPath(figureUris.MorphsBasePath)) {
 			importer.ImportFrom(doc);

@@ -21,7 +21,7 @@ public class FaceTransparencyDemo : IDemoApp {
 	}
 
 	public void Run() {
-		var loader = new FigureRecipeLoader(objectLocator, pathManager);
+		var loader = new FigureRecipeLoader(fileLocator, objectLocator, pathManager);
 
 		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);

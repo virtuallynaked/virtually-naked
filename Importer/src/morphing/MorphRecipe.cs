@@ -8,7 +8,8 @@ using SharpDX;
 public class MorphRecipe {
 	public string Channel { get; set; }
 	public MorphDelta[] Deltas { get; set; }
-
+	public string HdUrl { get; set; }
+	
 	public Morph Bake(Dictionary<string, Channel> channels) {
 		return new Morph(channels[Channel], Deltas);
 	}

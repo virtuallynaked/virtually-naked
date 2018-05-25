@@ -23,7 +23,7 @@ public class FigureDumperLoader {
 		this.device = device;
 		this.shaderCache = shaderCache;
 
-		figureRecipeLoader = new FigureRecipeLoader(objectLocator, pathManager);
+		figureRecipeLoader = new FigureRecipeLoader(fileLocator, objectLocator, pathManager);
 
 		FigureRecipe genesis3FemaleRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);

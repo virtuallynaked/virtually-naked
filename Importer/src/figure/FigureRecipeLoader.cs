@@ -1,10 +1,12 @@
 using System;
 
 public class FigureRecipeLoader {
+	private readonly ContentFileLocator fileLocator;
 	private readonly DsonObjectLocator objectLocator;
 	private readonly ImporterPathManager pathManager;
 
-	public FigureRecipeLoader(DsonObjectLocator objectLocator, ImporterPathManager pathManager) {
+	public FigureRecipeLoader(ContentFileLocator fileLocator, DsonObjectLocator objectLocator, ImporterPathManager pathManager) {
+		this.fileLocator = fileLocator;
 		this.objectLocator = objectLocator;
 		this.pathManager = pathManager;
 	}
@@ -20,6 +22,7 @@ public class FigureRecipeLoader {
 			Console.WriteLine($"Reimporting {figureName}...");
 			FigureRecipe recipeToPersist = FigureImporter.ImportFor(
 				figureName,
+				fileLocator,
 				objectLocator,
 				importProperties.Uris,
 				parentRecipe,

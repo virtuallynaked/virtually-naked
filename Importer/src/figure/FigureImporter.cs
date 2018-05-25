@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 
 class FigureImporter {
-	public static FigureRecipe ImportFor(string figureName, DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue, ImmutableHashSet<string> visibleProducts) {
+	public static FigureRecipe ImportFor(string figureName, ContentFileLocator fileLocator, DsonObjectLocator locator, FigureUris figureUris, FigureRecipe parentRecipe, double hdCorrectionInitialValue, ImmutableHashSet<string> visibleProducts) {
 		var geometryRecipe = GeometryImporter.ImportForFigure(locator, figureUris);
 
 		FigureRecipe recipe = new FigureRecipe {
@@ -11,7 +11,7 @@ class FigureImporter {
 			Channels = ChannelImporter.ImportForFigure(locator, figureUris, visibleProducts).ToList(),
 			Formulas = FormulaImporter.ImportForFigure(locator, figureUris).ToList(),
 			Bones = BoneImporter.ImportForFigure(locator, figureUris).ToList(),
-			Morphs = MorphImporter.ImportForFigure(locator, figureUris).ToList(),
+			Morphs = MorphImporter.ImportForFigure(fileLocator, locator, figureUris).ToList(),
 			SkinBinding = SkinBindingImporter.ImportForFigure(locator, figureUris),
 			UvSets = UvSetImporter.ImportForFigure(locator, figureUris, geometryRecipe).ToList()
 		};
