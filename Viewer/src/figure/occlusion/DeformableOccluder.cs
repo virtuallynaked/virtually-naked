@@ -26,6 +26,7 @@ public class DeformableOccluder : IOccluder {
 		
 		unmorphedWithoutChildrenOcclusionInfosView = BufferUtilities.ToStructuredBufferView(device, OcclusionInfo.PackArray(unmorphedOcclusionInfos));
 		unmorphedWithChildrenOcclusionInfosBufferManager = new StructuredBufferManager<uint>(device, unmorphedOcclusionInfos.Length);
+		unmorphedWithChildrenOcclusionInfosToUpload = OcclusionInfo.PackArray(unmorphedOcclusionInfos);
 		
 		parametersResources = OccluderParametersResources.Make(device, parameters);
 		channelIndices = parameters.ChannelNames
