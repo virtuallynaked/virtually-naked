@@ -28,7 +28,7 @@ public class FigureDumperLoader {
 		FigureRecipe genesis3FemaleRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
 		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
-		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(null);
+		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(fileLocator, null);
 		SurfaceProperties genesis3FemaleSurfaceProperties = SurfacePropertiesJson.Load(pathManager, genesis3FemaleWithGenitalia);
 		float[] genesis3FemaleFaceTransparencies = FaceTransparencies.For(genesis3FemaleWithGenitalia, genesis3FemaleSurfaceProperties, null);
 
@@ -40,7 +40,7 @@ public class FigureDumperLoader {
 	public FigureDumper LoadDumper(string figureName) {
 		var figure = figureName == parentFigure.Name ?
 			parentFigure :
-			figureRecipeLoader.LoadFigureRecipe(figureName, parentFigureRecipe).Bake(parentFigure);
+			figureRecipeLoader.LoadFigureRecipe(figureName, parentFigureRecipe).Bake(fileLocator, parentFigure);
 
 		var figureConfDir = pathManager.GetConfDirForFigure(figure.Name);
 		MaterialSetImportConfiguration baseMaterialSetConfiguration = MaterialSetImportConfiguration.Load(figureConfDir).Single(conf => conf.name == "Base");

@@ -10,8 +10,9 @@ public class MorphRecipe {
 	public MorphDelta[] Deltas { get; set; }
 	public string HdUrl { get; set; }
 	
-	public Morph Bake(Dictionary<string, Channel> channels) {
-		return new Morph(channels[Channel], Deltas);
+	public Morph Bake(ContentFileLocator fileLocator, Dictionary<string, Channel> channels) {
+		var hdFile = HdUrl != null ? fileLocator.Locate(HdUrl).File : null;
+		return new Morph(channels[Channel], Deltas, hdFile);
 	}
 
 	public static MorphRecipe Merge(string channelName, FigureRecipeMerger.Reindexer reindexer, MorphRecipe parentMorph, MorphRecipe[] childMorphs, AutomorpherRecipe[] childAutomorphers) {

@@ -26,12 +26,12 @@ public class FaceTransparencyDemo : IDemoApp {
 		FigureRecipe genesis3FemaleRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
 		FigureRecipe genitaliaRecipe = loader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
 		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
-		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(null);
+		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(fileLocator, null);
 
 		Figure parentFigure = genesis3FemaleWithGenitalia;
 
 		FigureRecipe livHairRecipe = loader.LoadFigureRecipe("liv-hair", null);
-		var livHairFigure = livHairRecipe.Bake(parentFigure);
+		var livHairFigure = livHairRecipe.Bake(fileLocator, parentFigure);
 
 		var surfaceProperties = SurfacePropertiesJson.Load(pathManager, livHairFigure);
 		var processor = new FaceTransparencyProcessor(device, shaderCache, livHairFigure, surfaceProperties);

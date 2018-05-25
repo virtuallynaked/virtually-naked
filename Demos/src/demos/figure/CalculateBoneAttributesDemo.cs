@@ -8,7 +8,7 @@ public class CalculateBoneAttributesDemo : IDemoApp {
 		var pathManager = ImporterPathManager.Make(contentPackConfs);
 		var loader = new FigureRecipeLoader(fileLocator, objectLocator, pathManager);
 		var figureRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
-		var figure = figureRecipe.Bake(null);
+		var figure = figureRecipe.Bake(fileLocator, null);
 
 		var calculator = new BoneAttributesCalculator(figure.ChannelSystem, figure.BoneSystem, figure.Geometry, figure.SkinBinding);
 		BoneAttributes[] boneAttributes = calculator.CalculateBoneAttributes();

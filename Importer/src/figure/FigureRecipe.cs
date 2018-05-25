@@ -39,7 +39,7 @@ public class FigureRecipe {
 		return childToParentBindPoseTransforms;
 	}
 
-	public Figure Bake(Figure parentFigure) {
+	public Figure Bake(ContentFileLocator fileLocator, Figure parentFigure) {
 		if (Channels == null) {
 			Channels = new List<ChannelRecipe>();
 		}
@@ -61,7 +61,7 @@ public class FigureRecipe {
 		int graftVertexOffset = Geometry.VertexPositions.Length;
 
 		List<MorphRecipe> rewrittenMorphRecipes = Automorpher != null ? Automorpher.Rewrite(Morphs, parentFigure) : Morphs;
-		List<Morph> morphs = rewrittenMorphRecipes.Select(recipe => recipe.Bake(channelSystem.ChannelsByName)).ToList();
+		List<Morph> morphs = rewrittenMorphRecipes.Select(recipe => recipe.Bake(fileLocator, channelSystem.ChannelsByName)).ToList();
 		Morpher morpher = new Morpher(morphs);
 
 		Automorpher automorpher = Automorpher?.Bake();

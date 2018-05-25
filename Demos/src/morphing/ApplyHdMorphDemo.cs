@@ -14,7 +14,7 @@ public class ApplyHdMorphDemo : IDemoApp {
 		var pathManager = ImporterPathManager.Make(contentPackConfs);
 		var loader = new FigureRecipeLoader(fileLocator, objectLocator, pathManager);
 		var figureRecipe = loader.LoadFigureRecipe("genesis-3-female", null);
-		var figure = figureRecipe.Bake(null);
+		var figure = figureRecipe.Bake(fileLocator, null);
 		var geometry = figure.Geometry;
 		controlTopology = new QuadTopology(geometry.VertexCount, geometry.Faces);
 		controlVertexPositions = geometry.VertexPositions;
