@@ -3,6 +3,10 @@ using SharpDX;
 using System.Linq;
 
 public class HdCorrectionMorphSynthesizer {
+	public static string CalcChannelName(string figureName) {
+		return figureName + "-hd-correction?value";
+	}
+
 	private readonly string figureName;
 	private readonly Geometry geometry;
 	private readonly Subdivider limit0Subdivider;
@@ -13,7 +17,7 @@ public class HdCorrectionMorphSynthesizer {
 		limit0Subdivider = new Subdivider(geometry.MakeStencils(StencilKind.LimitStencils, 0));
 	}
 
-	private string ChannelName => figureName + "-hd-correction?value";
+	private string ChannelName => CalcChannelName(figureName);
 	
 	public ChannelRecipe SynthesizeChannel(double initialValue = 0) {
 		return new ChannelRecipe {

@@ -37,4 +37,26 @@ public class Morpher {
 
 		return PackedLists<VertexDelta>.Pack(vertexDeltas);
 	}
+
+	public List<WeightedHdMorph> LoadActiveHdMorphs(ChannelOutputs channelOutputs) {
+		List<WeightedHdMorph> hdMorphs = new List<WeightedHdMorph>();
+
+		foreach (var morph in morphs) {
+			float weight = (float) morph.Channel.GetValue(channelOutputs);
+			if (weight == 0) {
+				continue;
+			}
+
+			var hdFile = morph.HdFile;
+			if (hdFile == null) {
+				continue;
+			}
+
+			var hdMorph = HdMorphSerialization.LoadHdMorph(hdFile);
+
+			hdMorphs.Add(new WeightedHdMorph(hdMorph, weight));
+		}
+
+		return hdMorphs;
+	}
 }

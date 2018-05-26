@@ -91,6 +91,11 @@
 		"ApplyHdMorphDemo": {
 			"commandName": "Project",
 			"commandLineArgs": "ApplyHdMorphDemo"
+		},
+		"HdMorphToNormalMapConverterDemo": {
+			"commandName": "Project",
+			"commandLineArgs": "HdMorphToNormalMapConverterDemo",
+			"nativeDebugging": true
 		}
 	}
 }

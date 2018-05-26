@@ -2,6 +2,7 @@ using OpenSubdivFacade;
 using SharpDX;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 public class ApplyHdMorphDemo : IDemoApp {
 	private readonly QuadTopology controlTopology;
@@ -20,17 +21,48 @@ public class ApplyHdMorphDemo : IDemoApp {
 		controlVertexPositions = geometry.VertexPositions;
 	}
 
+	public static void AssertTopologyAssumptions(QuadTopology topology, QuadTopology nextLevelTopology) {
+		for (int faceIdx = 0; faceIdx < topology.Faces.Length; ++faceIdx) {
+			for (int cornerIdx = 0; cornerIdx < Quad.SideCount; ++cornerIdx) {
+				int vertexIdx = topology.Faces[faceIdx].GetCorner(cornerIdx);
+				int nextLevelVertexIdx = nextLevelTopology.Faces[faceIdx * 4 + cornerIdx].GetCorner(cornerIdx);
+				Debug.Assert(vertexIdx == nextLevelVertexIdx);
+			}
+		}
+	}
+
+	private static (QuadTopology, Vector3[]) ApplyHdMorph(HdMorph hdMorph, QuadTopology controlTopology, Vector3[] controlPositions, Refinement refinement) {
+		var applier = HdMorphApplier.Make(controlTopology, controlPositions);
+		
+		var topology = controlTopology;
+		var positions = controlPositions;
+
+		for (int levelIdx = 1; levelIdx <= hdMorph.MaxLevel; ++levelIdx) {
+			topology = refinement.GetTopology(levelIdx);
+			positions = refinement.Refine(levelIdx, positions);
+			applier.Apply(hdMorph, 1, levelIdx, topology, positions);
+		}
+		
+		return (topology, positions);
+	}
+
+	private static (QuadTopology, Vector3[]) ApplyHdMorph(HdMorph hdMorph, QuadTopology controlTopology, Vector3[] controlPositions) {
+		using (var refinement = new Refinement(controlTopology, hdMorph.MaxLevel)) {
+			return ApplyHdMorph(hdMorph, controlTopology, controlPositions, refinement);
+		}
+	}
+
 	private void TestTopologyAssumptions() {
 		using (var refinement = new Refinement(controlTopology, 2)) {
 			var level1Topology = refinement.GetTopology(1);
 			var level2Topology = refinement.GetTopology(2);
-			HdMorphApplier.AssertTopologyAssumptions(controlTopology, level1Topology);
-			HdMorphApplier.AssertTopologyAssumptions(level1Topology, level2Topology);
+			AssertTopologyAssumptions(controlTopology, level1Topology);
+			AssertTopologyAssumptions(level1Topology, level2Topology);
 		}
 	}
 
 	private void TestHdMorph(HdMorph hdMorph, int refinedFaceIdxToCheck, int cornerToCheck, Vector3 expectedValue) {
-		var (refinedTopology, refinedVertexPositions) = HdMorphApplier.ApplyHdMorph(hdMorph, controlTopology, controlVertexPositions);
+		var (refinedTopology, refinedVertexPositions) = ApplyHdMorph(hdMorph, controlTopology, controlVertexPositions);
 		Vector3 actualValue = refinedVertexPositions[refinedTopology.Faces[refinedFaceIdxToCheck].GetCorner(cornerToCheck)];
 		bool isOk = Vector3.Distance(actualValue, expectedValue) < 1e-2;
 		Console.WriteLine($"{actualValue.FormatForMathematica()}: {(isOk ? "OK" : "FAIL")}");

@@ -81,4 +81,13 @@ public class HdMorph {
 			}
 		}
 	}
+
+	public Level GetLevel(int levelIdx) {
+		foreach (var level in Levels) {
+			if (level.LevelIdx == levelIdx) {
+				return level;
+			}
+		}
+		return null;
+	}
 }
