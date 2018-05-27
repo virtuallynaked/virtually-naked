@@ -18,11 +18,13 @@ public class ImporterMain : IDisposable {
 	}
 
 	public static void Main(string[] args) {
+		LeakTracking.Setup();
 		using (var app = Make(args)) {
 			Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
 			app.Run(args);
 			Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Normal;
 		}
+		LeakTracking.Finish();
 	}
 
 	public ImporterMain(ContentFileLocator fileLocator, DsonObjectLocator objectLocator) {

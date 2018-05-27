@@ -51,6 +51,7 @@ public class TextureMaskRenderer : IDisposable {
 	}
 	
 	public void Dispose() {
+		device.Dispose();
 		inputLayout.Dispose();
 		rasterizerState.Dispose();
 		blendState.Dispose();
