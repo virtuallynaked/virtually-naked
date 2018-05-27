@@ -91,13 +91,7 @@ public class ShapeDumper {
 
 		bool generateFromHd = normalsConf?.generatedFromHd ?? false;
 		var generatedTextureDirectory = CommonPaths.WorkDir.Subdirectory("generated-textures");
-		NormalMapRenderer normalMapRenderer;
-		if (generateFromHd) {
-			Console.WriteLine($"Generating normals for shape '{shapeImportConfiguration.name}'...");
-			normalMapRenderer = hdMorphToNormalMapConverter.MakeNormalMapRenderer(figure, uvSet, shapeInputs);
-		} else {
-			normalMapRenderer = null;
-		}
+		NormalMapRenderer normalMapRenderer = null;
 		
 		string[] textureNamesBySurface = Enumerable.Repeat(ShapeNormalsRecipe.DefaultTextureName, surfaceNames.Length).ToArray();
 		
@@ -107,7 +101,7 @@ public class ShapeDumper {
 				.ToList();
 
 			FileInfo textureFile;
-			if (normalMapRenderer == null) {
+			if (!generateFromHd) {
 				var texturePath = normalsConf?.textures?[groupIdx];
 				if (texturePath == null) {
 					continue;
@@ -117,6 +111,11 @@ public class ShapeDumper {
 			} else {
 				textureFile = generatedTextureDirectory.File($"normal-map-{shapeImportConfiguration.name}-{groupIdx}.png");
 				if (!textureFile.Exists) {
+					if (normalMapRenderer == null) {
+						Console.WriteLine($"Generating normals for shape '{shapeImportConfiguration.name}'...");
+						normalMapRenderer = hdMorphToNormalMapConverter.MakeNormalMapRenderer(figure, uvSet, shapeInputs);
+					}
+
 					var normalMap = normalMapRenderer.Render(new HashSet<int>(surfaceIdxs));
 					generatedTextureDirectory.CreateWithParents();
 					normalMap.Save(textureFile);
