@@ -29,6 +29,14 @@ public class NormalMapRenderer : IDisposable {
 	private const int Size = 4096;
 
 	private readonly Device device;
+	private readonly Vector3[] hdNormals;
+	private readonly Vector3[] ldNormals;
+	private readonly Quad[] faces;
+	private readonly Vector2[] uvs;
+	private readonly Vector3[] ldTangents;
+	private readonly Quad[] uvFaces;
+	private readonly int[] surfaceMap;
+
 	private readonly InputLayout inputLayout;
 	private readonly VertexShader vertexShader;
 	private readonly PixelShader pixelShader;
@@ -38,13 +46,22 @@ public class NormalMapRenderer : IDisposable {
 	private readonly Texture2D resolveTexture;
 	private readonly Texture2D stagingTexture;
 
-	public NormalMapRenderer(Device device, ShaderCache shaderCache) {
+	public NormalMapRenderer(Device device, ShaderCache shaderCache,
+		Vector3[] hdNormals, Vector3[] ldNormals, Quad[] faces,
+		Vector2[] uvs, Vector3[] ldTangents, Quad[] uvFaces, int[] surfaceMap) {
 		this.device = device;
+		this.hdNormals = hdNormals;
+		this.ldNormals = ldNormals;
+		this.faces = faces;
+		this.uvs = uvs;
+		this.ldTangents = ldTangents;
+		this.uvFaces = uvFaces;
+		this.surfaceMap = surfaceMap;
 
-		var vertexShaderAndByteCode = shaderCache.GetVertexShader<NormalMapRenderer>("morphing/NormalMapRenderer");
+		var vertexShaderAndByteCode = shaderCache.GetVertexShader<NormalMapRenderer>("morphing/hd/NormalMapRenderer");
 		inputLayout = new InputLayout(device, vertexShaderAndByteCode.Bytecode, InputElements);
 		vertexShader = vertexShaderAndByteCode.Shader;
-		pixelShader = shaderCache.GetPixelShader<NormalMapRenderer>("morphing/NormalMapRenderer");
+		pixelShader = shaderCache.GetPixelShader<NormalMapRenderer>("morphing/hd/NormalMapRenderer");
 
 		var rasterizerStateDesc = RasterizerStateDescription.Default();
 		rasterizerStateDesc.CullMode = CullMode.None;
@@ -101,10 +118,7 @@ public class NormalMapRenderer : IDisposable {
 		return image;
 	}
 
-	private VertexInfo[] MakeVertexInfos(
-		Vector3[] hdNormals, Vector3[] ldNormals, Quad[] faces,
-		Vector2[] uvs, Vector3[] ldTangents, Quad[] uvFaces,
-		int[] surfaceMap, HashSet<int> surfaceIdxs) {
+	private VertexInfo[] MakeVertexInfos(HashSet<int> surfaceIdxs) {
 		List<VertexInfo> vertexInfos = new List<VertexInfo>();
 		for (int faceIdx = 0; faceIdx < surfaceMap.Length; ++faceIdx) {
 			if (!surfaceIdxs.Contains(surfaceMap[faceIdx])) {
@@ -137,15 +151,11 @@ public class NormalMapRenderer : IDisposable {
 		return vertexInfos.ToArray();
 	}
 
-	public UnmanagedRgbaImage Render(
-		Vector3[] hdNormals, Vector3[] ldNormals, Quad[] faces,
-		Vector2[] uvs, Vector3[] ldTangents, Quad[] uvFaces, int[] surfaceMap, HashSet<int> surfaceIdxs) {
+	public UnmanagedRgbaImage Render(HashSet<int> surfaceIdxs) {
 		var context = device.ImmediateContext;
 		context.ClearRenderTargetView(textureTargetView, new Color4(0.5f, 0.5f, 1f, 1));
 		
-		VertexInfo[] vertexInfos = MakeVertexInfos(
-			hdNormals, ldNormals, faces,
-			uvs, ldTangents, uvFaces, surfaceMap, surfaceIdxs);
+		VertexInfo[] vertexInfos = MakeVertexInfos(surfaceIdxs);
 		var vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, vertexInfos);
 
 		context.ClearState();

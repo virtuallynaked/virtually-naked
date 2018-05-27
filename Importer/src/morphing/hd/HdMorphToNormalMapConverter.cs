@@ -2,7 +2,6 @@ using OpenSubdivFacade;
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 public class HdMorphToNormalMapConverter {
@@ -18,7 +17,7 @@ public class HdMorphToNormalMapConverter {
 		this.figure = figure;
 	}
 	
-	public List<UnmanagedRgbaImage> Convert(ChannelInputs ldChannelInputs, ChannelInputs hdChannelInputs, UvSet uvSet, List<HashSet<int>> surfaceSubsets) {
+	public NormalMapRenderer MakeNormalMapRenderer(ChannelInputs ldChannelInputs, ChannelInputs hdChannelInputs, UvSet uvSet) {
 		var ldChannelOutputs = figure.Evaluate(null, ldChannelInputs);
 		var hdChannelOutputs = figure.Evaluate(null, hdChannelInputs);
 
@@ -83,13 +82,8 @@ public class HdMorphToNormalMapConverter {
 			.Select(controlFaceIdx => controlSurfaceMap[controlFaceIdx])
 			.ToArray();
 
-		return surfaceSubsets
-			.Select(surfaceSubset => {
-				using (var renderer = new NormalMapRenderer(device, shaderCache)) {
-					return renderer.Render(hdNormals, ldNormals, topology.Faces, uvLimit.values, ldTangents, uvTopology.Faces, surfaceMap, surfaceSubset);
-				}
-			})
-			.ToList();
+		var renderer = new NormalMapRenderer(device, shaderCache, hdNormals, ldNormals, topology.Faces, uvLimit.values, ldTangents, uvTopology.Faces, surfaceMap);
+		return renderer;
 	}
 
 	private Vector3[] CalculateNormals(LimitValues<Vector3> limitPositions) {
@@ -118,6 +112,32 @@ public class HdMorphToNormalMapConverter {
 				limitTexturedPositions.tangents1[i], limitTexturedPositions.tangents2[i]);
 		}
 		return tangents;
+	}
+	
+	public NormalMapRenderer MakeNormalMapRenderer(Figure figureWithGrafts, UvSet uvSetWithGrafts, ChannelInputs shapeInputsWithGrafts) {
+		/*
+		 * HUGE HACKS:
+		 * This class only works on figures without grafts whereas everything else works on figures with grafts.
+		 * So I have to convert the uvSet and shapeInputs the with-grafts figure to the without-grafts figure.
+		 */
+
+		var uvSet = figure.UvSets[uvSetWithGrafts.Name];
+
+		ChannelInputs ldInputs = figure.MakeDefaultChannelInputs();
+		ChannelInputs hdInputs = figure.MakeDefaultChannelInputs();
+
+		string hdCorrectionMorphChannelName = HdCorrectionMorphSynthesizer.CalcChannelName(figure.Name);
+		foreach (var channel in figure.Channels) {
+			var channelWithGrafts = figureWithGrafts.ChannelsByName[channel.Name];
+
+			double value = channelWithGrafts.GetInputValue(shapeInputsWithGrafts);
+			channel.SetValue(ldInputs, value);
+			if (channel.Name != hdCorrectionMorphChannelName) {
+				channel.SetValue(hdInputs, value);
+			}
+		}
+		
+		return MakeNormalMapRenderer(ldInputs, hdInputs, uvSet);
 	}
 
 	private static Vector3[] ExtractTexturedPositions(QuadTopology topology, QuadTopology uvTopology, Vector3[] ldPositions) {

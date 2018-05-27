@@ -13,8 +13,9 @@ public class ShapeDumper {
 	private readonly Figure figure;
 	private readonly SurfaceProperties surfaceProperties;
 	private readonly ShapeImportConfiguration baseConfiguration;
-	
-	public ShapeDumper(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, float[] parentFaceTransparencies, Figure figure, SurfaceProperties surfaceProperties, ShapeImportConfiguration baseConfiguration) {
+	private readonly HdMorphToNormalMapConverter hdMorphToNormalMapConverter;
+
+	public ShapeDumper(ContentFileLocator fileLocator, Device device, ShaderCache shaderCache, Figure parentFigure, float[] parentFaceTransparencies, Figure figure, SurfaceProperties surfaceProperties, ShapeImportConfiguration baseConfiguration, HdMorphToNormalMapConverter hdMorphToNormalMapConverter) {
 		this.fileLocator = fileLocator;
 		this.device = device;
 		this.shaderCache = shaderCache;
@@ -23,6 +24,7 @@ public class ShapeDumper {
 		this.figure = figure;
 		this.surfaceProperties = surfaceProperties;
 		this.baseConfiguration = baseConfiguration;
+		this.hdMorphToNormalMapConverter = hdMorphToNormalMapConverter;
 	}
 	
 	private ChannelInputs MakeShapeInputs(ShapeImportConfiguration shapeImportConfiguration) {
@@ -48,11 +50,11 @@ public class ShapeDumper {
 	public void DumpShape(TextureProcessor textureProcessor, DirectoryInfo figureDestDir, ShapeImportConfiguration shapeImportConfiguration) {
 		DirectoryInfo shapeDirectory = figureDestDir.Subdirectory("shapes").Subdirectory(shapeImportConfiguration.name);
 		
-		DumpNormals(textureProcessor, shapeDirectory, shapeImportConfiguration);
-
 		//generate inputs
 		var shapeInputs = MakeShapeInputs(shapeImportConfiguration);
-		
+
+		DumpNormals(textureProcessor, shapeDirectory, shapeImportConfiguration, shapeInputs);
+
 		DumpInputs(shapeDirectory, shapeInputs);
 		DumpParentOverrides(shapeDirectory, shapeImportConfiguration);
 
@@ -65,7 +67,7 @@ public class ShapeDumper {
 		}
     }
 
-	private void DumpNormals(TextureProcessor textureProcessor, DirectoryInfo shapeDirectory, ShapeImportConfiguration shapeImportConfiguration) {
+	private void DumpNormals(TextureProcessor textureProcessor, DirectoryInfo shapeDirectory, ShapeImportConfiguration shapeImportConfiguration, ChannelInputs shapeInputs) {
 		var normalsConf = shapeImportConfiguration?.normals;
 		var baseNormalsConf = baseConfiguration?.normals;
 
@@ -87,27 +89,56 @@ public class ShapeDumper {
 		Dictionary<string, int> surfaceNameToIdx = Enumerable.Range(0, surfaceNames.Length)
 			.ToDictionary(idx => surfaceNames[idx], idx => idx);
 
+		bool generateFromHd = normalsConf?.generatedFromHd ?? false;
+		var generatedTextureDirectory = CommonPaths.WorkDir.Subdirectory("generated-textures");
+		NormalMapRenderer normalMapRenderer;
+		if (generateFromHd) {
+			Console.WriteLine($"Generating normals for shape '{shapeImportConfiguration.name}'...");
+			normalMapRenderer = hdMorphToNormalMapConverter.MakeNormalMapRenderer(figure, uvSet, shapeInputs);
+		} else {
+			normalMapRenderer = null;
+		}
+		
 		string[] textureNamesBySurface = Enumerable.Repeat(ShapeNormalsRecipe.DefaultTextureName, surfaceNames.Length).ToArray();
-
+		
 		for (int groupIdx = 0; groupIdx < surfaceGroups.Count; ++groupIdx) {
-			var texturePath = normalsConf?.textures?[groupIdx];
-			if (texturePath == null) {
-				continue;
+			var surfaceIdxs = surfaceGroups[groupIdx]
+				.Select(surfaceName => surfaceNameToIdx[surfaceName])
+				.ToList();
+
+			FileInfo textureFile;
+			if (normalMapRenderer == null) {
+				var texturePath = normalsConf?.textures?[groupIdx];
+				if (texturePath == null) {
+					continue;
+				}
+
+				textureFile = fileLocator.Locate(texturePath).File;
+			} else {
+				textureFile = generatedTextureDirectory.File($"normal-map-{shapeImportConfiguration.name}-{groupIdx}.png");
+				if (!textureFile.Exists) {
+					var normalMap = normalMapRenderer.Render(new HashSet<int>(surfaceIdxs));
+					generatedTextureDirectory.CreateWithParents();
+					normalMap.Save(textureFile);
+					normalMap.Dispose();
+				}
 			}
 
-			var textureFile = fileLocator.Locate(texturePath).File;
-			foreach (string surfaceName in surfaceGroups[groupIdx]) {
-				int surfaceIdx = surfaceNameToIdx[surfaceName];
-
+			foreach (int surfaceIdx in surfaceIdxs) {
 				var mask = TextureMask.Make(uvSet, figure.Geometry.SurfaceMap, surfaceIdx);
 				var textureName = textureProcessor.RegisterForProcessing(textureFile, TextureProcessingType.Normal, true, mask);
 				textureNamesBySurface[surfaceIdx] = textureName;
 			}
 		}
+
+		normalMapRenderer?.Dispose();
 		
 		var recipe = new ShapeNormalsRecipe(uvSetName, textureNamesBySurface);
-		shapeDirectory.CreateWithParents();
-		Persistance.Save(recipeFile, recipe);
+
+		textureProcessor.RegisterAction(() => {
+			shapeDirectory.CreateWithParents();
+			Persistance.Save(recipeFile, recipe);
+		});
 	}
 
 	public void DumpUnmorphed(DirectoryInfo figureDestDir) {

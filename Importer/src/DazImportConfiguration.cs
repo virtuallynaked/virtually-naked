@@ -74,6 +74,9 @@ public class ShapeImportConfiguration {
 
 		[JsonProperty("textures")]
 		public List<String> textures;
+
+		[JsonProperty("generate-from-hd")]
+		public bool generatedFromHd;
 	}
 
 	public string name;

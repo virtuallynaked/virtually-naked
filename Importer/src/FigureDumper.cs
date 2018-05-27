@@ -13,6 +13,7 @@ public class FigureDumperLoader {
 	private readonly FigureRecipeLoader figureRecipeLoader;
 
 	private readonly FigureRecipe parentFigureRecipe;
+	private readonly Figure parentFigureWithoutGrafts;
 	private readonly Figure parentFigure;
 	private readonly float[] parentFaceTransparencies;
 
@@ -26,6 +27,7 @@ public class FigureDumperLoader {
 		figureRecipeLoader = new FigureRecipeLoader(fileLocator, objectLocator, pathManager);
 
 		FigureRecipe genesis3FemaleRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female", null);
+		Figure genesis3Female = genesis3FemaleRecipe.Bake(fileLocator, null);
 		FigureRecipe genitaliaRecipe = figureRecipeLoader.LoadFigureRecipe("genesis-3-female-genitalia", genesis3FemaleRecipe);
 		FigureRecipe genesis3FemaleWithGenitaliaRecipe = new FigureRecipeMerger(genesis3FemaleRecipe, genitaliaRecipe).Merge();
 		Figure genesis3FemaleWithGenitalia = genesis3FemaleWithGenitaliaRecipe.Bake(fileLocator, null);
@@ -33,6 +35,7 @@ public class FigureDumperLoader {
 		float[] genesis3FemaleFaceTransparencies = FaceTransparencies.For(genesis3FemaleWithGenitalia, genesis3FemaleSurfaceProperties, null);
 
 		parentFigureRecipe = genesis3FemaleRecipe;
+		parentFigureWithoutGrafts = genesis3Female;
 		parentFigure = genesis3FemaleWithGenitalia;
 		parentFaceTransparencies = genesis3FemaleFaceTransparencies;
 	}
@@ -47,7 +50,8 @@ public class FigureDumperLoader {
 		ShapeImportConfiguration baseShapeImportConfiguration = ShapeImportConfiguration.Load(figureConfDir).SingleOrDefault(conf => conf.name == "Base");
 		SurfaceProperties surfaceProperties = SurfacePropertiesJson.Load(pathManager, figure);
 
-		ShapeDumper shapeDumper = new ShapeDumper(fileLocator, device, shaderCache, parentFigure, parentFaceTransparencies, figure, surfaceProperties, baseShapeImportConfiguration);
+		HdMorphToNormalMapConverter hdMorphToNormalMapConverter = figure == parentFigure ? new HdMorphToNormalMapConverter(device, shaderCache, parentFigureWithoutGrafts) : null;
+		ShapeDumper shapeDumper = new ShapeDumper(fileLocator, device, shaderCache, parentFigure, parentFaceTransparencies, figure, surfaceProperties, baseShapeImportConfiguration, hdMorphToNormalMapConverter);
 		return new FigureDumper(fileLocator, objectLocator, device, shaderCache, parentFigure, figure, surfaceProperties, baseMaterialSetConfiguration, baseShapeImportConfiguration, shapeDumper);
 	}
 }
