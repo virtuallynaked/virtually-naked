@@ -161,6 +161,7 @@ public class VRApp : IDisposable {
 	private void Run() {
 		//setup initial frame
 		timeKeeper.Start();
+		OpenVR.Compositor.SetTrackingSpace(ETrackingUniverseOrigin.TrackingUniverseStanding);
 		OpenVR.Compositor.GetLastPoses(poses, gamePoses);
 		KickoffFramePreparation();
 		preparedFrame = asyncFramePreparer.FinishPreparingFrame();
