@@ -35,6 +35,10 @@ namespace OpenSubdivFacadeNative {
 		}
 	};
 
+	RefinerFacade::~RefinerFacade() {
+
+	}
+
 	class RefinerFacadeImpl : public RefinerFacade {
 		std::unique_ptr<Far::TopologyRefiner> refiner;
 		std::unique_ptr<Far::PrimvarRefiner> primvarRefiner;

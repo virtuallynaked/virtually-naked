@@ -71,6 +71,7 @@ namespace OpenSubdivFacadeNative {
 
 	class RefinerFacade {
 	public:
+		virtual ~RefinerFacade() = 0;
 		virtual int GetFaceCount(int level) = 0;
 		virtual int GetVertexCount(int level) = 0;
 		virtual int GetEdgeCount(int level) = 0;
