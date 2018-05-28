@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 static class ActorMenuProvider {
 	public static IMenuLevel MakeHairMenuLevel(FigureFacade hairFigure) {
@@ -25,7 +24,7 @@ static class ActorMenuProvider {
 		var expressionsMenuLevel = poseControlsMenuLevel.Extract(new string[] {"Head", "Expressions"});
 		var behaviorMenuLevel = new BehaviorMenuLevel(model.Behavior);
 
-		var charactersMenuLevel = new CharactersMenuLevel(actor.Main.Definition, actor.Main.Model);
+		var charactersMenuLevel = new CharactersMenuLevel(actor.Characters, actor.Main.Definition, actor.Main.Model);
 		
 		var shapingItems = new List<IMenuItem>();
 		var channelShapesMenuLevel = channelMenuLevel.Extract(new string[] {"Shapes"});

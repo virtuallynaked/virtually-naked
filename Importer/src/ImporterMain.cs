@@ -62,6 +62,10 @@ public class ImporterMain : IDisposable {
 				new EnvironmentCubeGenerator().Run(settings, destDir);
 			}
 		
+			foreach (var characterConf in contentPackConf.Characters) {
+				CharacterImporter.Import(pathManager, characterConf.File, destDir);
+			}
+
 			foreach (var outfitConf in contentPackConf.Outfits) {
 				OutfitImporter.Import(pathManager, outfitConf.File, destDir);
 			}

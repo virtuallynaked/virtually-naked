@@ -33,15 +33,31 @@ public class ContentPackImportConfiguration {
 		}
 	}
 
+	public class Character {
+		public string Name { get; }
+		public FileInfo File { get; }
+
+		public Character(string name, FileInfo file) {
+			Name = name;
+			File = file;
+		}
+
+		public override string ToString() {
+			return $"ContentPackImportConfiguration.Character[{Name}]";
+		}
+	}
+
 	public const string CoreName = "core";
 
 	public string Name { get; }
 	public ImmutableList<Figure> Figures { get; }
+	public ImmutableList<Character> Characters { get; }
 	public ImmutableList<Outfit> Outfits { get; }
 	
-	public ContentPackImportConfiguration(string name, ImmutableList<Figure> figures, ImmutableList<Outfit> outfits) {
+	public ContentPackImportConfiguration(string name, ImmutableList<Figure> figures, ImmutableList<Character> characters, ImmutableList<Outfit> outfits) {
 		Name = name;
 		Figures = figures;
+		Characters = characters;
 		Outfits = outfits;
 	}
 	
@@ -59,12 +75,17 @@ public class ContentPackImportConfiguration {
 			.Select(figureDir => new Figure(figureDir.Name, figureDir))
 			.ToImmutableList();
 
+		var charactersDir = confDir.Subdirectory("characters");
+		var characters = (charactersDir.Exists ? charactersDir.GetFiles() : new FileInfo[0])
+			.Select(characterFile => new Character(characterFile.Name, characterFile))
+			.ToImmutableList();
+
 		var outfitsDir = confDir.Subdirectory("outfits");
 		var outfits = (outfitsDir.Exists ? outfitsDir.GetFiles() : new FileInfo[0])
 			.Select(outfitFile => new Outfit(outfitFile.Name, outfitFile))
 			.ToImmutableList();
 
-		return new ContentPackImportConfiguration(name, figures, outfits);
+		return new ContentPackImportConfiguration(name, figures, characters, outfits);
 	}
 
 	public static ImmutableList<ContentPackImportConfiguration> LoadAll(DirectoryInfo confsDir) {

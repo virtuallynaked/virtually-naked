@@ -1,34 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public class CharacterMenuItem : IToggleMenuItem {
 	private readonly FigureModel model;
-	private readonly Shape shape;
-	private readonly MaterialSetOption materialSet;
+	private readonly Character character;
 
-	public CharacterMenuItem(FigureModel model, Shape shape, MaterialSetOption materialSet) {
+	public CharacterMenuItem(FigureModel model, Character character) {
 		this.model = model;
-		this.shape = shape;
-		this.materialSet = materialSet;
+		this.character = character;
 	}
 
-	public string Label => shape.Label;
+	public string Label => character.Label;
 
-	public bool IsSet => model.Shape == shape && model.MaterialSet == materialSet;
+	public bool IsSet => model.Shape.Label == character.Shape && model.MaterialSetAndVariant.MaterialSet.Label == character.MaterialSet;
 
 	public void Toggle() {
-		model.Shape = shape;
-		model.MaterialSet = materialSet;
+		model.ShapeName = character.Shape;
+		model.SetMaterialSetAndVariantByName(character.MaterialSet, null);
 	}
 }
 
 public class CharactersMenuLevel : IMenuLevel {
 	private readonly List<IMenuItem> items;
 
-	public CharactersMenuLevel(FigureDefinition definition, FigureModel model) {
-		var materialSetDict = definition.MaterialSetOptions.ToDictionary(item => item.Label, item => item);
-
+	public CharactersMenuLevel(List<Character> characters, FigureDefinition definition, FigureModel model) {
 		var shapesMenuLevel = new ShapesMenuLevel(definition, model);
 		var materialsMenuLevel = new MaterialsMenuLevel(definition, model);
 		var advancedMenuLevel = new StaticMenuLevel(
@@ -41,10 +36,8 @@ public class CharactersMenuLevel : IMenuLevel {
 		items = new List<IMenuItem>{};
 		items.Add(new SubLevelMenuItem("Mix & Match", advancedMenuLevel));
 		items.Add(new SubLevelMenuItem("Character Details", detailsMenuLevel));
-		foreach (var shape in definition.ShapeOptions) {
-			if (materialSetDict.TryGetValue(shape.Label, out var materialSet)) {
-				items.Add(new CharacterMenuItem(model, shape, materialSet));
-			}
+		foreach (var character in characters) {
+			items.Add(new CharacterMenuItem(model, character));
 		}
 	}
 
