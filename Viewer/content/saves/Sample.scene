@@ -9,6 +9,9 @@
     "name": "Ruins A",
     "rotation": -2.31241465
   },
+  "floor": {
+    "visible": true
+  },
   "actor": {
     "main": {
       "name": "genesis-3-female",

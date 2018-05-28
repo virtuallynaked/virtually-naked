@@ -32,7 +32,8 @@ class Scene : IDisposable {
 		var toneMappingMenuLevel = new ToneMappingMenuLevel(toneMappingSettings);
 		var renderSettingsMenuLevel = new StaticMenuLevel(
 			new SubLevelMenuItem("Lighting Enviroment", iblMenu),
-			new SubLevelMenuItem("Tone Mapping", toneMappingMenuLevel)
+			new SubLevelMenuItem("Tone Mapping", toneMappingMenuLevel),
+			new FloorVisibilityToggleMenuItem(floor)
 		);
 		var scenePersistenceMenuLevel = ScenePersistenceMenuLevel.Make(this);
 		var appMenuLevel = new StaticMenuLevel(
@@ -102,12 +103,16 @@ class Scene : IDisposable {
 		[JsonProperty("lighting-environment")]
 		public ImageBasedLightingEnvironment.Recipe lightingEnvironment;
 
+		[JsonProperty("floor")]
+		public PlayspaceFloor.Recipe floor;
+
 		[JsonProperty("actor")]
 		public Actor.Recipe actor;
 		
 		public void Merge(Scene scene) {
 			toneMapping?.Merge(scene.toneMappingSettings);
 			lightingEnvironment?.Merge(scene.iblEnvironment);
+			floor?.Merge(scene.floor);
 			actor?.Merge(scene.actor);
 		}
 	}
@@ -116,6 +121,7 @@ class Scene : IDisposable {
 		return new Recipe {
 			toneMapping = toneMappingSettings.Recipize(),
 			lightingEnvironment = iblEnvironment.Recipize(),
+			floor = floor.Recipize(),
 			actor = actor.Recipize()
 		};
 	}

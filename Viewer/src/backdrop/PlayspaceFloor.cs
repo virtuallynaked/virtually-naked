@@ -1,11 +1,13 @@
+using Newtonsoft.Json;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Valve.VR;
 using Device = SharpDX.Direct3D11.Device;
 
-class PlayspaceFloor {
+public class PlayspaceFloor {
 	[StructLayout(LayoutKind.Explicit, Size = 4 * 16)]
 	private struct PlayAreaRect {
 		[FieldOffset(0 * 16)] public Vector3 corner0;
@@ -16,7 +18,7 @@ class PlayspaceFloor {
 
 	private readonly VertexShader vertexShader;
 	private readonly PixelShader pixelShader;
-	
+	public bool IsVisible { get; set; } = true;
 	private ConstantBufferManager<PlayAreaRect> playAreaRectBuffer;
 
 	public PlayspaceFloor(Device device, ShaderCache shaderCache) {
@@ -54,10 +56,30 @@ class PlayspaceFloor {
 	}
 
 	public void Render(DeviceContext context, bool depthOnly) {
+		if (!IsVisible) {
+			return;
+		}
+
 		context.VertexShader.Set(vertexShader);
 		context.VertexShader.SetConstantBuffer(1, playAreaRectBuffer.Buffer);
 		context.PixelShader.Set(depthOnly ? null : pixelShader);
 		context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 		context.Draw(4, 0);
+	}
+
+	public class Recipe {
+		[JsonProperty("visible", DefaultValueHandling = DefaultValueHandling.Populate)]
+		[DefaultValue(true)]
+		public bool isVisible;
+
+		public void Merge(PlayspaceFloor floor) {
+			floor.IsVisible = isVisible;
+		}
+	}
+
+	public Recipe Recipize() {
+		return new Recipe {
+			isVisible = IsVisible
+		};
 	}
 }
