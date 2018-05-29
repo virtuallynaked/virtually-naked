@@ -3,8 +3,11 @@ using System.Linq;
 
 public class ImportSettings {
 	public static ImportSettings MakeReleaseSettings() {
-		var ReleaseCharacters = new HashSet<string> { "Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea" };
-		
+		var ReleaseCharacterShapes = new HashSet<string> {
+			"Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea",
+			"Lien", "Soraya", "Phoenix", "Halina" };
+		var ReleaseCharactersSkins = new HashSet<string> { "Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea" };
+
 		return new ImportSettings {
 			CompressTextures = true,
 
@@ -23,8 +26,8 @@ public class ImportSettings {
 
 			Figures = new Dictionary<string, FigureImportSettings> {
 				["genesis-3-female"] = new FigureImportSettings {
-					Shapes = ReleaseCharacters,
-					MaterialSets = ReleaseCharacters
+					Shapes = ReleaseCharacterShapes,
+					MaterialSets = ReleaseCharactersSkins
 				},
 
 				["liv-hair"] = FigureImportSettings.All,

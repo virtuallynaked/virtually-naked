@@ -10,26 +10,6 @@
 		}
 	},
 	{
-		"name": "Lien",
-		"morphs": {
-			"CTRL-FWLien": 1.0,
-			"genesis-3-female-hd-correction": 1.0
-		},
-		"normals": {
-			"generate-from-hd": true
-		}
-	},
-	{
-		"name": "Phoenix",
-		"morphs": {
-			"CTRL-FWPhoenix": 1.0,
-			"genesis-3-female-hd-correction": 1.0
-		},
-		"normals": {
-			"generate-from-hd": true
-		}
-	},
-	{
 		"name": "Adaline",
 		"morphs": {
 			"CTRL-FWSAAdaline": 1.0,
@@ -83,16 +63,6 @@
 		"name": "Gillian",
 		"morphs": {
 			"CTRL-FWSAGillian": 1.0,
-			"genesis-3-female-hd-correction": 1.0
-		},
-		"normals": {
-			"generate-from-hd": true
-		}
-	},
-	{
-		"name": "Halina",
-		"morphs": {
-			"CTRL-FWSAHalina": 1.0,
 			"genesis-3-female-hd-correction": 1.0
 		},
 		"normals": {
@@ -323,16 +293,6 @@
 		"name": "Shiloh",
 		"morphs": {
 			"CTRL-FWSAShiloh": 1.0,
-			"genesis-3-female-hd-correction": 1.0
-		},
-		"normals": {
-			"generate-from-hd": true
-		}
-	},
-	{
-		"name": "Soraya",
-		"morphs": {
-			"CTRL-FSSSoraya": 1.0,
 			"genesis-3-female-hd-correction": 1.0
 		},
 		"normals": {

@@ -1,0 +1,12 @@
+[
+	{
+		"name": "Halina",
+		"morphs": {
+			"CTRL-FWSAHalina": 1.0,
+			"genesis-3-female-hd-correction": 1.0
+		},
+		"normals": {
+			"generate-from-hd": true
+		}
+	}
+]
