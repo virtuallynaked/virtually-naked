@@ -61,17 +61,11 @@ public class ImporterMain : IDisposable {
 				new UiImporter(destDir).Run();
 				new EnvironmentCubeGenerator().Run(settings, destDir);
 			}
-		
-			foreach (var characterConf in contentPackConf.Characters) {
-				CharacterImporter.Import(pathManager, characterConf.File, destDir);
-			}
-
-			foreach (var outfitConf in contentPackConf.Outfits) {
-				OutfitImporter.Import(pathManager, outfitConf.File, destDir);
-			}
 
 			var texturesDir = destDir.Subdirectory("textures").Subdirectory(contentPackConf.Name);
 			var textureProcessor = new TextureProcessor(device, shaderCache, texturesDir, contentPackConf.Name, settings.CompressTextures);
+
+			bool shouldImportAnything = false;
 
 			foreach (var figureConf in contentPackConf.Figures) {
 				string figureName = figureConf.Name;
@@ -88,6 +82,7 @@ public class ImporterMain : IDisposable {
 				var figureDestDir = destDir.Subdirectory("figures").Subdirectory(figureName);
 
 				if (figureConf.IsPrimary) {
+					shouldImportAnything = true;
 					figureDumper.DumpFigure(shapeImportConfigurations, figureDestDir);
 				}
 				
@@ -96,10 +91,12 @@ public class ImporterMain : IDisposable {
 						continue;
 					}
 
+					shouldImportAnything = true;
 					figureDumper.DumpMaterialSet(settings, textureProcessor, figureDestDir, materialSetConf);
 				}
 
 				if (figureConf.IsPrimary) {
+					shouldImportAnything = true;
 					figureDumper.DumpBaseShape(figureDestDir);
 				}
 
@@ -108,8 +105,18 @@ public class ImporterMain : IDisposable {
 						continue;
 					}
 
+					shouldImportAnything = true;
 					figureDumper.DumpShape(textureProcessor, figureDestDir, shapeConf);
+				}
+			}
 
+			if (shouldImportAnything) {
+				foreach (var characterConf in contentPackConf.Characters) {
+					CharacterImporter.Import(pathManager, characterConf.File, destDir);
+				}
+
+				foreach (var outfitConf in contentPackConf.Outfits) {
+					OutfitImporter.Import(pathManager, outfitConf.File, destDir);
 				}
 			}
 
