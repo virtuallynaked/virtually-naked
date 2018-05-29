@@ -4,9 +4,9 @@ using System.Linq;
 public class ImportSettings {
 	public static ImportSettings MakeReleaseSettings() {
 		var ReleaseCharacterShapes = new HashSet<string> {
-			"Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea",
+			"Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea", "Aiko", "Karen",
 			"Lien", "Soraya", "Phoenix", "Halina" };
-		var ReleaseCharactersSkins = new HashSet<string> { "Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea" };
+		var ReleaseCharactersSkins = new HashSet<string> { "Mei Lin", "Rune", "Eva", "Monique", "Victoria", "Kalea", "Aiko", "Karen" };
 
 		return new ImportSettings {
 			CompressTextures = true,
