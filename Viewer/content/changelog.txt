@@ -1,7 +1,11 @@
 [0.9]
-	Major: Enhanced character "Mix & Match": Skin details (like freckles) and shape details (like muscles) are kept
-	       separate so mixing the skin of a muscular character (like "Rune") with the shape of a another character now gives
-	       better results.
+	Major: Added new characters Aiko and Karen.
+	Major: Added new shape-only characters Lien, Soraya, Phoenix and Halina. These characters reuse the skins from the Mei
+	       Lin, Rune, Monique and Kalea characters respectively. To keep things simple, I've hidden the later characters from
+		   the "Characters" menu, but they they can still be found under the the "Mix & Match" menu.
+	Major: Enhanced character "Mix & Match": Skin details like freckles and shape details like muscles are kept separate so
+	       mixing the skin of a muscular character (like "Rune") with the shape of a another character now produces better
+		   results.
 	Minor: Added option to show/hide floor under "Render Settings"
 	Fixed: Screenshots taken through SteamVR were blank in one or both eyes.
 
