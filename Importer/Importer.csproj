@@ -9,7 +9,7 @@
   <Import Project="..\CommonAssemblyAttributes.targets" />
   <Import Project="..\RunSettings.targets" />
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="SharpDX.Direct2D1" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
